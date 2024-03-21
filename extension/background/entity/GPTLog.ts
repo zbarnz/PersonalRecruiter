@@ -9,8 +9,6 @@ import {
 } from "typeorm";
 import { Listing } from "./Listing";
 import { User } from "./User";
-import { type } from "os";
-
 @Entity()
 export class GPTLog {
   @PrimaryGeneratedColumn()

@@ -1,0 +1,20 @@
+[
+  {
+    "id": 1,
+    "priority": 1,
+    "action": {
+      "type": "modifyHeaders",
+      "requestHeaders": [
+        {
+          "header": "Referer",
+          "operation": "set",
+          "value": "http://www.indeed.com"
+        }
+      ]
+    },
+    "condition": {
+      "urlFilter": "|http://*/*",
+      "resourceTypes": ["main_frame"]
+    }
+  }
+]

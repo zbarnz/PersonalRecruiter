@@ -1,33 +1,67 @@
 // Assume that GPTLog is in the same directory level as AutoApply
-import { GPTLog } from "../../src/entity/GPTLog";
-import { getConnection } from "../../src/data-source";
+import { GPTLog } from "../entity/GPTLog";
+import { getConnection } from "../data-source";
 
-export async function createGPTLog(gptLog: GPTLog) {
-  const connection = await getConnection();
-  return await connection.manager.save(gptLog);
-}
+import { Request, Response } from "express";
 
-export async function getGPTLog(gptLogId: GPTLog["id"]) {
-  const connection = await getConnection();
-  return await connection.manager.findOne(GPTLog, {
-    where: { id: gptLogId },
-  });
-}
-
-export async function markGPTLogAsFailed(gptLogId: number): Promise<GPTLog> {
-  const connection = await getConnection();
-
-  const gptLog = await connection.manager.findOne(GPTLog, { where: { id: gptLogId } });
-
-  if (!gptLog) {
-    throw new Error(`GPTLog with ID ${gptLogId} not found.`);
+export const createGPTLog = async (req: Request, res: Response) => {
+  try {
+    const gptLog = req.body; // Assuming GPTLog comes from the request body
+    const connection = await getConnection();
+    const savedLog = await connection.manager.save(gptLog);
+    res.json(savedLog);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
   }
+};
 
-  // Mark the GPTLog as failed
-  gptLog.failedFlag = true;
+export const getGPTLog = async (req: Request, res: Response) => {
+  try {
+    const gptLogId = req.params._id; // Assuming ID comes from URL parameters
+    const connection = await getConnection();
+    const gptLog = await connection.manager.findOne(GPTLog, {
+      where: { id: Number(gptLogId) },
+    });
 
-  // Save the updated GPTLog back to the database
-  await connection.manager.save(gptLog);
+    if (!gptLog) {
+      return res.status(404).json({ error: "GPTLog not found." });
+    }
 
-  return gptLog; // This will return the updated GPTLog entity
-}
+    res.json(gptLog);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
+};
+
+export const setGPTLogAsFailed = async (req: Request, res: Response) => {
+  try {
+    const gptLogId = req.params._id; // Assuming ID comes from URL parameters
+    const connection = await getConnection();
+
+    let gptLog = await connection.manager.findOne(GPTLog, {
+      where: { id: Number(gptLogId) },
+    });
+
+    if (!gptLog) {
+      return res
+        .status(404)
+        .json({ error: `GPTLog with ID ${gptLogId} not found.` });
+    }
+
+    gptLog.failedFlag = true;
+    gptLog = await connection.manager.save(gptLog);
+
+    res.json(gptLog);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
+};
+
+const gptLogController = { setGPTLogAsFailed, getGPTLog, createGPTLog };
+export default gptLogController;

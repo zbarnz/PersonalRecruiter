@@ -2,6 +2,8 @@ import { User } from "../../background/entity/User";
 import { AutoApply } from "../../background/entity/AutoApply";
 
 import {
+  waitForNavigationComplete,
+  waitForURL,
   waitForElement,
   shortWait,
   tinyWait,
@@ -67,24 +69,40 @@ async function main(user: User, summarizeDescription: boolean) {
       listing.title + `\n` + "listingID: " + listing.jobListingId
     );
 
-    const url = `https://www.indeed.com/viewjob?jk=${listing.jobListingId}`;
+    const message: NavigateMessage = {
+      action: "navigate",
+      url: `https://www.indeed.com/viewjob?jk=${listing.jobListingId}`,
+    };
 
-    await page.goto(url);
+    chrome.runtime.sendMessage(message);
+
+    //what from reply from background task
+    await waitForNavigationComplete();
 
     const signInButtonSelector = 'div[data-gnav-element-name="SignIn"] a';
     const navSelector = ".gnav";
 
     await waitForElement(navSelector);
-    await shortWait(page);
+    await shortWait();
 
-    const signInButton = await page.$(signInButtonSelector);
+    const signInButton = document.querySelector(signInButtonSelector);
 
     if (signInButton) {
-      const cookies = await indeedSignInManual(page);
-      //await context.addCookies(cookies);
-      await shortWait(page);
-      await page.goto(url);
-      await shortWait(page);
+      const message: NavigateMessage = {
+        action: "navigate",
+        url: `https://secure.indeed.com/auth`,
+      };
+
+      chrome.runtime.sendMessage(message);
+
+      //wait from reply from background task
+      await waitForNavigationComplete();
+
+      //wait for user sign in
+      await waitForURL("https://secure.indeed.com/settings/account");
+      console.log("User Signed in");
+
+      await shortWait();
     }
 
     const isCloudflare = await cloudflareCheck(page);

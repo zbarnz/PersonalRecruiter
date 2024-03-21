@@ -1,158 +1,167 @@
-import { Listing } from "../../src/entity/Listing";
-import { getConnection } from "../../src/data-source";
+import { Listing } from "../entity/Listing";
+import { getConnection } from "../data-source";
 
-import { User } from "../../src/entity/User";
-import { AutoApply } from "../../src/entity/AutoApply";
+import { User } from "../entity/User";
+import { AutoApply } from "../entity/AutoApply";
 
-//import { utcToUnix } from "../../../src/utils/date";
+import { Request, Response } from "express";
 
 const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
 
 /**
- * basic create function. NO UPDATES ALLOWED
- * @param {Listing}  listing - A valid listing object
- * @returns {Promise<Listing[]>} created listing
+ * Controller to create a listing.
+ * @param {Request} req - Express request object containing listing data in the body.
+ * @param {Response} res - Express response object for sending the response.
  */
-export async function createListing(listing: Listing) {
-  const connection = await getConnection();
-  return await connection.manager.save(listing);
-}
+export const createListing = async (req: Request, res: Response) => {
+  try {
+    const listing = req.body;
+    const connection = await getConnection();
+    const createdListing = await connection.manager.save(listing);
+    res.json(createdListing);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 /**
- * basic get function.
- * @param {Listing["jobListingId"]}  jobListingId - A job listing job board id
- * @param {Listing["jobBoardId"]}  jobBoardId - A job Board's id
- * @returns {Promise<Listing[]>} Found listing
+ * Controller to get a listing by jobListingId and jobBoardId.
+ * @param {Request} req - Express request object, jobListingId and jobBoardId should be in the request parameters.
+ * @param {Response} res - Express response object for sending the response.
  */
-export async function getListing(
-  jobListingId: Listing["jobListingId"],
-  jobBoardId: Listing["jobBoardId"]
-): Promise<Listing> {
-  const connection = await getConnection();
-
-  const listing: Listing = await connection.manager //findOne was producing inefficient queries
-    .createQueryBuilder(Listing, "listing")
-    .select("listing.jobListingId")
-    .where("listing.jobListingId = :jobListingId", { jobListingId })
-    .andWhere("listing.jobBoardId = :jobBoardId", { jobBoardId })
-    .getOne();
-
-  return listing;
-}
-
-export async function getListingById(id: Listing["id"]) {
-  const connection = await getConnection();
-
-  const listing: Listing = await connection.manager.findOne(Listing, {
-    where: { id },
-  });
-
-  return listing;
-}
+export const getListing = async (req: Request, res: Response) => {
+  try {
+    const { jobListingId, jobBoardId } = req.params;
+    const connection = await getConnection();
+    const listing = await connection.manager
+      .createQueryBuilder(Listing, "listing")
+      .where("listing.jobListingId = :jobListingId", { jobListingId })
+      .andWhere("listing.jobBoardId = :jobBoardId", { jobBoardId })
+      .getOne();
+    if (!listing) {
+      return res.status(404).json({ error: "Listing not found." });
+    }
+    res.json(listing);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
 /**
- * This function finds listings in the database that have not been applied to b
- * @param {User} user - The user applying
- * @param {number}  minSalary - A Listing's minimum maxSalary value
- * @param {boolean} remote - find only remote jobs?
- * @param {string[]} [skills] - List of user's skills
- * @param {boolean} [matchSkills] - Only find jobs that are a skills match
- * @param {number} requiredMatches number of skills Listing must contain
- * @returns {Promise<Listing[]>} Unapplied listings that matches user's preferences
+ * Controller to get a listing by ID.
+ * @param {Request} req - Express request object, id should be in the request parameters.
+ * @param {Response} res - Express response object for sending the response.
  */
-export async function findUnappliedListing(
-  user: User,
-  minSalary?: number,
-  remote?: boolean,
-  skills?: string[],
-  matchSkills?: boolean,
-  requiredMatches?: number,
-  limit?: number
-): Promise<Listing[]> {
-  const connection = await getConnection();
-  const userId = user.id;
-
-  if (!requiredMatches) {
-    requiredMatches = Math.ceil(skills.length * 0.1); //listing must match 10% of skills
-  }
-
-  let subQueries = skills
-    .map(
-      (skill) =>
-        `(CASE WHEN lower(listing.description) ILIKE '%${skill}%' THEN 1 ELSE 0 END)`
-    )
-    .join(" + ");
-
-  // This subquery calculates the number of skills matches for each listing
-  const skillMatchQuery = `(${subQueries})`;
-
-  let query = connection.manager
-    .createQueryBuilder(Listing, "listing")
-    .leftJoin(
-      AutoApply,
-      "autoApply",
-      "autoApply.listing = listing.id AND autoApply.user = :userId",
-      { userId }
-    )
-    .addSelect(skillMatchQuery, "matchCount")
-    .where("listing.maxSalary >= :minSalary", { minSalary }) //max sure the listing max salary is higher than the users min acceptable salary
-    .andWhere("autoApply.id IS NULL")
-    .andWhere("listing.directApplyFlag")
-    .andWhere("listing.closedFlag = false")
-    .orderBy("listing.datePosted", "DESC")
-    .take(limit || 1);
-
-  if (remote) {
-    query = query.andWhere("listing.remoteFlag = TRUE");
-  }
-
-  if (matchSkills) {
-    query = query.andWhere(`${skillMatchQuery} >= :requiredMatches`, {
-      requiredMatches,
+export const getListingById = async (req: Request, res: Response) => {
+  try {
+    const id = req.params._id;
+    const connection = await getConnection();
+    const listing = await connection.manager.findOne(Listing, {
+      where: { id: Number(id) },
     });
+    if (!listing) {
+      return res.status(404).json({ error: "Listing not found." });
+    }
+    res.json(listing);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
+};
 
-  let listings = await query.getRawAndEntities();
+/**
+ * Finds listings in the database that have not been applied to by the user.
+ * @param {Request} req - Express request object containing filter criteria.
+ * @param {Response} res - Express response object for sending the found listings.
+ */
+export const getUnappliedListing = async (req: Request, res: Response) => {
+  try {
+    const {
+      user,
+      minSalary,
+      remote,
+      skills,
+      matchSkills,
+      requiredMatches,
+      limit,
+    } = req.body;
+    const connection = await getConnection();
 
-  // Calculate and add percentage match for each listing
-  listings.entities = listings.entities.map((entity, index) => {
-    const raw = listings.raw[index];
-    entity["numberMatch"] = raw.matchCount + "/" + skills.length;
-    return entity;
-  });
+    let calculatedRequiredMatches =
+      requiredMatches || Math.ceil((skills?.length || 0) * 0.1);
+    let subQueries = (skills || [])
+      .map(
+        (skill) =>
+          `(CASE WHEN lower(listing.description) ILIKE '%${skill.toLowerCase()}%' THEN 1 ELSE 0 END)`
+      )
+      .join(" + ");
+    const skillMatchQuery = `(${subQueries})`;
 
-  return listings.entities;
-}
+    let query = connection.manager
+      .createQueryBuilder(Listing, "listing")
+      .leftJoin(
+        AutoApply,
+        "autoApply",
+        "autoApply.listingId = listing.id AND autoApply.userId = :userId",
+        { userId: user.id }
+      )
+      .addSelect(skillMatchQuery, "matchCount")
+      .where("listing.maxSalary >= :minSalary", { minSalary })
+      .andWhere("autoApply.id IS NULL")
+      .andWhere("listing.directApplyFlag = TRUE")
+      .andWhere("listing.closedFlag = FALSE")
+      .orderBy("listing.datePosted", "DESC")
+      .take(limit || 10);
 
-async function upsertMonthOld(listing: Listing) {
-  const connection = await getConnection();
+    if (remote) {
+      query = query.andWhere("listing.remoteFlag = TRUE");
+    }
 
-  if (listing.id && listing.datePosted < THIRTY_DAYS_IN_MILLISECONDS) {
-    return null;
+    if (matchSkills) {
+      query = query.andWhere(
+        `${skillMatchQuery} >= :calculatedRequiredMatches`,
+        { calculatedRequiredMatches }
+      );
+    }
+
+    const listings = await query.getRawMany();
+
+    res.json(listings);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  return connection.manager.upsert(Listing, listing, Array(listing.id));
-}
+};
 
 /**
  * Update the closed_flag of a listing to true.
- * @param {number} listingId - ID of the listing to be closed.
- * @returns {Promise<Listing>} Updated listing with closedFlag set to true.
- * @throws {Error} If the listing is not found.
+ * @param {Request} req - Express request object containing the ID of the listing to be closed.
+ * @param {Response} res - Express response object for sending the updated listing.
  */
-export async function closeListing(listingId: number): Promise<Listing> {
-  const connection = await getConnection();
+export async function closeListing(req: Request, res: Response) {
+  try {
+    const listingId = req.params._id;
+    const connection = await getConnection();
 
-  const listingToUpdate = await connection.manager.findOne(Listing, {
-    where: {
-      id: listingId,
-    },
-  });
+    const listingToUpdate = await connection.manager.findOne(Listing, {
+      where: { id: Number(listingId) },
+    });
 
-  if (!listingToUpdate) {
-    throw new Error(`Listing with ID ${listingId} not found.`);
+    if (!listingToUpdate) {
+      throw new Error(`Listing with ID ${listingId} not found.`);
+    }
+
+    listingToUpdate.closedFlag = true;
+    const updatedListing = await connection.manager.save(listingToUpdate);
+    res.json(updatedListing);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
-
-  listingToUpdate.closedFlag = true;
-  return await connection.manager.save(Listing, listingToUpdate);
 }
+
+const listingController = {
+  closeListing,
+  createListing,
+  getUnappliedListing,
+  getListing,
+  getListingById,
+};
+export default listingController;

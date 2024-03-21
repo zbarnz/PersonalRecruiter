@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Job Application Assistant",
+  "name": "Personal Recruiter AI Apply",
   "version": "1.0",
   "description": "Automatically applies to jobs on popular job application websites.",
   "permissions": [
@@ -8,11 +8,15 @@
     "storage",
     "tabs",
     "scripting",
-    "downloads"
+    "downloads",
+    "notifications",
+    "declarativeNetRequest",
+    "declarativeNetRequestFeedback"
   ],
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://www.indeed.com/*",
+    "https://secure.indeed.com/*",
     "https://www.monster.com/*",
     "https://www.glassdoor.com/*",
     "https://www.ziprecruiter.com/*",
@@ -21,21 +25,23 @@
     "https://www.dice.com/*"
   ],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "./popup/popup.html",
     "default_icon": {
-      "16": "images/icon16.png",
-      "48": "images/icon48.png",
-      "128": "images/icon128.png"
+      "16": "./src/images/icon16.png",
+      "48": "./src/images/icon48.png",
+      "128": "./src/images/icon128.png"
     }
   },
   "background": {
-    "service_worker": "background.js"
+    "service_worker": "./build/background/index.js",
+    "type": "module"
   },
-  "content_scripts": [
+  "web_accessible_resources": [
     {
       "matches": [
         "https://www.linkedin.com/*",
         "https://www.indeed.com/*",
+        "https://secure.indeed.com/*",
         "https://www.monster.com/*",
         "https://www.glassdoor.com/*",
         "https://www.ziprecruiter.com/*",
@@ -43,13 +49,12 @@
         "https://www.careerbuilder.com/*",
         "https://www.dice.com/*"
       ],
-      "js": ["contentScript.js"]
+      "resources": ["./build/*"]
     }
   ],
   "icons": {
-    "16": "images/icon16.png",
-    "48": "images/icon48.png",
-    "128": "images/icon128.png"
-  },
-  "options_page": "options.html"
+    "16": "./src/images/icon16.png",
+    "48": "./src/images/icon48.png",
+    "128": "./src/images/icon128.png"
+  }
 }

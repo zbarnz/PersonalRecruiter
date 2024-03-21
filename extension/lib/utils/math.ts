@@ -12,7 +12,7 @@ export function calculateYearlySalary(
     case "month": //indeed
       return amount * 12;
     case "hourly": //dice
-    case "hour":  //indeed
+    case "hour": //indeed
       // Assuming a 40-hour work week and 52 weeks in a year
       return amount * 40 * 52;
     default:

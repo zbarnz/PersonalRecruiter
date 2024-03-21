@@ -1,5 +1,5 @@
-import fs from "fs/promises";
-import html_to_pdf from "html-pdf-node";
+import * as fs from "fs/promises";
+import * as html_to_pdf from "html-pdf-node";
 import { File } from "html-pdf-node";
 import { PDFDocument } from "pdf-lib";
 

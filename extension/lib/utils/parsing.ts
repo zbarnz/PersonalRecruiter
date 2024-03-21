@@ -23,7 +23,7 @@ function isIqURL(url: string): boolean {
   return pattern.test(url);
 }
 
-function isIndeedApplyUrl(url) {
+function isIndeedApplyUrl(url: string) {
   return (
     url.startsWith("https://m5.apply.indeed.com") ||
     url.startsWith("https://smartapply.indeed.com")

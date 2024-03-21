@@ -1,12 +1,23 @@
+import { Listing } from "../../../background/entity/Listing";
+import { User } from "../../../background/entity/User";
+
 import { tinyWait } from "../../../lib/utils/waits";
 
-async function handleReviewPage(aiStructuredResume, jobDescription, listing, user) {
+
+async function handleReviewPage(
+  aiStructuredResume: string,
+  jobDescription: string,
+  listing: Listing,
+  user: User
+) {
   try {
     // Assuming generateCoverLetter and handleDocumentsPage are functions you will adapt or handle differently
     // since content scripts can't directly perform file operations or complex page manipulations like in Playwright
 
     // Check if the "Add Supporting documents" link exists
-    const addDocumentsLink = document.querySelector('a[aria-label="Add Supporting documents"]');
+    const addDocumentsLink = document.querySelector(
+      'a[aria-label="Add Supporting documents"]'
+    );
     if (addDocumentsLink && addDocumentsLink instanceof HTMLElement) {
       await tinyWait();
 
@@ -28,7 +39,9 @@ async function handleReviewPage(aiStructuredResume, jobDescription, listing, use
       console.log("handled documents page in review page flow");
 
       // Click the continue button if it's now visible and not disabled
-      const continueButton = document.querySelector(".ia-continueButton:not([disabled])");
+      const continueButton = document.querySelector(
+        ".ia-continueButton:not([disabled])"
+      );
       if (continueButton && continueButton instanceof HTMLElement) {
         continueButton.click();
       }
@@ -40,6 +53,3 @@ async function handleReviewPage(aiStructuredResume, jobDescription, listing, use
     console.error("Error in handleReviewPage function:", error);
   }
 }
-
-// Since functions like generateCoverLetter and handleDocumentsPage likely involve server-side processing or background script logic,
-// you'd need to adjust your approach for those, possibly involving messaging between the content script and background script.

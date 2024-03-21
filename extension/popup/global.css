@@ -1,0 +1,139 @@
+/* Ultimate Aesthetics for Popup Design */
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap");
+
+body,
+html {
+  margin: 0;
+  padding: 0;
+  width: 400px; /* Expanded for intricate design */
+  height: 250px; /* Increased height for design elements */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Roboto", sans-serif;
+  background: linear-gradient(135deg, #fceff9 0%, #e9e4f0 100%);
+  overflow: hidden;
+}
+
+.popup-container {
+  width: 95%;
+  height: 95%;
+  padding: 20px;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 25px;
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  position: relative;
+  overflow: hidden;
+}
+
+.popup-container::before {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background-color: #fff;
+  background-repeat: no-repeat;
+  background-size: 50% 50%, 50% 50%;
+  background-position: 0 0, 100% 0, 100% 100%, 0 100%;
+  animation: rotate 5s linear infinite;
+  z-index: 0;
+  background-image: linear-gradient(60deg, #abecd6 50%, transparent 50%),
+    linear-gradient(60deg, transparent 50%, #abecd6 50%),
+    linear-gradient(60deg, #abecd6 50%, transparent 50%),
+    linear-gradient(60deg, transparent 50%, #abecd6 50%);
+}
+
+@keyframes rotate {
+  100% {
+    transform: rotate(1turn);
+  }
+}
+
+h3 {
+  font-size: 24px;
+  color: #6c5ce7;
+  position: relative;
+  z-index: 1;
+}
+
+input[type="text"] {
+  width: 80%;
+  padding: 15px;
+  margin: 20px 0;
+  border-radius: 30px;
+  border: 2px solid #6c5ce7;
+  background-color: #e3e4e6;
+  transition: all 0.3s ease;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+}
+
+input[type="text"]:focus {
+  background-color: #fff;
+  box-shadow: 0 0 15px #6c5ce7;
+}
+
+.input-error {
+  border-color: #ff6b6b; /* Red border color */
+  box-shadow: 0 0 5px #ff6b6b; /* Red box shadow */
+  animation: bounce 0.5s ease-in-out; /* Bounce animation */
+}
+
+@keyframes bounce {
+  20%,
+  50%,
+  80% {
+    transform: translateY(-10px);
+  }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.activate-button {
+  padding: 12px 28px;
+  font-size: 18px;
+  color: white;
+  background-image: linear-gradient(45deg, #8a2387, #e94057, #f27121);
+  border: none;
+  border-radius: 30px;
+  cursor: pointer;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s ease;
+  position: relative;
+  z-index: 1;
+}
+
+.activate-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+}
+
+.activate-button:active {
+  transform: scale(0.99);
+}
+
+/* Subtle floating animation for the button */
+@keyframes float {
+  0% {
+    transform: translatey(0px);
+  }
+  50% {
+    transform: translatey(-10px);
+  }
+  100% {
+    transform: translatey(0px);
+  }
+}
+
+.activate-button {
+  animation: float 6s ease-in-out infinite;
+}

@@ -11,7 +11,7 @@ export async function handleQuestionsPage(answeredQuestions: any) {
   await new Promise((resolve) => setTimeout(resolve, 1000)); // Simplified wait
 
   // Add 'answered' property when it doesn't exist
-  answeredQuestions.forEach((question) => {
+  answeredQuestions.forEach((question: any) => {
     if (typeof question.answered === "undefined") {
       question.answered = false;
     }
@@ -22,7 +22,7 @@ export async function handleQuestionsPage(answeredQuestions: any) {
   }
 }
 
-async function fillQuestion(question) {
+async function fillQuestion(question: any) {
   if (question.answered) {
     console.log(
       "skipping answered question: " + question.viewId || question.name

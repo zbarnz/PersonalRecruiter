@@ -12,7 +12,7 @@ import {
   TiktokenModel,
 } from "tiktoken";
 
-import { markGPTLogAsFailed, createGPTLog } from "../controllers/gPTLog";
+import { setGPTLogAsFailed, createGPTLog } from "../controllers/gPTLog";
 import { createApply } from "../controllers/autoApply";
 
 import OpenAI from "openai";
@@ -39,7 +39,7 @@ export async function GPTText(
   let encoder: Tiktoken;
 
   if (prevLogId) {
-    await markGPTLogAsFailed(prevLogId);
+    await setGPTLogAsFailed(prevLogId);
   }
 
   if (forceModel) {

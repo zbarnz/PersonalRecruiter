@@ -1,7 +1,7 @@
-import { Listing } from "../../entity/Listing.ts";
-import { User } from "../../entity/User.ts";
+import { Listing } from "../../entity/Listing";
+import { User } from "../../entity/User";
 
-import { summarizeDescriptionPrompt } from "../../src/prompts/apply/summarizeDescription.ts";
+import { summarizeDescriptionPrompt } from "../../src/prompts/summarizeDescription";
 import { GPTText } from "../index";
 
 async function summarizeJobDescription(

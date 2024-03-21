@@ -8,11 +8,11 @@ import { User } from "./entity/User";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
-  host: "localhost",
+  host: "postgres",
   port: 5432,
   username: "admin",
   password: "password",
-  database: "hottesttechnologies",
+  database: "autoapply",
   synchronize: true,
   logging: false,
   entities: [Listing, JobBoard, AutoApply, GPTLog, User], //can also import like "src/entity/*.ts"
@@ -23,9 +23,15 @@ export const AppDataSource = new DataSource({
 let connection;
 
 export const getConnection = async (): Promise<DataSource> => {
-  if (!AppDataSource.isInitialized) {
-    connection = await AppDataSource.initialize();
+  try {
+    if (!AppDataSource.isInitialized) {
+      connection = await AppDataSource.initialize();
+      return connection;
+    } else {
+      return AppDataSource;
+    }
+  } catch (error) {
+    console.error("Error initializing the database connection:", error);
+    throw error; // Rethrow or handle as appropriate for your application
   }
-
-  return connection;
 };
