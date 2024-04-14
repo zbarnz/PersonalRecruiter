@@ -16,6 +16,8 @@
   "host_permissions": [
     "https://www.linkedin.com/*",
     "https://www.indeed.com/*",
+    "https://smartapply.indeed.com/*",
+    "https://m5.apply.indeed.com/*",
     "https://secure.indeed.com/*",
     "https://www.monster.com/*",
     "https://www.glassdoor.com/*",

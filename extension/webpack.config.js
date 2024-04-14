@@ -8,6 +8,7 @@ module.exports = {
     setup: "./build/content_scripts/indeed/processes/setup.js",
     getInitialData:
       "./build/content_scripts/indeed/processes/getInitialData.js",
+    apply: "./build/content_scripts/indeed/processes/apply.js",
   }, // Entry point of your application
   output: {
     path: path.resolve(__dirname, "webpack_build"), // Output directory

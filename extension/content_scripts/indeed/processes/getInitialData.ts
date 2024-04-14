@@ -1,8 +1,4 @@
-import { ENV } from "../../../env";
-import { apiBaseUrl } from "../../../apiConfig";
 import { waitForElement } from "../../../lib/utils/waits";
-
-const { LISTING_LIMIT_PER_PAGE } = ENV;
 
 chrome.runtime.onMessage.addListener(getInitialData);
 
@@ -19,7 +15,11 @@ async function getInitialData(
     console.log("Starting scraping!");
 
     if (message.getContext) {
-      await waitForElement("#indeedApplyButton", true);
+      Promise.race([
+        //either external link or apply button
+        waitForElement("#indeedApplyButton", true),
+        waitForElement("#applyButtonLinkContainer", true),
+      ]);
     }
 
     //set script run listener

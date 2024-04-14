@@ -356,6 +356,8 @@ async function parseListings(
 
       chrome.storage.local.get(console.log);
 
+      await shortWait();
+
       if (updatedListings.length < RequestedListings) {
         console.log("Sending " + pagesCrawled + "th page crawl request");
         await newListingScrape(msg, sender);
@@ -372,7 +374,7 @@ async function parseListings(
 
 /**********************
  *
- *       Apply
+ *   Parse Job Data
  *
  **********************/
 
@@ -496,10 +498,11 @@ async function parseListingDataListener(
 
         await chrome.storage.local.set({
           "unappliedListings": listings.filter(
-            (item) => item !== "initialData.jobKey"
+            (item) => item !== initialData.jobKey
           ),
         });
 
+        await shortWait();
         await getListingData(msg, sender);
         return;
       }
@@ -517,7 +520,7 @@ async function parseListingDataListener(
       }
       const requiredQualifications =
         initialData.jobInfoWrapperModel.jobInfoModel.jobDescriptionSectionModel
-          .qualificationsSectionModel.content || null;
+          .qualificationsSectionModel?.content || null;
 
       chrome.storage.local.set({
         "currentListingContext": {
@@ -530,9 +533,69 @@ async function parseListingDataListener(
       await shortWait();
 
       console.log("sending start apply messsage...");
-      chrome.tabs.sendMessage(sender.tab?.id, { action: "startApply" });
+
+      //set apply listener and send message
+      chrome.scripting.executeScript(
+        {
+          target: { tabId: sender.tab?.id },
+          files: ["./webpack_build/apply.js"],
+        },
+        () => {
+          if (chrome.runtime.lastError) {
+            console.error(
+              `Error injecting script: ${chrome.runtime.lastError.message}`
+            );
+          } else {
+            chrome.tabs.onUpdated.addListener(applyPageReachedListener);
+            chrome.tabs.sendMessage(sender.tab?.id!, { action: "startApply" }); //tabId is definitly freaking defined
+          }
+        }
+      );
     } else {
       throw new Error("Failed to get tab id");
     }
+  }
+}
+
+/**********************
+ *
+ *       Apply
+ *
+ **********************/
+
+async function applyPageReachedListener(tabId: number, changeInfo: any) {
+  console.log(changeInfo);
+  if (
+    changeInfo.status === "loading" &&
+    (changeInfo.url.includes("m5.apply.indeed") ||
+      changeInfo.url.includes("smartapply.indeed"))
+  ) {
+    console.log("Arrived at apply page");
+    chrome.tabs.onUpdated.removeListener(applyPageReachedListener);
+    chrome.tabs.onUpdated.addListener(startApplyListner);
+  }
+}
+
+async function startApplyListner(tabId: number, changeInfo: any) {
+  console.log(changeInfo);
+  if (changeInfo.status === "complete") {
+    chrome.tabs.onUpdated.removeListener(startApplyListner);
+    console.log("Beginning Apply flow...");
+    chrome.scripting.executeScript(
+      {
+        target: { tabId: tabId },
+        files: ["./webpack_build/apply.js"],
+      },
+      () => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            `Error injecting script: ${chrome.runtime.lastError.message}`
+          );
+        } else {
+          chrome.tabs.onUpdated.addListener(applyPageReachedListener);
+          chrome.tabs.sendMessage(tabId, { action: "beginApplyFlow" }); //tabId is definitly freaking defined
+        }
+      }
+    );
   }
 }
