@@ -5,6 +5,7 @@ import { JobBoard } from "./entity/JobBoard";
 import { AutoApply } from "./entity/AutoApply";
 import { GPTLog } from "./entity/GPTLog";
 import { User } from "./entity/User";
+import { Exception } from "./entity/Exception";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -15,7 +16,7 @@ export const AppDataSource = new DataSource({
   database: "autoapply",
   synchronize: true,
   logging: false,
-  entities: [Listing, JobBoard, AutoApply, GPTLog, User], //can also import like "src/entity/*.ts"
+  entities: [Listing, JobBoard, AutoApply, GPTLog, User, Exception], //can also import like "src/entity/*.ts"
   migrations: [],
   subscribers: [],
 });

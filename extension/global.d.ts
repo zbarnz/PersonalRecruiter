@@ -35,3 +35,6 @@ interface NavigateMessage {
   tabId: number;
   navId: string;
 }
+  interface Window {
+    _initialData: any; // You can replace `any` with a more specific type tailored to your data
+  }

@@ -17,8 +17,10 @@ export const createListing = async (req: Request, res: Response) => {
   try {
     const listing = req.body;
     const connection = await getConnection();
-    const createdListing = await connection.manager.save(listing);
-    res.json(createdListing);
+
+    const listingEntity = connection.manager.create(Listing, listing);
+    const savedListing = await connection.manager.save(listingEntity);
+    res.json(savedListing);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }

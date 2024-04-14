@@ -4,7 +4,10 @@ const webpack = require("webpack");
 module.exports = {
   mode: "development", // or 'production'
   entry: {
+    index: "./build/background/indeed/index.js",
     setup: "./build/content_scripts/indeed/processes/setup.js",
+    getInitialData:
+      "./build/content_scripts/indeed/processes/getInitialData.js",
   }, // Entry point of your application
   output: {
     path: path.resolve(__dirname, "webpack_build"), // Output directory

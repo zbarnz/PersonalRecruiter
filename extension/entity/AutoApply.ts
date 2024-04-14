@@ -4,12 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
-  OneToOne,
-  OneToMany,
 } from "typeorm";
 
-import { Listing } from "./Listing";
 import { User } from "./User";
+import { JobBoard } from "./JobBoard";
 
 @Entity()
 export class AutoApply {
@@ -19,9 +17,12 @@ export class AutoApply {
   @Column({ name: "date_applied" })
   dateApplied: number; //unix
 
-  @ManyToOne((type) => Listing)
-  @JoinColumn({ name: "listing_id" })
-  listing: Listing;
+  @Column({ name: "listing_id" })
+  listingId: string;
+
+  @ManyToOne((type) => User)
+  @JoinColumn({ name: "job_board_id" })
+  jobBoardId: JobBoard;
 
   @ManyToOne((type) => User)
   @JoinColumn({ name: "user_id" })

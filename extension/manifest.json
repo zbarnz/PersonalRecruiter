@@ -22,7 +22,8 @@
     "https://www.ziprecruiter.com/*",
     "https://www.simplyhired.com/*",
     "https://www.careerbuilder.com/*",
-    "https://www.dice.com/*"
+    "https://www.dice.com/*",
+    "http://localhost:4000/api/*"
   ],
   "action": {
     "default_popup": "./popup/popup.html",
@@ -33,23 +34,13 @@
     }
   },
   "background": {
-    "service_worker": "./build/background/index.js",
+    "service_worker": "./webpack_build/index.js",
     "type": "module"
   },
   "web_accessible_resources": [
     {
-      "matches": [
-        "https://www.linkedin.com/*",
-        "https://www.indeed.com/*",
-        "https://secure.indeed.com/*",
-        "https://www.monster.com/*",
-        "https://www.glassdoor.com/*",
-        "https://www.ziprecruiter.com/*",
-        "https://www.simplyhired.com/*",
-        "https://www.careerbuilder.com/*",
-        "https://www.dice.com/*"
-      ],
-      "resources": ["./build/*"]
+      "resources": ["build/content_scripts/indeed/injections/getInitialData.js"],
+      "matches": ["<all_urls>"]
     }
   ],
   "icons": {

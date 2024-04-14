@@ -2,8 +2,8 @@
   "compilerOptions": {
     "outDir": "./build",
     "noImplicitAny": true,
-    "module": "ES2020",
-    "target": "ES6",
+    "module": "ESNEXT",
+    "target": "ESNext",
     "allowJs": true,
     "moduleResolution": "node",
     "sourceMap": true,
@@ -11,7 +11,8 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "strictPropertyInitialization": false,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "esModuleInterop": true
   },
   "include": ["./**/*"],
   "exclude": [

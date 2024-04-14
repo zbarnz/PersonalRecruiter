@@ -69,6 +69,56 @@ export async function waitForElement(
   });
 }
 
+export async function waitForWindowObject(
+  variableName: string,
+  timeout = 30000
+) {
+  return new Promise((resolve, reject) => {
+    // Find the current tab to inject the script into
+    chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+      const currentTabId = tabs[0].id;
+
+      // Ensure currentTabId is defined
+      if (typeof currentTabId === "undefined") {
+        console.error("No active tab identified.");
+        return;
+      }
+
+      chrome.scripting
+        .executeScript({
+          target: { tabId: currentTabId },
+          // Use func to specify the function to execute
+          func: function (variableName) {
+            // Your previously defined script logic here
+            const check = () => {
+              if ((window as any)[variableName] !== undefined) {
+                window.postMessage(
+                  {
+                    type: "VARIABLE_FOUND",
+                    variable: (window as any)[variableName],
+                  },
+                  "*"
+                );
+              } else {
+                setTimeout(check, 200);
+              }
+            };
+            check();
+          },
+          args: [variableName], // Pass variableName as an argument to your function
+        })
+        .then(() => {
+          // Handle the success of the script injection
+          console.log(`Script injected successfully.`);
+        })
+        .catch((error) => {
+          // Handle any errors that occur during script injection
+          console.error(`Error injecting script: ${error}`);
+        });
+    });
+  });
+}
+
 export async function waitForNavigationComplete(
   timeout: number = 30000
 ): Promise<void> {

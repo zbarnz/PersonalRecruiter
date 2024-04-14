@@ -10,27 +10,24 @@ import { User } from "./User";
 import { JobBoard } from "./JobBoard";
 
 @Entity()
-export class AutoApply {
+export class Exception {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "date_applied" })
-  dateApplied: number; //unix
+  @ManyToOne((type) => JobBoard)
+  @JoinColumn({ name: "job_board_id" })
+  jobBoardId: JobBoard;
 
   @Column({ name: "listing_id" })
   listingId: string;
 
-  @ManyToOne((type) => User)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: JobBoard;
+  @Column({ name: "date_updated" })
+  dateUpdated: number; //unix
+
+  @Column({ name: "reason" })
+  reason: string;
 
   @ManyToOne((type) => User)
   @JoinColumn({ name: "user_id" })
   userId: User;
-
-  @Column({ name: "failed_flag", default: false })
-  failedFlag: boolean;
-
-  @Column({ name: "failed_reason", nullable: true })
-  failedReason: string | null;
 }

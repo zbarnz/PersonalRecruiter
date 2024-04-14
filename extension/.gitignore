@@ -12,4 +12,4 @@ package-lock.json
 
 # builds
 build/
-webpack-build/
+webpack_build/

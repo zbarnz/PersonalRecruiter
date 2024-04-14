@@ -58,6 +58,7 @@ async function newTabListener(
   }
   // Optionally send a response
   sendResponse({ status: "Received" });
+  return true;
 }
 
 async function checkSignedInListener(
@@ -90,6 +91,7 @@ async function checkSignedInListener(
   if (message.message == "checkSignedIn") {
     if (isSignedIn) {
       console.log("Already signed in");
+      chrome.runtime.sendMessage({ action: "newListingScrape" });
     } else {
       await signIn(tabId).catch(console.error);
     }
@@ -97,14 +99,14 @@ async function checkSignedInListener(
   if (message.message == "checkSignedInFinal") {
     if (isSignedIn) {
       console.log("Succesfully signed in");
-      window.location.href = "www.indeed.com";
+      chrome.runtime.onMessage.removeListener(checkSignedInListener);
+      chrome.runtime.sendMessage({ action: "newListingScrape" });
     } else {
       console.error("User still not signed in");
       chrome.runtime.onMessage.removeListener(checkSignedInListener);
     }
   }
 
-  // Optionally send a response
   sendResponse({ status: "Received" });
 }
 

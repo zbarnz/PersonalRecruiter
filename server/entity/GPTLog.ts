@@ -43,9 +43,8 @@ export class GPTLog {
   @Column({ name: "created_at", nullable: true })
   createdAt: number | null;
 
-  @ManyToOne((type) => Listing, { nullable: true })
-  @JoinColumn({ name: "listing_id" })
-  listingId: number;
+  @Column({ name: "listing_id" })
+  listingId: string;
 
   @ManyToOne((type) => User)
   @JoinColumn({ name: "user_id" })

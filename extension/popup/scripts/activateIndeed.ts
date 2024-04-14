@@ -1,11 +1,9 @@
-import { LISTING_LIMIT_PER_PAGE } from "../../env.json";
-
 const button = document.getElementById("activateButton") as HTMLElement;
 const jobQueryInput = document.getElementById(
   "searchQueryInput"
 ) as HTMLInputElement;
 
-const limit = LISTING_LIMIT_PER_PAGE
+const limit = 50;
 
 //unset error
 jobQueryInput.addEventListener("click", () => {
@@ -13,7 +11,7 @@ jobQueryInput.addEventListener("click", () => {
   jobQueryInput.style.boxShadow = "0 3px 6px rgba(0, 0, 0, 0.1)";
 });
 
-button.addEventListener("click", () => {
+button.addEventListener("click", async () => {
   if (!jobQueryInput.value) {
     // Apply red border and box shadow directly
     jobQueryInput.style.borderColor = "#ff6b6b";
@@ -37,9 +35,12 @@ button.addEventListener("click", () => {
     return;
   }
 
-  // Send a message to the background script
-  chrome.runtime.sendMessage({
-    action: "setup",
-    url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}&limit=${limit}`,
+  chrome.storage.local.set({ "jobQuery": jobQueryInput.value }).then(() => {
+    chrome.runtime.sendMessage({
+      action: "setup",
+      url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}&limit=${limit}`,
+    });
   });
+
+  // Send a message to the background script
 });

@@ -1,5 +1,5 @@
-import { Listing } from "../../../background/entity/Listing";
-import { User } from "../../../background/entity/User";
+import { Listing } from "../../../entity/Listing";
+import { User } from "../../../entity/User";
 
 import { tinyWait } from "../../../lib/utils/waits";
 
