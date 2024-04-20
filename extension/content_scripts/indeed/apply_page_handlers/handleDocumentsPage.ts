@@ -1,4 +1,4 @@
-async function handleDocumentsPage(clText: string) {
+export async function handleDocumentsPage(clText: string) {
   const fileInputElement = document.querySelector('input[type="file"]');
 
   if (fileInputElement instanceof HTMLElement) { // This check ensures fileInputElement is an HTMLElement

@@ -42,7 +42,17 @@ export async function waitForElement(
   selector: string,
   checkCloudflare: boolean,
   timeout = 30000
-): Promise<Element | null | "cloudflare"> {
+): Promise<HTMLElement | "cloudflare"> {
+  function isVisible(elem: Element): boolean {
+    const htmlElem = elem as HTMLElement;
+
+    return !!(
+      htmlElem.offsetWidth ||
+      htmlElem.offsetHeight ||
+      htmlElem.getClientRects().length
+    );
+  }
+
   return new Promise((resolve, reject) => {
     const startTime = Date.now();
 
@@ -54,8 +64,8 @@ export async function waitForElement(
         cfEl = document.querySelector("#challenge-stage");
       }
 
-      if (el) {
-        resolve(el);
+      if (el && isVisible(el)) {
+        resolve(el as HTMLElement);
       } else if (cfEl) {
         resolve("cloudflare");
       } else if (Date.now() - startTime > timeout) {

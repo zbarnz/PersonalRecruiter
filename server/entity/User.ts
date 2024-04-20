@@ -1,9 +1,4 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-
-} from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
 
 @Entity()
 export class User {
@@ -22,6 +17,12 @@ export class User {
   @Column()
   phone: string;
 
+  @Column({ nullable: true, type: "text" })
+  website: string | null;
+
   @Column({ name: "created_at" }) //unix in seconds
   createdAt: number;
+
+  @Column({ name: "summarized_resume" })
+  summarizedResume: string;
 }

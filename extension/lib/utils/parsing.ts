@@ -5,7 +5,7 @@
  **************************/
 
 
-function stripHTMLTags(input: string): string {
+export function stripHTMLTags(input: string): string {
   return input.replace(/<\/?[^>]+(>|$)/g, "");
 }
 
@@ -15,7 +15,7 @@ function stripHTMLTags(input: string): string {
  * 
  **************************/
 
-function isIqURL(url: string): boolean {
+export function isIqURL(url: string): boolean {
   console.log("is IQ?: " + url);
   //check if a url is a indeed  URL scheme
   // Regular expression to match the format 'iq://<some characters>'
@@ -23,14 +23,14 @@ function isIqURL(url: string): boolean {
   return pattern.test(url);
 }
 
-function isIndeedApplyUrl(url: string) {
+export function isIndeedApplyUrl(url: string) {
   return (
     url.startsWith("https://m5.apply.indeed.com") ||
     url.startsWith("https://smartapply.indeed.com")
   );
 }
 
-function standardizeIndeedApplyUrl(originalUrl: string): string {
+export function standardizeIndeedApplyUrl(originalUrl: string): string {
   const regex = /^https:\/\/smartapply\.indeed\.com\/(.*)$/;
   const match = originalUrl.match(regex);
 
@@ -48,7 +48,7 @@ function standardizeIndeedApplyUrl(originalUrl: string): string {
  **************************/
 
 
-function isValidJson(text: string): boolean {
+export function isValidJson(text: string): boolean {
   try {
     JSON.parse(text);
     return true;
@@ -57,7 +57,7 @@ function isValidJson(text: string): boolean {
   }
 }
 
-function isValidArray(str: string): boolean {
+export function isValidArray(str: string): boolean {
   try {
     // Try to parse the string as JSON
     const parsed = JSON.parse(str);
@@ -77,7 +77,7 @@ function isValidArray(str: string): boolean {
  **************************/
 
 
-function sanitizeFilename(input: string): string {
+export function sanitizeFilename(input: string): string {
   // Define a regex pattern for invalid filename characters
   // This includes \ / : * ? " < > |
   const invalidChars = /[\\/:*?"<>|]/g;

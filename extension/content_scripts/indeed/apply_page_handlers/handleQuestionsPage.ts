@@ -22,7 +22,7 @@ export async function handleQuestionsPage(answeredQuestions: any) {
   }
 }
 
-async function fillQuestion(question: any) {
+export async function fillQuestion(question: any) {
   if (question.answered) {
     console.log(
       "skipping answered question: " + question.viewId || question.name

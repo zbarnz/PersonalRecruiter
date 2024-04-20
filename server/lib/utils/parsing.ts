@@ -20,3 +20,12 @@ export function isValidArray(str: string): boolean {
     return false;
   }
 }
+
+export function sanitizeFilename(input: string): string {
+  // Define a regex pattern for invalid filename characters
+  // This includes \ / : * ? " < > |
+  const invalidChars = /[\\/:*?"<>|]/g;
+
+  // Replace invalid characters with an underscore
+  return input.replace(invalidChars, "_");
+}

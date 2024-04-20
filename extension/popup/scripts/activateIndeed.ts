@@ -38,7 +38,7 @@ button.addEventListener("click", async () => {
   chrome.storage.local.set({ "jobQuery": jobQueryInput.value }).then(() => {
     chrome.runtime.sendMessage({
       action: "setup",
-      url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}&limit=${limit}`,
+      url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}`,
     });
   });
 

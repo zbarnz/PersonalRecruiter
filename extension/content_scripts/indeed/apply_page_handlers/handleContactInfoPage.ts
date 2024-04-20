@@ -1,4 +1,4 @@
-async function handleContactInfoPage(
+export async function handleContactInfoPage(
   firstName: string,
   lastName: string,
   phoneNumber?: string,

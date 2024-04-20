@@ -1,4 +1,4 @@
-async function handleWorkExperiencePage(jobTitle: string, companyName: string) {
+export async function handleWorkExperiencePage(jobTitle: string, companyName: string) {
   // Find the job title input with the id "jobTitle" and set its value
   const jobTitleInput = document.querySelector("#jobTitle");
   if (jobTitleInput && jobTitleInput instanceof HTMLInputElement) {

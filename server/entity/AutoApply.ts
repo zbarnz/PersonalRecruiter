@@ -8,6 +8,7 @@ import {
 
 import { User } from "./User";
 import { JobBoard } from "./JobBoard";
+import { Listing } from "./Listing";
 
 @Entity()
 export class AutoApply {
@@ -17,8 +18,9 @@ export class AutoApply {
   @Column({ name: "date_applied" })
   dateApplied: number; //unix
 
-  @Column({ name: "listing_id" })
-  listingId: string;
+  @ManyToOne((type) => Listing, { nullable: true })
+  @JoinColumn({ name: "listing_id" })
+  listingId: number;
 
   @ManyToOne((type) => User)
   @JoinColumn({ name: "job_board_id" })
@@ -27,6 +29,12 @@ export class AutoApply {
   @ManyToOne((type) => User)
   @JoinColumn({ name: "user_id" })
   userId: User;
+
+  @Column({ name: "question_answers", nullable: true, type: "jsonb" })
+  questionAnswers: string | null;
+
+  @Column({ name: "completed_flag", default: false })
+  completedFlag: boolean;
 
   @Column({ name: "failed_flag", default: false })
   failedFlag: boolean;

@@ -3,6 +3,17 @@ import { getConnection } from "../data-source";
 
 import { Request, Response } from "express";
 
+//helpers
+export const getUserHelper = async (id: User["id"]): Promise<User> => {
+  const connection = await getConnection();
+  const user = await connection.manager.findOne(User, {
+    where: { id },
+  });
+
+  return user;
+};
+
+//route controller
 export const createUser = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
@@ -20,11 +31,9 @@ export const createUser = async (req: Request, res: Response) => {
 
 export const getUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.params._id;
-    const connection = await getConnection();
-    const user = await connection.manager.findOne(User, {
-      where: { id: Number(userId) },
-    });
+    const userId = Number(req.params._id);
+
+    const user = await getUserHelper(userId);
 
     if (!user) {
       return res.status(404).json({ error: "User not found." });

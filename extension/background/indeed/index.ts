@@ -15,7 +15,7 @@ const readLocalStorage = async (key: string): Promise<any> => {
 //testing stuff
 //TODO track these values in environment somehow
 const apiUrl = "http://localhost:4000/api/";
-const RequestedListings = 51;
+const RequestedListings = 11;
 const LISTING_LIMIT_PER_PAGE = 50;
 const TEST_USER = 1;
 const INDEED_BOARD_ID = 1;
@@ -287,8 +287,10 @@ async function newListingScrape(
       }
     });
 
+    //&limit=${LISTING_LIMIT_PER_PAGE}
+
     await chrome.tabs.update(tabId, {
-      url: `https://www.indeed.com/jobs?q=${jobQuery}&limit=${LISTING_LIMIT_PER_PAGE}&start=${
+      url: `https://www.indeed.com/jobs?q=${jobQuery}&start=${
         LISTING_LIMIT_PER_PAGE * (pagesCrawled + 1)
       }`,
     });
@@ -520,7 +522,7 @@ async function parseListingDataListener(
       }
       const requiredQualifications =
         initialData.jobInfoWrapperModel.jobInfoModel.jobDescriptionSectionModel
-          .qualificationsSectionModel?.content || null;
+          ?.qualificationsSectionModel?.content || null;
 
       chrome.storage.local.set({
         "currentListingContext": {
@@ -564,9 +566,10 @@ async function parseListingDataListener(
  **********************/
 
 async function applyPageReachedListener(tabId: number, changeInfo: any) {
-  console.log(changeInfo);
+  console.log("1" + changeInfo);
   if (
     changeInfo.status === "loading" &&
+    changeInfo.url &&
     (changeInfo.url.includes("m5.apply.indeed") ||
       changeInfo.url.includes("smartapply.indeed"))
   ) {
@@ -577,7 +580,7 @@ async function applyPageReachedListener(tabId: number, changeInfo: any) {
 }
 
 async function startApplyListner(tabId: number, changeInfo: any) {
-  console.log(changeInfo);
+  console.log("2" + changeInfo);
   if (changeInfo.status === "complete") {
     chrome.tabs.onUpdated.removeListener(startApplyListner);
     console.log("Beginning Apply flow...");
@@ -592,7 +595,6 @@ async function startApplyListner(tabId: number, changeInfo: any) {
             `Error injecting script: ${chrome.runtime.lastError.message}`
           );
         } else {
-          chrome.tabs.onUpdated.addListener(applyPageReachedListener);
           chrome.tabs.sendMessage(tabId, { action: "beginApplyFlow" }); //tabId is definitly freaking defined
         }
       }

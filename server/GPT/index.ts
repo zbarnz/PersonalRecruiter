@@ -3,8 +3,11 @@ import { Listing } from "../entity/Listing";
 import { AutoApply } from "../entity/AutoApply";
 import { GPTLog } from "../entity/GPTLog";
 
-import { ChatCompletionMessage, ChatCompletion } from "openai/resources";
-import { ChatCompletionCreateParamsBase } from "openai/resources/chat/completions";
+import {
+  ChatCompletionCreateParamsBase,
+  ChatCompletionMessage,
+  ChatCompletion,
+} from "openai/resources/chat/completions";
 import {
   get_encoding,
   encoding_for_model,
@@ -12,14 +15,18 @@ import {
   TiktokenModel,
 } from "tiktoken";
 
-import { setGPTLogAsFailed, createGPTLog } from "../controllers/gPTLog";
-import { createApply } from "../controllers/autoApply";
+import {
+  setGPTLogAsFailedHelper,
+  createGPTLogHelper,
+} from "../controllers/gPTLog";
+import { createApplyHelper } from "../controllers/autoApply";
 
 import OpenAI from "openai";
 import dotenv from "dotenv";
 
 dotenv.config();
 const GPT_API_KEY = process.env.GPT_API_KEY;
+const GPT_MODEL = process.env.GPT_MODEL;
 
 const openai = new OpenAI({
   apiKey: GPT_API_KEY,
@@ -34,12 +41,13 @@ export async function GPTText(
   forceModel?: string,
   systemPrompt?: string
 ): Promise<{ text: string; prevLogId: number }> {
-  let model: ChatCompletionCreateParamsBase["model"] = "gpt-3.5-turbo-1106";
+  let model: ChatCompletionCreateParamsBase["model"] =
+    GPT_MODEL as ChatCompletionCreateParamsBase["model"];
   let completionText: ChatCompletionMessage;
   let encoder: Tiktoken;
 
   if (prevLogId) {
-    await setGPTLogAsFailed(prevLogId);
+    await setGPTLogAsFailedHelper(prevLogId);
   }
 
   if (forceModel) {
@@ -52,8 +60,10 @@ export async function GPTText(
     encoder = encoding_for_model("gpt-4");
   }
 
-  if (!listing || !listing.id){
-    throw new Error("GPT call not associated with listing. This is a serious error")
+  if (!listing || !listing.id) {
+    throw new Error(
+      "GPT call not associated with listing. This is a serious error"
+    );
   }
 
   const tokensArray = encoder.encode(prompt);
@@ -64,7 +74,7 @@ export async function GPTText(
       // Check if autoApply is defined
       autoApply.failedFlag = true;
       autoApply.failedReason = "GPT Prompt too expensive";
-      await createApply(autoApply);
+      await createApplyHelper(autoApply);
     }
 
     throw new Error(
@@ -105,7 +115,7 @@ export async function GPTText(
   gptLog.user = user;
   gptLog.createdAt = Math.floor(Date.now() / 1000);
 
-  const savedLog = await createGPTLog(gptLog);
+  const savedLog = await createGPTLogHelper(gptLog);
 
   completionText = completion.choices[0].message;
 

@@ -1,14 +1,43 @@
 // Assume that GPTLog is in the same directory level as AutoApply
 import { GPTLog } from "../entity/GPTLog";
 import { getConnection } from "../data-source";
+import { DataSource } from "typeorm";
 
 import { Request, Response } from "express";
 
+//helpers
+
+export const createGPTLogHelper = async (g: GPTLog): Promise<GPTLog> => {
+  const connection: DataSource = await getConnection();
+  const savedGPTLog = await connection.manager.save(g);
+  return savedGPTLog;
+};
+
+export const setGPTLogAsFailedHelper = async (
+  id: GPTLog["id"]
+): Promise<GPTLog> => {
+  const connection = await getConnection();
+
+  let gptLog = await connection.manager.findOne(GPTLog, {
+    where: { id: Number(id) },
+  });
+
+  if (!gptLog) {
+    return null;
+  }
+
+  gptLog.failedFlag = true;
+  gptLog = await connection.manager.save(gptLog);
+
+  return gptLog;
+};
+
+//route controllers
+
 export const createGPTLog = async (req: Request, res: Response) => {
   try {
-    const gptLog = req.body; // Assuming GPTLog comes from the request body
-    const connection = await getConnection();
-    const savedLog = await connection.manager.save(gptLog);
+    const gptLog: GPTLog = req.body; // Assuming GPTLog comes from the request body
+    const savedLog: GPTLog = await createGPTLogHelper(gptLog);
     res.json(savedLog);
   } catch (error) {
     res
@@ -39,21 +68,13 @@ export const getGPTLog = async (req: Request, res: Response) => {
 
 export const setGPTLogAsFailed = async (req: Request, res: Response) => {
   try {
-    const gptLogId = req.params._id; // Assuming ID comes from URL parameters
-    const connection = await getConnection();
+    const gptLogId: GPTLog["id"] = Number(req.params._id); // Assuming ID comes from URL parameters
 
-    let gptLog = await connection.manager.findOne(GPTLog, {
-      where: { id: Number(gptLogId) },
-    });
+    const gptLog: GPTLog = await setGPTLogAsFailedHelper(gptLogId);
 
     if (!gptLog) {
-      return res
-        .status(404)
-        .json({ error: `GPTLog with ID ${gptLogId} not found.` });
+      res.status(404).json({ error: `GPTLog with ID ${gptLogId} not found.` });
     }
-
-    gptLog.failedFlag = true;
-    gptLog = await connection.manager.save(gptLog);
 
     res.json(gptLog);
   } catch (error) {

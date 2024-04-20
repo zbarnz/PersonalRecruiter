@@ -8,6 +8,20 @@ import { Request, Response } from "express";
 
 const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
 
+//helpers
+
+export const getListingByIdHelper = async (
+  id: Listing["id"]
+): Promise<Listing> => {
+  const connection = await getConnection();
+  const autoApply = await connection.manager.findOne(Listing, {
+    where: { id },
+  });
+  return autoApply;
+};
+
+//route controllers
+
 /**
  * Controller to create a listing.
  * @param {Request} req - Express request object containing listing data in the body.
@@ -56,11 +70,9 @@ export const getListing = async (req: Request, res: Response) => {
  */
 export const getListingById = async (req: Request, res: Response) => {
   try {
-    const id = req.params._id;
-    const connection = await getConnection();
-    const listing = await connection.manager.findOne(Listing, {
-      where: { id: Number(id) },
-    });
+    const id = Number(req.params._id);
+
+    const listing = await getListingByIdHelper(id);
     if (!listing) {
       return res.status(404).json({ error: "Listing not found." });
     }

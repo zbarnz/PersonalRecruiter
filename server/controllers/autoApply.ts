@@ -4,12 +4,32 @@ import { getConnection } from "../data-source";
 
 import { Request, Response } from "express";
 import { JobBoard } from "entity/JobBoard";
+import { DataSource } from "typeorm";
+
+//helpers
+
+export const createApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
+  const connection: DataSource = await getConnection();
+  const savedApply = await connection.manager.save(a);
+  return savedApply;
+};
+
+export const getApplyHelper = async (
+  id: AutoApply["id"]
+): Promise<AutoApply> => {
+  const connection = await getConnection();
+  const autoApply = await connection.manager.findOne(AutoApply, {
+    where: { id: Number(id) },
+  });
+  return autoApply;
+};
+
+//controllers
 
 export const createApply = async (req: Request, res: Response) => {
   try {
-    const autoApply = req.body;
-    const connection = await getConnection();
-    const savedApply = await connection.manager.save(autoApply);
+    const autoApply: AutoApply = req.body;
+    const savedApply = await createApplyHelper(autoApply);
     res.json(savedApply);
   } catch (error) {
     res
@@ -20,11 +40,9 @@ export const createApply = async (req: Request, res: Response) => {
 
 export const getApply = async (req: Request, res: Response) => {
   try {
-    const autoApplyId = req.params._id; // Assuming ID comes from URL parameters
-    const connection = await getConnection();
-    const autoApply = await connection.manager.findOne(AutoApply, {
-      where: { id: Number(autoApplyId) },
-    });
+    const autoApplyId = Number(req.params._id); // Assuming ID comes from URL parameters
+
+    const autoApply = await getApplyHelper(autoApplyId);
 
     if (!autoApply) {
       return res.status(404).json({ error: "AutoApply not found." });
@@ -52,6 +70,7 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
         .createQueryBuilder(AutoApply, "aop")
         .where("aop.listingId = :listingId", { listingId })
         .andWhere("aop.failedFlag = :failedFlag", { failedFlag: false })
+        .andWhere("aop.completedFlag = :completedFlag", { completedFlag: true })
         .andWhere("aop.jobBoardId = :jobBoardId", { jobBoardId })
         .andWhere("aop.userId = :userId", { userId })
         .getMany();

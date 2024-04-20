@@ -1,19 +1,16 @@
-async function handleResumePage() {
+import { tinyWait, waitForElement } from "../../../lib/utils/waits";
 
+export async function handleResumePage() {
   //TODO figure out how to get resume uploaded
 
-  // Function to simulate short waits
-  function tinyWait() {
-    return new Promise(resolve => setTimeout(resolve, 100));
-  }
-
   // Click the header button to start the resume upload process
-  const headerButton = document.querySelector(".ia-SmartApplyCard-headerButton");
+  const headButtonSelector = '[data-testid="FileResumeCard-label"]';
+
+  const headerButton = await waitForElement(headButtonSelector, false);
+
   if (headerButton && headerButton instanceof HTMLElement) {
     headerButton.click();
   }
-
-  await tinyWait(); // Wait for any animations or dynamic content
 
   // Since we cannot set file input files programmatically in content scripts,
   // the user must select the resume file manually.
@@ -36,12 +33,13 @@ async function handleResumePage() {
 
   await tinyWait(); // Wait for the modal to become visible
 
-  const saveButton = document.querySelector('button:has-text("Save")'); // This pseudo-class might not work as expected in plain JS
-  if (saveButton && saveButton instanceof HTMLElement) {
-    saveButton.click();
-  }
+  // const saveButtonSelector = 'button[data-testid="ResumePrivacyModal-SaveBtn"]';
 
-  await tinyWait(); // Final wait
+  // const saveButton = waitForElement(saveButtonSelector, false);
+
+  // if (saveButton && saveButton instanceof HTMLElement) {
+  //   saveButton.click();
+  // }
 }
 
 // Since this script cannot directly upload files, consider implementing a user instruction step.

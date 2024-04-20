@@ -4,7 +4,7 @@ import { User } from "../../../entity/User";
 import { tinyWait } from "../../../lib/utils/waits";
 
 
-async function handleReviewPage(
+export async function handleReviewPage(
   aiStructuredResume: string,
   jobDescription: string,
   listing: Listing,
