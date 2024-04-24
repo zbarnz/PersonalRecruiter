@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BeforeUpdate,
 } from "typeorm";
 
 import { User } from "./User";
@@ -15,19 +16,24 @@ export class Exception {
   id: number;
 
   @ManyToOne((type) => JobBoard)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: JobBoard;
+  @JoinColumn({ name: "job_board" })
+  jobBoard: JobBoard;
 
   @Column({ name: "listing_id" })
   listingId: string;
 
-  @Column({ name: "date_updated" })
+  @Column({ name: "date_updated", type: "bigint" })
   dateUpdated: number; //unix
 
   @Column({ name: "reason" })
   reason: string;
 
   @ManyToOne((type) => User)
-  @JoinColumn({ name: "user_id" })
-  userId: User;
+  @JoinColumn({ name: "user" })
+  user: User;
+
+  @BeforeUpdate()
+  setDateUpdated() {
+    this.dateUpdated = Math.floor(Date.now() / 1000);
+  }
 }

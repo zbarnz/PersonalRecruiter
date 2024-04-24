@@ -6,6 +6,8 @@ import {
   JoinColumn,
   Index,
   Unique,
+  BeforeInsert,
+  BeforeUpdate,
 } from "typeorm";
 
 import { JobBoard } from "./JobBoard";
@@ -29,10 +31,10 @@ export class Listing {
   @Column({ nullable: true, type: "text" })
   company: string;
 
-  @Column({ name: "date_posted" })
+  @Column({ name: "date_posted", type: "bigint" })
   datePosted: number;
 
-  @Column({ name: "date_updated" })
+  @Column({ name: "date_updated", type: "bigint" })
   dateUpdated: number;
 
   @Column({
@@ -75,14 +77,12 @@ export class Listing {
 
   @Index()
   @ManyToOne((type) => JobBoard)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: number;
+  @JoinColumn({ name: "job_board" })
+  jobBoard: JobBoard;
 
   @Index()
   @Column({ name: "job_listing_id" })
   jobListingId: string;
-
-  // We can likely remove the below columns after some testing, but I need to ensure there's no important information in them first.
 
   @Column({ name: "requirements_object", nullable: true, type: "jsonb" })
   requirementsObject: string | null;
@@ -98,4 +98,14 @@ export class Listing {
 
   @Column({ name: "questions_object", nullable: true, type: "jsonb" })
   questionsObject: string | null;
+
+  @BeforeInsert()
+  setDateCreated() {
+    this.datePosted = Math.floor(Date.now() / 1000);
+  }
+
+  @BeforeUpdate()
+  setDateUpdated() {
+    this.dateUpdated = Math.floor(Date.now() / 1000);
+  }
 }

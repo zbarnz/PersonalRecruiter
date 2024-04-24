@@ -4,10 +4,10 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BeforeInsert,
 } from "typeorm";
 
 import { User } from "./User";
-import { JobBoard } from "./JobBoard";
 import { Listing } from "./Listing";
 
 @Entity()
@@ -15,20 +15,16 @@ export class AutoApply {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column({ name: "date_applied" })
+  @Column({ name: "date_applied", type: "bigint" })
   dateApplied: number; //unix
 
   @ManyToOne((type) => Listing, { nullable: true })
-  @JoinColumn({ name: "listing_id" })
-  listingId: number;
+  @JoinColumn({ name: "listing" })
+  listing: Listing;
 
   @ManyToOne((type) => User)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: JobBoard;
-
-  @ManyToOne((type) => User)
-  @JoinColumn({ name: "user_id" })
-  userId: User;
+  @JoinColumn({ name: "user" })
+  user: User;
 
   @Column({ name: "question_answers", nullable: true, type: "jsonb" })
   questionAnswers: string | null;
@@ -41,4 +37,9 @@ export class AutoApply {
 
   @Column({ name: "failed_reason", nullable: true })
   failedReason: string | null;
+
+  @BeforeInsert()
+  setDateCreated() {
+    this.dateApplied = Math.floor(Date.now() / 1000);
+  }
 }
