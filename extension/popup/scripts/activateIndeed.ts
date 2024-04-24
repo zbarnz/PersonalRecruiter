@@ -47,6 +47,7 @@ button.addEventListener("click", async () => {
         .set({
           "jobQuery": jobQueryInput.value,
           "jobBoard": data, 
+          "requestedListings": 11,
         })
         .then(() => {
           chrome.runtime.sendMessage({

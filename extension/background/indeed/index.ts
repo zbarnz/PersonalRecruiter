@@ -21,11 +21,11 @@ const readLocalStorage = async (key: string): Promise<any> => {
 //TODO track these values in environment somehow
 const apiUrl = "http://localhost:4000/api/";
 const RequestedListings = 11;
-const LISTING_LIMIT_PER_PAGE = 50;
 const TEST_USER = 1;
 //
 
 let INDEED_BOARD: JobBoard;
+let prevListingsPerPage: number; //Not sure if this changes between user so just track it individually
 
 chrome.runtime.onSuspend.addListener(() => console.log("SUSPENDING"));
 
@@ -295,11 +295,9 @@ async function newListingScrape(
       }
     });
 
-    //&limit=${LISTING_LIMIT_PER_PAGE}
-
     await chrome.tabs.update(tabId, {
       url: `https://www.indeed.com/jobs?q=${jobQuery}&start=${
-        LISTING_LIMIT_PER_PAGE * (pagesCrawled + 1)
+        prevListingsPerPage * (pagesCrawled + 1)
       }`,
     });
   } else {
@@ -320,6 +318,8 @@ async function parseListings(
       const jobKeys = Object.keys(
         msg.initialData.jobKeysWithTwoPaneEligibility
       );
+
+      prevListingsPerPage = jobKeys.length;
 
       console.log(jobKeys);
 
