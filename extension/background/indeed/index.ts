@@ -3,6 +3,7 @@ import { calculateYearlySalary, safeMath } from "../../lib/utils/math";
 import { utcToUnix } from "../../lib/utils/date";
 
 import { Listing } from "../../src/entity/Listing";
+import { JobBoard } from "../../src/entity/JobBoard";
 
 const readLocalStorage = async (key: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -22,8 +23,9 @@ const apiUrl = "http://localhost:4000/api/";
 const RequestedListings = 11;
 const LISTING_LIMIT_PER_PAGE = 50;
 const TEST_USER = 1;
-const INDEED_BOARD_ID = 1;
 //
+
+let INDEED_BOARD: JobBoard;
 
 chrome.runtime.onSuspend.addListener(() => console.log("SUSPENDING"));
 
@@ -76,9 +78,11 @@ chrome.runtime.onMessage.addListener(
  * New Tab listners
  **********************/
 
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "setup") {
     console.log("received setup message");
+    INDEED_BOARD = await readLocalStorage("jobBoard");
+
     chrome.tabs.create({ url: message.url }, (newTab) => {
       if (newTab.id !== undefined) {
         chrome.tabs.onUpdated.addListener(function listener(tabId, changeInfo) {
@@ -327,7 +331,7 @@ async function parseListings(
         body: JSON.stringify({
           jobKeys,
           userId: currentUserId,
-          jobBoard: INDEED_BOARD_ID,
+          jobBoard: INDEED_BOARD,
         }),
       });
 
@@ -508,7 +512,7 @@ async function parseListingDataListener(
       listing.locality =
         contextData.jobLocation?.address?.addressLocality ?? null;
       listing.remoteFlag = contextData.jobLocationType == "TELECOMMUTE"; //if telecommute then true
-      listing.jobBoardId = INDEED_BOARD_ID;
+      listing.jobBoard = INDEED_BOARD;
       listing.jobListingId = initialData.jobKey;
       listing.requirementsObject =
         contextData.applicantLocationRequirements ?? null;
@@ -541,7 +545,7 @@ async function parseListingDataListener(
           },
           body: JSON.stringify({
             userId: TEST_USER,
-            jobBoard: INDEED_BOARD_ID,
+            jobBoard: INDEED_BOARD,
             reason: "Extenal Apply Link",
             listingId: initialData.jobKey,
           }),
@@ -633,11 +637,7 @@ async function applyPageReachedListener(tabId: number, changeInfo: any) {
     (changeInfo.url.includes("m5.apply.indeed") ||
       changeInfo.url.includes("smartapply.indeed"))
   ) {
-    if (
-      changeInfo.url.includes(
-        "/verify-account"
-      )
-    ) {
+    if (changeInfo.url.includes("/verify-account")) {
       throw new Error("Must verify account");
     }
     console.log("Arrived at apply page");

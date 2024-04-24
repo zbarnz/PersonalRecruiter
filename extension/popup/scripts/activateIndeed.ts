@@ -12,6 +12,9 @@ jobQueryInput.addEventListener("click", () => {
 });
 
 button.addEventListener("click", async () => {
+  const apiUrl = "http://localhost:4000/api/";
+  const jobBoardName = "indeed";
+
   if (!jobQueryInput.value) {
     // Apply red border and box shadow directly
     jobQueryInput.style.borderColor = "#ff6b6b";
@@ -35,12 +38,22 @@ button.addEventListener("click", async () => {
     return;
   }
 
-  chrome.storage.local.set({ "jobQuery": jobQueryInput.value }).then(() => {
-    chrome.runtime.sendMessage({
-      action: "setup",
-      url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}`,
-    });
-  });
-
-  // Send a message to the background script
+  fetch(`${apiUrl}/jobBoard/${jobBoardName}`, {
+    method: "GET",
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      chrome.storage.local
+        .set({
+          "jobQuery": jobQueryInput.value,
+          "jobBoard": data, 
+        })
+        .then(() => {
+          chrome.runtime.sendMessage({
+            action: "setup",
+            url: `https://www.indeed.com/jobs?q=${jobQueryInput.value}`,
+          });
+        });
+    })
+    .catch((error) => console.error("Error fetching jobBoard data:", error));
 });
