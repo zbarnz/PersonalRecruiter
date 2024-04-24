@@ -4,6 +4,7 @@ import {
   Column,
   ManyToOne,
   JoinColumn,
+  BeforeUpdate,
 } from "typeorm";
 
 import { User } from "./User";
@@ -21,7 +22,7 @@ export class Exception {
   @Column({ name: "listing_id" })
   listingId: string;
 
-  @Column({ name: "date_updated" })
+  @Column({ name: "date_updated", type: "bigint" })
   dateUpdated: number; //unix
 
   @Column({ name: "reason" })
@@ -30,4 +31,9 @@ export class Exception {
   @ManyToOne((type) => User)
   @JoinColumn({ name: "user" })
   user: User;
+
+  @BeforeUpdate()
+  setDateUpdated() {
+    this.dateUpdated = Math.floor(Date.now() / 1000);
+  }
 }

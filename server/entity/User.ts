@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
 
 @Entity()
 export class User {
@@ -20,7 +20,7 @@ export class User {
   @Column({ nullable: true, type: "text" })
   website: string | null;
 
-  @Column({ name: "created_at" }) //unix in seconds
+  @Column({ name: "created_at", type: "bigint" }) //unix in seconds
   createdAt: number;
 
   @Column({ name: "summarized_resume", nullable: true })
@@ -28,4 +28,9 @@ export class User {
 
   @Column()
   skills: string[] | null;
+
+  @BeforeInsert()
+  setDateCreated() {
+    this.createdAt = Math.floor(Date.now() / 1000);
+  }
 }

@@ -1,15 +1,13 @@
 import {
   Entity,
   PrimaryGeneratedColumn,
-  CreateDateColumn,
   Column,
-  OneToOne,
   JoinColumn,
   ManyToOne,
+  BeforeInsert,
 } from "typeorm";
 import { Listing } from "./Listing";
 import { User } from "./User";
-import { type } from "os";
 
 @Entity()
 export class GPTLog {
@@ -37,10 +35,13 @@ export class GPTLog {
   @Column({ default: false })
   failedFlag: boolean; // Indicates whether the entry was invalid and needed to be retried
 
+  @Column({ name: "batch_id", type: "bigint", nullable: true })
+  batchId: number | null;
+
   @Column({ type: "int", name: "prev_attempt_id", nullable: true })
   prevAttemptId: number | null;
 
-  @Column({ name: "created_at", nullable: true })
+  @Column({ name: "created_at", nullable: true, type: "bigint" })
   createdAt: number | null;
 
   @ManyToOne((type) => Listing, { nullable: true })
@@ -53,4 +54,9 @@ export class GPTLog {
 
   @Column({ name: "system_flag", default: false })
   systemFlag: boolean;
+
+  @BeforeInsert()
+  setDateCreated() {
+    this.createdAt = Math.floor(Date.now() / 1000);
+  }
 }

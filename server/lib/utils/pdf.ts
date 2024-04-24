@@ -1,5 +1,4 @@
 import html_to_pdf from "html-pdf-node";
-import fs from "fs/promises";
 
 function generatePdfPromise(
   file: html_to_pdf.File,
@@ -20,10 +19,7 @@ function generatePdfPromise(
   });
 }
 
-export async function compileHTMLtoPDF(
-  coverLetter: string,
-  outputPath: string
-) {
+export async function compileHTMLtoPDF(coverLetter: string): Promise<Buffer> {
   // Create a File object for the generatePdfPromise function
   const contentObj = {
     content: coverLetter, // Set the HTML content
@@ -36,6 +32,5 @@ export async function compileHTMLtoPDF(
   });
 
   // Write the generated PDF to the file system
-  await fs.writeFile(outputPath, generatedPdfBuffer);
-  console.log("The PDF has been saved");
+  return generatedPdfBuffer;
 }

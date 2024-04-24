@@ -8,6 +8,8 @@ import { isValidJson } from "../../lib/utils/parsing";
 
 import { GPTText } from "../index";
 
+import { EntityManager } from "typeorm";
+
 import dotenv from "dotenv";
 dotenv.config();
 

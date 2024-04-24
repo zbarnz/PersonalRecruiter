@@ -1,25 +1,19 @@
 import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
 import { coverLetter } from "../../src/apply_assets/coverletter";
 
-import { sanitizeFilename } from "../../lib/utils/parsing";
 import { compileHTMLtoPDF } from "../../lib/utils/pdf";
 
 import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";
 
-import { getListingByIdHelper } from "../../controllers/listing";
-import { getUserHelper } from "../../controllers/user";
-
 import { GPTText } from "../index";
 
-import { Response, Request } from "express";
-
-import path from "path";
+import { EntityManager } from "typeorm";
 
 export async function generateCoverLetter(
   user: User,
   listing: Listing
-): Promise<{ clPath: string; clText: string }> {
+): Promise<Buffer> {
   if (
     user &&
     user.summarizedResume &&
@@ -33,7 +27,6 @@ export async function generateCoverLetter(
 
     let retries: number = 0;
     let completionText: string;
-    let clPath: string;
 
     ({ text: completionText } = await GPTText(
       prompt,
@@ -51,22 +44,6 @@ export async function generateCoverLetter(
 
     console.log("GPT Attempt #:" + retries);
 
-    const clFolder = path.join(
-      __dirname,
-      "../../../../src/otherApplyAssets/cover_letters/"
-    );
-
-    const clFileName = sanitizeFilename(
-      (listing.company || "Zach_Barnes") +
-        "_" +
-        listing.title +
-        "_resume_" +
-        listing.jobListingId +
-        ".pdf"
-    );
-
-    clPath = clFolder + clFileName;
-
     const clHTML = coverLetter(
       parsedText,
       user.firstName + " " + user.lastName,
@@ -75,9 +52,9 @@ export async function generateCoverLetter(
       user.website
     );
 
-    await compileHTMLtoPDF(clHTML, clPath);
+    const pdfBuffer = await compileHTMLtoPDF(clHTML);
 
-    return { clPath, clText: completionText };
+    return pdfBuffer;
   } else {
     throw new Error("User or listing missing summarization");
   }

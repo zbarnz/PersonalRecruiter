@@ -6,9 +6,13 @@ import { Listing } from "../../entity/Listing";
 
 import { isValidArray } from "../../lib/utils/parsing";
 
+import { compileHTMLtoPDF } from "lib/utils/pdf";
+
 import { resumeWSkills } from "../../src/apply_assets/resume";
 
 import { GPTText } from "../index";
+
+import { EntityManager } from "typeorm";
 
 import dotenv from "dotenv";
 dotenv.config();
@@ -18,7 +22,7 @@ const MAX_RETRIES = Number(process.env.MAX_GPT_RETRIES);
 export async function getResume(
   user: User,
   listing?: Listing
-): Promise<string> {
+): Promise<Buffer> {
   let completionText: string = "";
   let retries: number = 0;
   let previousLogId: number;
@@ -73,5 +77,8 @@ export async function getResume(
   const skillsArray: string[] = JSON.parse(completionText);
 
   const resume = resumeWSkills(skillsArray); //TODO custome resume handler
-  return resume;
+
+  const pdfBuffer = await compileHTMLtoPDF(resume);
+
+  return pdfBuffer;
 }

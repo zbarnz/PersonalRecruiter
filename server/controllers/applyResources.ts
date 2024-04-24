@@ -3,19 +3,22 @@ import { Response, Request } from "express";
 import { Listing } from "entity/Listing";
 import { User } from "entity/User";
 import { AutoApply } from "entity/AutoApply";
+import { PDF } from "entity/PDF";
 
 import { generateCoverLetter } from "../GPT/utils/getCoverLetter";
 import { answerQuestions } from "../GPT/utils/answerQuestions";
 import { getResume } from "../GPT/utils/getResume";
 
+import { setGPTLogBatchAsFailedHelper } from "./gPTLog";
 import { getListingByIdHelper } from "./listing";
 import { getApplyHelper } from "./autoApply";
 import { getUserHelper } from "./user";
-import { getSkillsPrompt } from "GPT/prompts/getSkills";
+
+import { getConnection } from "../data-source";
 
 type Documents = {
-  coverLetter: string | null;
-  resume: string | null;
+  coverLetter: Buffer | null;
+  resume: Buffer | null;
   answeredQuestions: any[] | null;
 };
 
@@ -28,29 +31,60 @@ export async function getApplyResourcesHelper(
   questions?: any,
   autoApply?: AutoApply
 ): Promise<Documents> {
-  let coverLetter = null;
-  let resume = null;
-  let answeredQuestions = null;
+  const connection = await getConnection();
+  return await connection.transaction(async (transactionalEntityManager) => {
+    let coverLetter: Buffer | null = null;
+    let resume: Buffer | null = null;
+    let answeredQuestions: any[] = null;
 
-  try {
-    if (getCoverLetterFlag) {
-      coverLetter = generateCoverLetter(user, listing);
+    //set batchId for marking as failed (we dont want to rollback gpt logs)
+    const batchId = Math.floor(Date.now() / 1000); //unix
+
+    try {
+      if (getCoverLetterFlag) {
+        coverLetter = await generateCoverLetter(user, listing);
+
+        const pdfRecord = new PDF();
+        pdfRecord.user = user;
+        pdfRecord.listing = listing;
+        pdfRecord.type = "Cover Letter";
+        pdfRecord.pdfData = coverLetter;
+        transactionalEntityManager.save(PDF);
+      }
+
+      if (getResumeFlag) {
+        resume = await getResume(user, listing);
+
+        const pdfRecord = new PDF();
+        pdfRecord.user = user;
+        pdfRecord.listing = listing;
+        pdfRecord.type = "Resume";
+        pdfRecord.pdfData = resume;
+        transactionalEntityManager.save(PDF);
+      }
+
+      if (getAnswersFlag) {
+        answeredQuestions = await answerQuestions(
+          autoApply,
+          user,
+          listing,
+          questions
+        );
+      }
+
+      return { coverLetter, resume, answeredQuestions };
+    } catch (err) {
+      try {
+        setGPTLogBatchAsFailedHelper(batchId);
+      } catch {
+        throw new Error(
+          "Failed to handle exception while getting documents: " + err.message
+        );
+      }
+
+      throw new Error("Failed to get Documents " + err.message);
     }
-
-    if (getResumeFlag) {
-      const skills = getSkillsPrompt(listing.description, user.skills);
-
-      resume = getResume(user, listing);
-    }
-
-    if (getAnswersFlag) {
-      answeredQuestions = answerQuestions(autoApply, user, listing, questions);
-    }
-
-    return { coverLetter, resume, answeredQuestions };
-  } catch (err) {
-    throw new Error("Failed to get Documents " + err.message);
-  }
+  });
 }
 
 export async function getApplyResources(req: Request, res: Response) {

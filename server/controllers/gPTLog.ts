@@ -1,7 +1,7 @@
 // Assume that GPTLog is in the same directory level as AutoApply
 import { GPTLog } from "../entity/GPTLog";
 import { getConnection } from "../data-source";
-import { DataSource } from "typeorm";
+import { DataSource, UpdateResult } from "typeorm";
 
 import { Request, Response } from "express";
 
@@ -30,6 +30,21 @@ export const setGPTLogAsFailedHelper = async (
   gptLog = await connection.manager.save(gptLog);
 
   return gptLog;
+};
+
+export const setGPTLogBatchAsFailedHelper = async (
+  batchId: GPTLog["batchId"]
+): Promise<UpdateResult> => {
+  const connection = await getConnection();
+
+  const updatedLogs = await connection
+    .createQueryBuilder()
+    .update(GPTLog)
+    .set({ failedFlag: true })
+    .where("batchId = :batchId", { batchId })
+    .execute();
+
+  return updatedLogs;
 };
 
 //route controllers

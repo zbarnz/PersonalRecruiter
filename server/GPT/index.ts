@@ -21,6 +21,8 @@ import {
 } from "../controllers/gPTLog";
 import { createApplyHelper } from "../controllers/autoApply";
 
+import { EntityManager } from "typeorm";
+
 import OpenAI from "openai";
 import dotenv from "dotenv";
 
