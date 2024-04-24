@@ -5,7 +5,7 @@ import {
   ManyToOne,
   JoinColumn,
   Index,
-  Unique
+  Unique,
 } from "typeorm";
 
 import { JobBoard } from "./JobBoard";
@@ -23,11 +23,17 @@ export class Listing {
   @Column()
   description: string;
 
+  @Column({ name: "summarized_job_description", nullable: true })
+  summarizedJobDescription: string | null;
+
   @Column({ nullable: true, type: "text" })
   company: string;
 
   @Column({ name: "date_posted" })
   datePosted: number;
+
+  @Column({ name: "date_updated" })
+  dateUpdated: number;
 
   @Column({
     name: "employment_type",
@@ -79,14 +85,17 @@ export class Listing {
   // We can likely remove the below columns after some testing, but I need to ensure there's no important information in them first.
 
   @Column({ name: "requirements_object", nullable: true, type: "jsonb" })
-  requirementsObject: string;
+  requirementsObject: string | null;
 
   @Column({ name: "salary_object", nullable: true, type: "jsonb" })
-  salaryObject: string;
+  salaryObject: string | null;
 
   @Column({ name: "oragnization_object", nullable: true, type: "jsonb" })
-  oragnizationObject: string;
+  oragnizationObject: string | null;
 
   @Column({ name: "location_object", nullable: true, type: "jsonb" })
-  locationObject: string;
+  locationObject: string | null;
+
+  @Column({ name: "questions_object", nullable: true, type: "jsonb" })
+  questionsObject: string | null;
 }

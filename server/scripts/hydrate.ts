@@ -40,9 +40,35 @@ const hydrateDatabase = async () => {
   const user1 = new User();
   user1.firstName = "Zach";
   user1.lastName = "Barnes";
-  user1.email = "zbarnz@yahoo.com";
+  user1.email = "zbarnz99@gmail.com";
   user1.phone = "7207557572";
   user1.createdAt = Math.floor(Date.now() / 1000);
+  user1.skills = [
+    "REACT",
+    "NEXT.JS",
+    "MONGODB",
+    "GRAPHQL",
+    "NEST.JS",
+    "POSTGRESQL",
+    "PRISMA",
+    "EXPRESS",
+    "APOLLO",
+    "SQL SERVER",
+    "HTML",
+    "CSS",
+    "JAVASCRIPT",
+    "GIT",
+    "Docker",
+    "Axios",
+    "Mocha",
+    "Mongoose",
+    "MUI",
+    "ChatGPT API",
+    "Node.js",
+    "SQL",
+    "Puppeteer",
+    "C++",
+  ];
 
   const user2 = new User();
   user2.firstName = "Sumedha";
@@ -50,6 +76,7 @@ const hydrateDatabase = async () => {
   user2.email = "ss@sumedhaiscool.com";
   user2.phone = "1929291102";
   user2.createdAt = Math.floor(Date.now() / 1000);
+  user2.skills = ["Being Cute", "Being Kind"];
 
   const connection = await getConnection();
 

@@ -32,14 +32,15 @@ const openai = new OpenAI({
   apiKey: GPT_API_KEY,
 });
 
-export async function GPTText(
+export async function GPTText( //TODO change args to options obj
   prompt: string,
-  user: User,
+  user?: User,
   prevLogId?: number,
   autoApply?: AutoApply,
   listing?: Listing,
   forceModel?: string,
-  systemPrompt?: string
+  systemPrompt?: string,
+  systemFlag?: boolean
 ): Promise<{ text: string; prevLogId: number }> {
   let model: ChatCompletionCreateParamsBase["model"] =
     GPT_MODEL as ChatCompletionCreateParamsBase["model"];
@@ -111,8 +112,9 @@ export async function GPTText(
   gptLog.promptTokens = completion?.usage?.prompt_tokens || null;
   gptLog.prevAttemptId = prevLogId || null;
   gptLog.model = model;
-  gptLog.listingId = listing.id;
-  gptLog.user = user;
+  gptLog.listing = listing;
+  gptLog.user = user || null;
+  gptLog.systemFlag = systemFlag || false;
   gptLog.createdAt = Math.floor(Date.now() / 1000);
 
   const savedLog = await createGPTLogHelper(gptLog);

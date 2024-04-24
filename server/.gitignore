@@ -12,3 +12,9 @@ package-lock.json
 
 # builds
 build/
+
+#scripts
+scripts/
+
+#apply assets
+src/apply_assets/

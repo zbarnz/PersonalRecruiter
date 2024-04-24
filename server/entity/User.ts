@@ -23,6 +23,9 @@ export class User {
   @Column({ name: "created_at" }) //unix in seconds
   createdAt: number;
 
-  @Column({ name: "summarized_resume" })
-  summarizedResume: string;
+  @Column({ name: "summarized_resume", nullable: true })
+  summarizedResume: string | null;
+
+  @Column()
+  skills: string[] | null;
 }

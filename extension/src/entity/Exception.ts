@@ -3,15 +3,20 @@ import {
   PrimaryGeneratedColumn,
   Column,
   ManyToOne,
-  JoinColumn
+  JoinColumn,
 } from "typeorm";
 
 import { User } from "./User";
+import { JobBoard } from "./JobBoard";
 
 @Entity()
-export class Exception{
+export class Exception {
   @PrimaryGeneratedColumn()
   id: number;
+
+  @ManyToOne((type) => JobBoard)
+  @JoinColumn({ name: "job_board_id" })
+  jobBoardId: JobBoard;
 
   @Column({ name: "listing_id" })
   listingId: string;
@@ -21,4 +26,8 @@ export class Exception{
 
   @Column({ name: "reason" })
   reason: string;
+
+  @ManyToOne((type) => User)
+  @JoinColumn({ name: "user_id" })
+  userId: User;
 }

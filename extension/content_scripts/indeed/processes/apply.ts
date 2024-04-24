@@ -6,7 +6,7 @@ import {
   waitForElement,
 } from "../../../lib/utils/waits";
 
-import { Listing } from "../../../entity/Listing";
+import { Listing } from "../../../src/entity/Listing";
 
 import { standardizeIndeedApplyUrl } from "../../../lib/utils/parsing";
 

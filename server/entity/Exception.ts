@@ -15,8 +15,8 @@ export class Exception {
   id: number;
 
   @ManyToOne((type) => JobBoard)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: JobBoard;
+  @JoinColumn({ name: "job_board" })
+  jobBoard: JobBoard;
 
   @Column({ name: "listing_id" })
   listingId: string;
@@ -28,6 +28,6 @@ export class Exception {
   reason: string;
 
   @ManyToOne((type) => User)
-  @JoinColumn({ name: "user_id" })
-  userId: User;
+  @JoinColumn({ name: "user" })
+  user: User;
 }

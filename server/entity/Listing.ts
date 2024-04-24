@@ -32,6 +32,9 @@ export class Listing {
   @Column({ name: "date_posted" })
   datePosted: number;
 
+  @Column({ name: "date_updated" })
+  dateUpdated: number;
+
   @Column({
     name: "employment_type",
     nullable: true,
@@ -72,14 +75,12 @@ export class Listing {
 
   @Index()
   @ManyToOne((type) => JobBoard)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: number;
+  @JoinColumn({ name: "job_board" })
+  jobBoard: JobBoard;
 
   @Index()
   @Column({ name: "job_listing_id" })
   jobListingId: string;
-
-  // We can likely remove the below columns after some testing, but I need to ensure there's no important information in them first.
 
   @Column({ name: "requirements_object", nullable: true, type: "jsonb" })
   requirementsObject: string | null;

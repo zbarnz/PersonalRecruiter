@@ -44,10 +44,13 @@ export class GPTLog {
   createdAt: number | null;
 
   @ManyToOne((type) => Listing, { nullable: true })
-  @JoinColumn({ name: "listing_id" })
-  listingId: number;
+  @JoinColumn({ name: "listing" })
+  listing: Listing;
 
-  @ManyToOne((type) => User)
-  @JoinColumn({ name: "user_id" })
-  user: User;
+  @ManyToOne(() => User, { nullable: true })
+  @JoinColumn({ name: "user" })
+  user: User | null;
+
+  @Column({ name: "system_flag", default: false })
+  systemFlag: boolean;
 }

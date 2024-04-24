@@ -1,4 +1,8 @@
 import { shortWait } from "../../lib/utils/waits";
+import { calculateYearlySalary, safeMath } from "../../lib/utils/math";
+import { utcToUnix } from "../../lib/utils/date";
+
+import { Listing } from "../../src/entity/Listing";
 
 const readLocalStorage = async (key: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -328,7 +332,12 @@ async function parseListings(
       });
 
       if (res.status !== 200) {
-        throw new Error("Removing applied listings failed: " + res.statusText);
+        throw new Error(
+          "Removing applied listings failed: " +
+            res.statusText +
+            ": " +
+            JSON.stringify(await res.json())
+        );
       }
 
       const newListingIds = await res.json();
@@ -454,24 +463,74 @@ async function parseListingDataListener(
       console.log(contextData);
       console.log(initialData);
 
-      //if this is underfined this is not an indeed quick apply job and we
-      //need to add it to the list of exceptions
+      let maxYearlySalary: number;
+      let minYearlySalary: number;
+
+      if (
+        contextData.baseSalary?.value?.maxValue ||
+        contextData.baseSalary?.value?.value
+      ) {
+        maxYearlySalary = calculateYearlySalary(
+          contextData.baseSalary.value.unitText || "Year",
+          contextData.baseSalary?.value?.maxValue ||
+            contextData.baseSalary?.value?.value
+        );
+      } else if (
+        contextData.baseSalary?.value?.minValue ||
+        contextData.baseSalary?.value?.value
+      ) {
+        minYearlySalary = calculateYearlySalary(
+          contextData.baseSalary.value.unitText || "Year",
+          contextData.baseSalary?.value?.minValue ||
+            contextData.baseSalary?.value?.value
+        );
+      } else {
+        maxYearlySalary = 1337;
+        minYearlySalary = 1337;
+      }
+
+      const listing = new Listing();
+
+      listing.title = contextData.title;
+      listing.description = contextData.description;
+      listing.company = contextData.hiringOrganization.name;
+      listing.datePosted = utcToUnix(contextData.datePosted);
+      listing.employmentType = contextData.employmentType ?? null;
+      listing.currency = contextData.baseSalary?.currency ?? null;
+      listing.minSalary = safeMath(Math.floor, minYearlySalary!) ?? null;
+      listing.maxSalary = safeMath(Math.ceil, maxYearlySalary!) ?? null;
+      listing.country =
+        contextData.jobLocation?.address?.addressCountry ?? null;
+      listing.region1 =
+        contextData.jobLocation?.address?.addressRegion1 ?? null;
+      listing.region2 =
+        contextData.jobLocation?.address?.addressRegion2 ?? null;
+      listing.locality =
+        contextData.jobLocation?.address?.addressLocality ?? null;
+      listing.remoteFlag = contextData.jobLocationType == "TELECOMMUTE"; //if telecommute then true
+      listing.jobBoardId = INDEED_BOARD_ID;
+      listing.jobListingId = initialData.jobKey;
+      listing.requirementsObject =
+        contextData.applicantLocationRequirements ?? null;
+      listing.salaryObject = contextData.baseSalary ?? null;
+      listing.oragnizationObject = contextData.hiringOrganization ?? null;
+      listing.locationObject = contextData.jobLocation ?? null;
+      listing.directApplyFlag = contextData.directApply;
+
+      const res = await fetch(`${apiUrl}/listing/create`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          listing,
+        }),
+      });
 
       const applyButtonAttributes: IndeedApplyButtonAttributes =
         initialData?.indeedApplyButtonContainer?.indeedApplyButtonAttributes;
 
-      const externalBoardLink =
-        initialData?.viewJobButtonLinkContainerModel?.viewJobButtonLinkModel
-          ?.href;
-
-      const applyBaseUrl: IndeedApplyButtonAttributes =
-        initialData?.indeedApplyButtonContainer?.indeedApplyBaseUrl;
-
-      console.log(applyBaseUrl);
-      console.log(applyButtonAttributes);
-      console.log(externalBoardLink);
-
-      if (!applyButtonAttributes && !applyBaseUrl && externalBoardLink) {
+      if (!contextData.directApply) {
         //Create an exception for this user
         console.log("creating Exception for Job");
 
@@ -526,9 +585,10 @@ async function parseListingDataListener(
 
       chrome.storage.local.set({
         "currentListingContext": {
+          jobKey: initialData.jobKey,
           ...contextData,
-          showExperienceFlag,
-          requiredQualifications,
+          showExperienceFlag: showExperienceFlag,
+          requiredQualifications: requiredQualifications,
         },
       });
 
@@ -573,6 +633,13 @@ async function applyPageReachedListener(tabId: number, changeInfo: any) {
     (changeInfo.url.includes("m5.apply.indeed") ||
       changeInfo.url.includes("smartapply.indeed"))
   ) {
+    if (
+      changeInfo.url.includes(
+        "/verify-account"
+      )
+    ) {
+      throw new Error("Must verify account");
+    }
     console.log("Arrived at apply page");
     chrome.tabs.onUpdated.removeListener(applyPageReachedListener);
     chrome.tabs.onUpdated.addListener(startApplyListner);

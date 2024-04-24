@@ -1,5 +1,11 @@
-export function coverLetter(coverLetter: string, fullName: string, phone: string, email: string, website?: string): string {
-  const formattedText = coverLetter.replace(/\n/g, '<br>');
+export function coverLetter(
+  coverLetter: string,
+  fullName: string,
+  phone: string,
+  email: string,
+  website?: string | null
+): string {
+  const formattedText = coverLetter.replace(/\n/g, "<br>");
 
   return `<!DOCTYPE html>
   <html lang="en">

@@ -6,6 +6,11 @@ import { AutoApply } from "../entity/AutoApply";
 
 import { Request, Response } from "express";
 
+import { calculateStringSimilarity } from "lib/utils/parsing";
+
+import { summarizeJobDescription } from "../GPT/utils/summarizeDescription"; //TODO empty page
+import { DataSource } from "typeorm";
+
 const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
 
 //helpers
@@ -27,13 +32,56 @@ export const getListingByIdHelper = async (
  * @param {Request} req - Express request object containing listing data in the body.
  * @param {Response} res - Express response object for sending the response.
  */
-export const createListing = async (req: Request, res: Response) => {
+export const saveListing = async (req: Request, res: Response) => {
   try {
-    const listing = req.body;
-    const connection = await getConnection();
+    const listing: Listing = req.body.listing;
+    const connection: DataSource = await getConnection();
 
-    const listingEntity = connection.manager.create(Listing, listing);
-    const savedListing = await connection.manager.save(listingEntity);
+    const unixDate = Math.floor(Date.now() / 1000);
+
+    const existingListing = await connection.manager.findOne(Listing, {
+      where: {
+        jobListingId: listing.jobListingId,
+        jobBoard: listing.jobBoard,
+      },
+    });
+
+    if (existingListing) {
+      // Update existing listing with new data from `listing`
+
+      if (listing.description && existingListing.description) {
+        // Calculate similarity of both descriptions
+        const similarity = calculateStringSimilarity(
+          existingListing.description,
+          listing.description
+        );
+
+        //if the description has been updated since last save then we need to resummarize the description
+        if (similarity < 0.95) {
+          listing.summarizedJobDescription = await summarizeJobDescription(
+            listing
+          );
+        }
+      }
+
+      Object.keys(listing).forEach((key) => {
+        if (listing[key] !== null && listing[key] !== undefined) {
+          // Make sure not to overwrite with null or undefined
+          existingListing[key] = listing[key];
+        }
+      });
+      existingListing.dateUpdated = unixDate;
+    } else {
+      // Create new listing and set initial update time and summarize the description
+      listing.dateUpdated = unixDate;
+      listing.summarizedJobDescription = await summarizeJobDescription(listing);
+
+      const listingEntity = connection.manager.create(Listing, listing);
+      res.json(listingEntity);
+      return;
+    }
+
+    const savedListing = await connection.manager.save(existingListing);
     res.json(savedListing);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -173,7 +221,7 @@ export async function closeListing(req: Request, res: Response) {
 
 const listingController = {
   closeListing,
-  createListing,
+  saveListing,
   getUnappliedListing,
   getListing,
   getListingById,

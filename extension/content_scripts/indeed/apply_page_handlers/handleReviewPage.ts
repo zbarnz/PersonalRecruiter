@@ -1,8 +1,7 @@
-import { Listing } from "../../../entity/Listing";
-import { User } from "../../../entity/User";
+import { Listing } from "../../../src/entity/Listing";
+import { User } from "../../../src/entity/User";
 
 import { tinyWait } from "../../../lib/utils/waits";
-
 
 export async function handleReviewPage(
   aiStructuredResume: string,

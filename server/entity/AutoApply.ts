@@ -19,16 +19,12 @@ export class AutoApply {
   dateApplied: number; //unix
 
   @ManyToOne((type) => Listing, { nullable: true })
-  @JoinColumn({ name: "listing_id" })
-  listingId: number;
+  @JoinColumn({ name: "listing" })
+  listing: Listing;
 
   @ManyToOne((type) => User)
-  @JoinColumn({ name: "job_board_id" })
-  jobBoardId: JobBoard;
-
-  @ManyToOne((type) => User)
-  @JoinColumn({ name: "user_id" })
-  userId: User;
+  @JoinColumn({ name: "user" })
+  user: User;
 
   @Column({ name: "question_answers", nullable: true, type: "jsonb" })
   questionAnswers: string | null;

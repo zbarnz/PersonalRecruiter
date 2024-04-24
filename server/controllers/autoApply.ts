@@ -2,6 +2,13 @@ import { AutoApply } from "../entity/AutoApply";
 import { Exception } from "../entity/Exception";
 import { getConnection } from "../data-source";
 
+import { getApplyResourcesHelper } from "./applyResources";
+import { getUserHelper } from "./user";
+import { getListingByIdHelper } from "./listing";
+
+import { User } from "entity/User";
+import { Listing } from "entity/Listing";
+
 import { Request, Response } from "express";
 import { JobBoard } from "entity/JobBoard";
 import { DataSource } from "typeorm";
@@ -29,7 +36,25 @@ export const getApplyHelper = async (
 export const createApply = async (req: Request, res: Response) => {
   try {
     const autoApply: AutoApply = req.body;
+
+    const getCoverLetter: boolean = req.body.getCoverLetter;
+    const getResume: boolean = req.body.getResume;
+    const getAnswers: boolean = req.body.getAnswers;
+    const questions: any = req.body.questions;
+
     const savedApply = await createApplyHelper(autoApply);
+
+    if (getCoverLetter || getResume || getAnswers) {
+      getApplyResourcesHelper(
+        autoApply.user,
+        autoApply.listing,
+        getCoverLetter,
+        getResume,
+        getAnswers,
+        questions,
+        savedApply
+      );
+    }
     res.json(savedApply);
   } catch (error) {
     res
@@ -68,10 +93,14 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
       //I dont think there is a way to merge these two queries in typeorm
       const autoApplyRecords = await connection.manager
         .createQueryBuilder(AutoApply, "aop")
-        .where("aop.listingId = :listingId", { listingId })
-        .andWhere("aop.failedFlag = :failedFlag", { failedFlag: false })
+        .innerJoinAndSelect(
+          "aop.listingId",
+          "listing",
+          "listing.jobListingId = :listingId AND listing.jobBoardId = :jobBoardId",
+          { listingId, jobBoardId }
+        )
+        .where("aop.failedFlag = :failedFlag", { failedFlag: false })
         .andWhere("aop.completedFlag = :completedFlag", { completedFlag: true })
-        .andWhere("aop.jobBoardId = :jobBoardId", { jobBoardId })
         .andWhere("aop.userId = :userId", { userId })
         .getMany();
 
