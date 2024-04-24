@@ -2,6 +2,7 @@ const button = document.getElementById("activateButton") as HTMLElement;
 const jobQueryInput = document.getElementById(
   "searchQueryInput"
 ) as HTMLInputElement;
+const userId = document.getElementById("userIdInput") as HTMLInputElement;
 
 const limit = 50;
 
@@ -38,16 +39,22 @@ button.addEventListener("click", async () => {
     return;
   }
 
-  fetch(`${apiUrl}/jobBoard/${jobBoardName}`, {
+  // Create promises for both fetch requests
+  const jobBoardPromise = fetch(`${apiUrl}/jobBoard/${jobBoardName}`, {
     method: "GET",
-  })
-    .then((response) => response.json())
-    .then((data) => {
+  }).then((response) => response.json());
+
+  const userPromise = fetch(`${apiUrl}/user/${userId}`, {
+    method: "GET",
+  }).then((response) => response.json());
+
+  Promise.all([jobBoardPromise, userPromise])
+    .then(([jobBoardData, userData]) => {
       chrome.storage.local
         .set({
           "jobQuery": jobQueryInput.value,
-          "jobBoard": data, 
-          "requestedListings": 11,
+          "jobBoard": jobBoardData,
+          "user": userData,
         })
         .then(() => {
           chrome.runtime.sendMessage({
@@ -56,5 +63,7 @@ button.addEventListener("click", async () => {
           });
         });
     })
-    .catch((error) => console.error("Error fetching jobBoard data:", error));
+    .catch((error) => {
+      console.error("Error fetching data:", error);
+    });
 });

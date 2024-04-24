@@ -4,6 +4,7 @@ import { utcToUnix } from "../../lib/utils/date";
 
 import { Listing } from "../../src/entity/Listing";
 import { JobBoard } from "../../src/entity/JobBoard";
+import { User } from "../../src/entity/User";
 
 const readLocalStorage = async (key: string): Promise<any> => {
   return new Promise((resolve, reject) => {
@@ -20,11 +21,12 @@ const readLocalStorage = async (key: string): Promise<any> => {
 //testing stuff
 //TODO track these values in environment somehow
 const apiUrl = "http://localhost:4000/api/";
-const RequestedListings = 11;
-const TEST_USER = 1;
 //
 
 let INDEED_BOARD: JobBoard;
+let CURRENT_USER: User;
+let REQUESTED_LISTINGS: number;
+
 let prevListingsPerPage: number; //Not sure if this changes between user so just track it individually
 
 chrome.runtime.onSuspend.addListener(() => console.log("SUSPENDING"));
@@ -82,6 +84,8 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
   if (message.action === "setup") {
     console.log("received setup message");
     INDEED_BOARD = await readLocalStorage("jobBoard");
+    REQUESTED_LISTINGS = await readLocalStorage("requestedListings");
+    CURRENT_USER = await readLocalStorage("User");
 
     chrome.tabs.create({ url: message.url }, (newTab) => {
       if (newTab.id !== undefined) {
@@ -313,7 +317,6 @@ async function parseListings(
   if (msg.message === "initialDataSet" && msg.process == "scrapeListings") {
     try {
       console.log("Removing applied listings...");
-      const currentUserId = TEST_USER;
 
       const jobKeys = Object.keys(
         msg.initialData.jobKeysWithTwoPaneEligibility
@@ -330,7 +333,7 @@ async function parseListings(
         },
         body: JSON.stringify({
           jobKeys,
-          userId: currentUserId,
+          userId: CURRENT_USER.id,
           jobBoard: INDEED_BOARD,
         }),
       });
@@ -373,7 +376,7 @@ async function parseListings(
 
       await shortWait();
 
-      if (updatedListings.length < RequestedListings) {
+      if (updatedListings.length < REQUESTED_LISTINGS) {
         console.log("Sending " + pagesCrawled + "th page crawl request");
         await newListingScrape(msg, sender);
       } else {
@@ -544,7 +547,7 @@ async function parseListingDataListener(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: TEST_USER,
+            userId: CURRENT_USER.id,
             jobBoard: INDEED_BOARD,
             reason: "Extenal Apply Link",
             listingId: initialData.jobKey,
