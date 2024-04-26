@@ -88,16 +88,25 @@ export class Listing {
   requirementsObject: string | null;
 
   @Column({ name: "salary_object", nullable: true, type: "jsonb" })
-  salaryObject: string | null;
+  salaryObject: any | null;
 
   @Column({ name: "oragnization_object", nullable: true, type: "jsonb" })
-  oragnizationObject: string | null;
+  oragnizationObject: any | null;
 
   @Column({ name: "location_object", nullable: true, type: "jsonb" })
-  locationObject: string | null;
+  locationObject: any | null;
+
+  @Column({ name: "questions_url", nullable: true })
+  questionsURL: string | null;
 
   @Column({ name: "questions_object", nullable: true, type: "jsonb" })
-  questionsObject: string | null;
+  questionsObject: any | null;
+
+  @Column({ name: "questions_flag", nullable: true })
+  questionsFlag: boolean | null;
+
+  @Column({ name: "cover_letter_flag", nullable: true })
+  coverLetterFlag: boolean | null;
 
   @BeforeInsert()
   setDateCreated() {

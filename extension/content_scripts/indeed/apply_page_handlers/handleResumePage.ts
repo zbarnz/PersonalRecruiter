@@ -1,6 +1,6 @@
 import { tinyWait, waitForElement } from "../../../lib/utils/waits";
 
-export async function handleResumePage() {
+export async function handleResumePage(resume: Buffer | null) {
   //TODO figure out how to get resume uploaded
 
   // Click the header button to start the resume upload process

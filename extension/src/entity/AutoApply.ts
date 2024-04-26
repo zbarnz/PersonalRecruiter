@@ -29,6 +29,12 @@ export class AutoApply {
   @Column({ name: "question_answers", nullable: true, type: "jsonb" })
   questionAnswers: string | null;
 
+  @Column({ name: "custom_resume_flag" })
+  customResumeFlag: boolean;
+
+  @Column({ name: "custom_cover_letter_flag" })
+  customCoverLetterFlag: boolean;
+
   @Column({ name: "completed_flag", default: false })
   completedFlag: boolean;
 

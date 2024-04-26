@@ -6,16 +6,13 @@ import { Listing } from "../../src/entity/Listing";
 import { JobBoard } from "../../src/entity/JobBoard";
 import { User } from "../../src/entity/User";
 
-const readLocalStorage = async (key: string): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    chrome.storage.local.get([key], function (result) {
-      if (result[key] === undefined) {
-        resolve(undefined);
-      } else {
-        resolve(result[key]);
-      }
-    });
-  });
+import { readLocalStorage } from "../../lib/utils/chrome/storage";
+
+type JobDetails = {
+  jobKey: any;
+  showExperienceFlag: boolean;
+  requiredQualifications: any;
+  listing: Listing;
 };
 
 //testing stuff
@@ -465,6 +462,9 @@ async function parseListingDataListener(
     if (sender.tab?.id) {
       const initialData: any = msg.initialData;
       const contextData: any = msg.context;
+      const applyButtonAttributes: IndeedApplyButtonAttributes =
+        initialData?.indeedApplyButtonContainer?.indeedApplyButtonAttributes;
+
       let showExperienceFlag: boolean;
 
       console.log(contextData);
@@ -523,6 +523,10 @@ async function parseListingDataListener(
       listing.oragnizationObject = contextData.hiringOrganization ?? null;
       listing.locationObject = contextData.jobLocation ?? null;
       listing.directApplyFlag = contextData.directApply;
+      listing.questionsFlag =
+        applyButtonAttributes.questions || initialData.hr?.questions
+          ? true
+          : false;
 
       const res = await fetch(`${apiUrl}/listing/create`, {
         method: "POST",
@@ -533,9 +537,6 @@ async function parseListingDataListener(
           listing,
         }),
       });
-
-      const applyButtonAttributes: IndeedApplyButtonAttributes =
-        initialData?.indeedApplyButtonContainer?.indeedApplyButtonAttributes;
 
       if (!contextData.directApply) {
         //Create an exception for this user
@@ -590,13 +591,15 @@ async function parseListingDataListener(
         initialData.jobInfoWrapperModel.jobInfoModel.jobDescriptionSectionModel
           ?.qualificationsSectionModel?.content || null;
 
+      const jobDetails: JobDetails = {
+        jobKey: initialData.jobKey,
+        listing: listing,
+        showExperienceFlag: showExperienceFlag,
+        requiredQualifications: requiredQualifications,
+      };
+
       chrome.storage.local.set({
-        "currentListingContext": {
-          jobKey: initialData.jobKey,
-          ...contextData,
-          showExperienceFlag: showExperienceFlag,
-          requiredQualifications: requiredQualifications,
-        },
+        "currentListingContext": jobDetails,
       });
 
       await shortWait();
@@ -653,6 +656,7 @@ async function startApplyListner(tabId: number, changeInfo: any) {
   console.log("2" + changeInfo);
   if (changeInfo.status === "complete") {
     chrome.tabs.onUpdated.removeListener(startApplyListner);
+
     console.log("Beginning Apply flow...");
     chrome.scripting.executeScript(
       {
@@ -665,7 +669,9 @@ async function startApplyListner(tabId: number, changeInfo: any) {
             `Error injecting script: ${chrome.runtime.lastError.message}`
           );
         } else {
-          chrome.tabs.sendMessage(tabId, { action: "beginApplyFlow" }); //tabId is definitly freaking defined
+          chrome.tabs.sendMessage(tabId, {
+            action: "beginApplyFlow",
+          });
         }
       }
     );

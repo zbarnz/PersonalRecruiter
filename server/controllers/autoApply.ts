@@ -3,14 +3,8 @@ import { Exception } from "../entity/Exception";
 import { getConnection } from "../data-source";
 
 import { getApplyResourcesHelper } from "./applyResources";
-import { getUserHelper } from "./user";
-import { getListingByIdHelper } from "./listing";
-
-import { User } from "entity/User";
-import { Listing } from "entity/Listing";
 
 import { Request, Response } from "express";
-import { JobBoard } from "entity/JobBoard";
 import { DataSource } from "typeorm";
 
 //helpers
@@ -42,10 +36,16 @@ export const createApply = async (req: Request, res: Response) => {
     const getAnswers: boolean = req.body.getAnswers;
     const questions: any = req.body.questions;
 
+    let documents: Documents = {
+      coverLetter: null,
+      resume: null,
+      answeredQuestions: null,
+    };
+
     const savedApply = await createApplyHelper(autoApply);
 
     if (getCoverLetter || getResume || getAnswers) {
-      getApplyResourcesHelper(
+      documents = await getApplyResourcesHelper(
         autoApply.user,
         autoApply.listing,
         getCoverLetter,
@@ -55,7 +55,7 @@ export const createApply = async (req: Request, res: Response) => {
         savedApply
       );
     }
-    res.json(savedApply);
+    res.json({ savedApply, documents });
   } catch (error) {
     res
       .status(500)

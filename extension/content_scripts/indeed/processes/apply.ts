@@ -7,6 +7,8 @@ import {
 } from "../../../lib/utils/waits";
 
 import { Listing } from "../../../src/entity/Listing";
+import { AutoApply } from "../../../src/entity/AutoApply";
+import { User } from "../../../src/entity/User";
 
 import { standardizeIndeedApplyUrl } from "../../../lib/utils/parsing";
 
@@ -19,6 +21,18 @@ import {
 import { handleResumePage } from "../apply_page_handlers/handleResumePage";
 import { handleReviewPage } from "../apply_page_handlers/handleReviewPage";
 import { handleWorkExperiencePage } from "../apply_page_handlers/handleWorkExperiencePage";
+import { getInitialDataInjection } from "./getInitialData";
+
+import { readLocalStorage } from "../../../lib/utils/chrome/storage";
+
+const apiUrl = "http://localhost:4000/api/";
+
+type JobDetails = {
+  jobKey: any;
+  showExperienceFlag: boolean;
+  requiredQualifications: any;
+  listing: Listing;
+};
 
 chrome.runtime.onMessage.addListener(startApplyListner);
 chrome.runtime.onMessage.addListener(beginApplyFlow);
@@ -45,6 +59,51 @@ async function clickApplyButton() {
   }
 }
 
+function isIqURL(url: string): boolean {
+  console.log("is IQ?: " + url);
+  //check if a url is a indeed  URL scheme
+  // Regular expression to match the format 'iq://<some characters>'
+  const pattern = /^iq:\/\/[^\s]+$/;
+  return pattern.test(url);
+}
+
+async function getQuestions(
+  initialData: any,
+  questionsURL: any
+): Promise<any | null> {
+  const isIndeedURL = isIqURL(questionsURL);
+
+  if (isIndeedURL) {
+    let questions = initialData.screenerQuestions;
+
+    if (questions.length) {
+      questions = filterQuestionsObjects(questions);
+    }
+  } else {
+    let questions;
+
+    questions = initialData.screenerQuestions;
+
+    if (!questions.length) {
+      console.log("\n \nREQUESTING QUESTIONS \n \n");
+
+      const res = await fetch(decodeURIComponent(questionsURL));
+      questions = await res.json();
+    }
+
+    if (questions.length) {
+      questions = filterQuestionsObjects(questions);
+    }
+
+    if (questions) {
+      console.log("got questions: \n" + JSON.stringify(questions));
+      return questions;
+    } else {
+      return null;
+    }
+  }
+}
+
 async function beginApplyFlow(
   message: any,
   sender: chrome.runtime.MessageSender,
@@ -53,20 +112,51 @@ async function beginApplyFlow(
   if (message.action == "beginApplyFlow") {
     console.log("beginning apply flow...");
 
-    console.log("testing wait at: " + new Date().getSeconds() + " seconds");
-    await longWait();
-    console.log("finished at: " + new Date().getSeconds() + " seconds");
+    await getInitialDataInjection();
+    const initialData = window._initialData;
+
+    const jobDetails: JobDetails = await readLocalStorage(
+      "currentListingContext"
+    );
+    const user: User = await readLocalStorage("User");
+    const listing: Listing = jobDetails.listing;
 
     let url: string;
     let matched = null;
 
-    //need to get these:
-    let aiStructuredResume = "";
-    let jobDescription = "";
-    let listing: Listing;
-    let user = "";
-    let autoApply = "";
-    let answeredQuestions: any[] = [];
+    const coverLetterFlag = initialData.hr.coverLetter;
+    const questions = getQuestions(initialData, listing.questionsURL);
+
+    let getCoverLetter: boolean =
+      coverLetterFlag && coverLetterFlag !== "hidden" ? true : false;
+    let getResume: boolean = user.customResumeFlag;
+    let getAnswers: boolean = listing.questionsFlag ? true : false;
+
+    let answeredQuestions: any[] | null = [];
+
+    console.log("Creating AutoApply and getting documents!");
+
+    const autoApply = new AutoApply();
+
+    autoApply.listing = listing;
+    autoApply.user = user;
+
+    const res = await fetch(`${apiUrl}/autoApply/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        autoApply: autoApply,
+        getCoverLetter: getCoverLetter,
+        getResume: getResume,
+        getAnswers: getAnswers,
+        questions: questions,
+      }),
+    });
+
+    const { documents }: { documents: Documents } = await res.json();
+    answeredQuestions = documents.answeredQuestions;
 
     while (
       location.href.includes("m5.apply.indeed") ||
@@ -111,7 +201,7 @@ async function beginApplyFlow(
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/resume":
           await waitForElement(continueButtonSelector, false);
-          await handleResumePage();
+          await handleResumePage(documents.resume);
           await (
             document.querySelector(continueButtonSelector) as HTMLElement
           ).click();
@@ -120,7 +210,7 @@ async function beginApplyFlow(
 
         case "questionsPattern":
           await waitForElement(continueButtonSelector, false);
-          if (answeredQuestions.length) {
+          if (answeredQuestions && answeredQuestions.length) {
             await handleQuestionsPage(answeredQuestions);
           }
           matched = undefined; //clear matched variable
@@ -150,9 +240,6 @@ async function beginApplyFlow(
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/review":
           await waitForElement(continueButtonSelector, false);
-          // if (!isVisible) {
-          //   continue;
-          // } //will sometimes render an invisible version on page
           //TODO reintroduce below
           // await handleReviewPage(
           //   aiStructuredResume,
@@ -163,7 +250,6 @@ async function beginApplyFlow(
           (document.querySelector("#continueButton") as HTMLElement)?.click();
           await waitForElement(disabledButtonSelector, false);
           //TODO reintroduce below
-          // await createApply(autoApply);
           await waitForElement(".ia-PostApply-header", false);
           break;
 
@@ -206,14 +292,10 @@ async function beginApplyFlow(
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/documents":
           await waitForElement(continueButtonSelector, false);
-          //TODO reintroduce below
-          // const { clPath, clText } = await generateCoverLetter(
-          //   aiStructuredResume,
-          //   jobDescription,
-          //   listing,
-          //   user
-          // );
-          // await handleDocumentsPage(clText);
+
+          await handleDocumentsPage(
+            documents.coverLetter
+          );
           await (
             document.querySelector(continueButtonSelector) as HTMLElement
           ).click();

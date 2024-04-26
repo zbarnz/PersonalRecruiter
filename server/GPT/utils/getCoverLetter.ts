@@ -13,7 +13,7 @@ import { EntityManager } from "typeorm";
 export async function generateCoverLetter(
   user: User,
   listing: Listing
-): Promise<Buffer> {
+): Promise<{ buffer: Buffer; text: string }> {
   if (
     user &&
     user.summarizedResume &&
@@ -40,12 +40,13 @@ export async function generateCoverLetter(
       return input.replace(/\[.*?\]/g, "");
     }
 
-    let parsedText = removePlaceholders(completionText).replace(/\n/g, "<br>");
+    let parsedText = removePlaceholders(completionText);
 
     console.log("GPT Attempt #:" + retries);
 
+    let removedNewLines = parsedText.replace(/\n/g, "<br>");
     const clHTML = coverLetter(
-      parsedText,
+      removedNewLines,
       user.firstName + " " + user.lastName,
       user.phone,
       user.email,
@@ -54,7 +55,7 @@ export async function generateCoverLetter(
 
     const pdfBuffer = await compileHTMLtoPDF(clHTML);
 
-    return pdfBuffer;
+    return { buffer: pdfBuffer, text: parsedText };
   } else {
     throw new Error("User or listing missing summarization");
   }

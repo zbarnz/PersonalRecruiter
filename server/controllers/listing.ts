@@ -36,6 +36,7 @@ export const saveListing = async (req: Request, res: Response) => {
   try {
     const listing: Listing = req.body.listing;
     const connection: DataSource = await getConnection();
+    const requiredQualifications = listing.requirementsObject;
 
     const unixDate = Math.floor(Date.now() / 1000);
 
@@ -58,9 +59,12 @@ export const saveListing = async (req: Request, res: Response) => {
 
         //if the description has been updated since last save then we need to resummarize the description
         if (similarity < 0.95) {
-          listing.summarizedJobDescription = await summarizeJobDescription(
-            listing
+          let summarizedJobDescription = await summarizeJobDescription(
+            listing,
+            listing.requirementsObject
           );
+
+          listing.summarizedJobDescription = summarizedJobDescription;
         }
       }
 
@@ -74,7 +78,12 @@ export const saveListing = async (req: Request, res: Response) => {
     } else {
       // Create new listing and set initial update time and summarize the description
       listing.dateUpdated = unixDate;
-      listing.summarizedJobDescription = await summarizeJobDescription(listing);
+      let summarizedJobDescription = await summarizeJobDescription(
+        listing,
+        listing.requirementsObject
+      );
+
+      listing.summarizedJobDescription = summarizedJobDescription;
 
       const listingEntity = connection.manager.create(Listing, listing);
       res.json(listingEntity);

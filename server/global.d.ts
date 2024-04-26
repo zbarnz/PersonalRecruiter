@@ -28,3 +28,9 @@ type Question = {
   characterLimit: string;
   options: Array<{ value: string; label: string }>;
 };
+
+type Documents = {
+  coverLetter: { buffer: Buffer | null; text: string | null } | null;
+  resume: Buffer | null;
+  answeredQuestions: any[] | null;
+};

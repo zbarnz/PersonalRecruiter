@@ -16,12 +16,6 @@ import { getUserHelper } from "./user";
 
 import { getConnection } from "../data-source";
 
-type Documents = {
-  coverLetter: Buffer | null;
-  resume: Buffer | null;
-  answeredQuestions: any[] | null;
-};
-
 export async function getApplyResourcesHelper(
   user: User,
   listing: Listing,
@@ -33,7 +27,7 @@ export async function getApplyResourcesHelper(
 ): Promise<Documents> {
   const connection = await getConnection();
   return await connection.transaction(async (transactionalEntityManager) => {
-    let coverLetter: Buffer | null = null;
+    let coverLetter: { buffer: Buffer | null; text: string | null } = null;
     let resume: Buffer | null = null;
     let answeredQuestions: any[] = null;
 
@@ -42,13 +36,13 @@ export async function getApplyResourcesHelper(
 
     try {
       if (getCoverLetterFlag) {
-        coverLetter = await generateCoverLetter(user, listing);
+        const coverLetter = await generateCoverLetter(user, listing);
 
         const pdfRecord = new PDF();
         pdfRecord.user = user;
         pdfRecord.listing = listing;
         pdfRecord.type = "Cover Letter";
-        pdfRecord.pdfData = coverLetter;
+        pdfRecord.pdfData = coverLetter.buffer;
         transactionalEntityManager.save(PDF);
       }
 

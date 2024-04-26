@@ -7,6 +7,7 @@ import { summarizeDescriptionPrompt } from "../prompts/summarizeDescription";
 
 export async function summarizeJobDescription(
   listing: Listing,
+  requiredQualifications?: any,
   user?: User
 ): Promise<string> {
   let completionText: string;
@@ -29,6 +30,16 @@ export async function summarizeJobDescription(
     undefined,
     user ? false : true
   ));
+
+  if (requiredQualifications) {
+    let qualificationsString = "\n\nMinimum Qualifications:\n";
+    for (const key in requiredQualifications) {
+      if (requiredQualifications.hasOwnProperty(key)) {
+        qualificationsString += requiredQualifications[key].join("\n") + "\n";
+      }
+    }
+    completionText += qualificationsString;
+  }
 
   return completionText;
 }

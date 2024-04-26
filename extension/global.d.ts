@@ -35,6 +35,12 @@ interface NavigateMessage {
   tabId: number;
   navId: string;
 }
-  interface Window {
-    _initialData: any; // You can replace `any` with a more specific type tailored to your data
-  }
+interface Window {
+  _initialData: any; // You can replace `any` with a more specific type tailored to your data
+}
+
+type Documents = {
+  coverLetter: { buffer: Buffer | null; text: string | null } | null;
+  resume: Buffer | null;
+  answeredQuestions: any[] | null;
+};

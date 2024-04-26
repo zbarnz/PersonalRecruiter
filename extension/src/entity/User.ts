@@ -29,6 +29,9 @@ export class User {
   @Column()
   skills: string[] | null;
 
+  @Column({ name: "custom_resume_flag", default: true })
+  customResumeFlag: boolean;
+
   @BeforeInsert()
   setDateCreated() {
     this.createdAt = Math.floor(Date.now() / 1000);
