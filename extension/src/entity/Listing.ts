@@ -12,8 +12,8 @@ import {
 
 import { JobBoard } from "./JobBoard";
 
-@Unique(["jobListingId", "jobBoardId"])
-@Index(["jobListingId", "jobBoardId"])
+@Unique(["jobListingId", "jobBoard"])
+@Index(["jobListingId", "jobBoard"])
 @Entity()
 export class Listing {
   @PrimaryGeneratedColumn()

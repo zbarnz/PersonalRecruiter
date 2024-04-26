@@ -6,7 +6,7 @@ import { AutoApply } from "../entity/AutoApply";
 
 import { Request, Response } from "express";
 
-import { calculateStringSimilarity } from "lib/utils/parsing";
+import { calculateStringSimilarity } from "../lib/utils/parsing";
 
 import { summarizeJobDescription } from "../GPT/utils/summarizeDescription"; //TODO empty page
 import { DataSource } from "typeorm";
@@ -98,18 +98,18 @@ export const saveListing = async (req: Request, res: Response) => {
 };
 
 /**
- * Controller to get a listing by jobListingId and jobBoardId.
- * @param {Request} req - Express request object, jobListingId and jobBoardId should be in the request parameters.
+ * Controller to get a listing by jobListingId and jobBoard.
+ * @param {Request} req - Express request object, jobListingId and jobBoard should be in the request parameters.
  * @param {Response} res - Express response object for sending the response.
  */
 export const getListing = async (req: Request, res: Response) => {
   try {
-    const { jobListingId, jobBoardId } = req.params;
+    const { jobListingId, jobBoard } = req.params;
     const connection = await getConnection();
     const listing = await connection.manager
       .createQueryBuilder(Listing, "listing")
       .where("listing.jobListingId = :jobListingId", { jobListingId })
-      .andWhere("listing.jobBoardId = :jobBoardId", { jobBoardId })
+      .andWhere("listing.jobBoard = :jobBoard", { jobBoard })
       .getOne();
     if (!listing) {
       return res.status(404).json({ error: "Listing not found." });

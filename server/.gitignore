@@ -15,3 +15,6 @@ scripts/
 
 #apply assets
 src/apply_assets/
+
+#env
+*.env

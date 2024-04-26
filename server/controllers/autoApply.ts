@@ -84,7 +84,7 @@ export const getApply = async (req: Request, res: Response) => {
 export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
     let listings: string[] = req.body.jobKeys; // Assuming ID comes from URL parameters
-    let jobBoardId: number = req.body.jobBoard;
+    let jobBoard: number = req.body.jobBoard;
     let userId: number = req.body.userId;
 
     const connection = await getConnection();
@@ -96,8 +96,8 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
         .innerJoinAndSelect(
           "aop.listingId",
           "listing",
-          "listing.jobListingId = :listingId AND listing.jobBoardId = :jobBoardId",
-          { listingId, jobBoardId }
+          "listing.jobListingId = :listingId AND listing.jobBoard = :jobBoard",
+          { listingId, jobBoard }
         )
         .where("aop.failedFlag = :failedFlag", { failedFlag: false })
         .andWhere("aop.completedFlag = :completedFlag", { completedFlag: true })
@@ -108,7 +108,7 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
       const exceptionRecords = await connection.manager
         .createQueryBuilder(Exception, "exc")
         .where("exc.listingId = :listingId", { listingId })
-        .andWhere("exc.jobBoardId = :jobBoardId", { jobBoardId })
+        .andWhere("exc.jobBoard = :jobBoard", { jobBoard })
         .andWhere("exc.userId = :userId", { userId })
         .getMany();
 

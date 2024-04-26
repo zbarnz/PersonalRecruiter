@@ -1,7 +1,7 @@
-import { Listing } from "entity/Listing";
-import { User } from "entity/User";
+import { Listing } from "../../entity/Listing";
+import { User } from "../../entity/User";
 
-import { GPTText } from "GPT";
+import { GPTText } from "../../GPT/index";
 
 import { summarizeDescriptionPrompt } from "../prompts/summarizeDescription";
 

@@ -6,9 +6,6 @@ import express from "express";
 import router from "./routes";
 import cors from "cors";
 
-import { JobBoard } from "../entity/JobBoard";
-import { Listing } from "../entity/Listing";
-
 //For docker to init db
 
 const start = async () => {

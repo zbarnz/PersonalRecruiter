@@ -26,7 +26,7 @@ export class User {
   @Column({ name: "summarized_resume", nullable: true })
   summarizedResume: string | null;
 
-  @Column()
+  @Column({ type: "text", array: true })
   skills: string[] | null;
 
   @Column({ name: "custom_resume_flag", default: true })

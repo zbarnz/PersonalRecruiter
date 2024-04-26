@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
 import { getConnection } from "../data-source";
 
+import { JobBoard } from "../entity/JobBoard";
+
 import { Exception } from "../entity/Exception";
-import { User } from "../entity/User";
-import { JobBoard } from "entity/JobBoard";
+
 
 export const createException = async (req: Request, res: Response) => {
   try {
@@ -12,7 +13,7 @@ export const createException = async (req: Request, res: Response) => {
       listingId: req.body.listingId,
       dateUpdated: Math.floor(Date.now() / 1000), // Current time in UNIX timestamp
       reason: req.body.reason,
-      jobBoardId: req.body.jobBoard,
+      jobBoard: req.body.jobBoard,
       userId: req.body.userId,
     };
     const exception = connection.manager.create(Exception, exceptionData);

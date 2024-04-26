@@ -6,13 +6,11 @@ import { Listing } from "../../entity/Listing";
 
 import { isValidArray } from "../../lib/utils/parsing";
 
-import { compileHTMLtoPDF } from "lib/utils/pdf";
+import { compileHTMLtoPDF } from "../../lib/utils/pdf";
 
 import { resumeWSkills } from "../../src/apply_assets/resume";
 
 import { GPTText } from "../index";
-
-import { EntityManager } from "typeorm";
 
 import dotenv from "dotenv";
 dotenv.config();

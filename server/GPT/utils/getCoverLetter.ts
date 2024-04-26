@@ -8,8 +8,6 @@ import { Listing } from "../../entity/Listing";
 
 import { GPTText } from "../index";
 
-import { EntityManager } from "typeorm";
-
 export async function generateCoverLetter(
   user: User,
   listing: Listing

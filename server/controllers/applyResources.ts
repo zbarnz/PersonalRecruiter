@@ -1,9 +1,9 @@
 import { Response, Request } from "express";
 
-import { Listing } from "entity/Listing";
-import { User } from "entity/User";
-import { AutoApply } from "entity/AutoApply";
-import { PDF } from "entity/PDF";
+import { Listing } from "../entity/Listing";
+import { User } from "../entity/User";
+import { AutoApply } from "../entity/AutoApply";
+import { PDF } from "../entity/PDF";
 
 import { generateCoverLetter } from "../GPT/utils/getCoverLetter";
 import { answerQuestions } from "../GPT/utils/answerQuestions";
