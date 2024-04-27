@@ -11,6 +11,7 @@ import { AutoApply } from "../../../src/entity/AutoApply";
 import { User } from "../../../src/entity/User";
 
 import { standardizeIndeedApplyUrl } from "../../../lib/utils/parsing";
+import { filterQuestionsObjects } from "../../../lib/utils/indeed";
 
 import { handleContactInfoPage } from "../apply_page_handlers/handleContactInfoPage";
 import { handleDocumentsPage } from "../apply_page_handlers/handleDocumentsPage";
@@ -25,13 +26,14 @@ import { getInitialDataInjection } from "./getInitialData";
 
 import { readLocalStorage } from "../../../lib/utils/chrome/storage";
 
-const apiUrl = "http://localhost:4000/api/";
+const apiUrl = "http://localhost:4000/api";
 
 type JobDetails = {
   jobKey: any;
   showExperienceFlag: boolean;
   requiredQualifications: any;
   listing: Listing;
+  questionsUrl: string;
 };
 
 chrome.runtime.onMessage.addListener(startApplyListner);
@@ -60,11 +62,15 @@ async function clickApplyButton() {
 }
 
 function isIqURL(url: string): boolean {
-  console.log("is IQ?: " + url);
-  //check if a url is a indeed  URL scheme
-  // Regular expression to match the format 'iq://<some characters>'
-  const pattern = /^iq:\/\/[^\s]+$/;
-  return pattern.test(url);
+  if (url) {
+    console.log("is IQ?: " + url);
+    //check if a url is a indeed  URL scheme
+    // Regular expression to match the format 'iq://<some characters>'
+    const pattern = /^iq:\/\/[^\s]+$/;
+    return pattern.test(url);
+  } else {
+    throw new Error("Missing question url");
+  }
 }
 
 async function getQuestions(
@@ -84,7 +90,7 @@ async function getQuestions(
 
     questions = initialData.screenerQuestions;
 
-    if (!questions.length) {
+    if (!questions.length && questionsURL) {
       console.log("\n \nREQUESTING QUESTIONS \n \n");
 
       const res = await fetch(decodeURIComponent(questionsURL));
@@ -118,14 +124,18 @@ async function beginApplyFlow(
     const jobDetails: JobDetails = await readLocalStorage(
       "currentListingContext"
     );
-    const user: User = await readLocalStorage("User");
+    const user: User = await readLocalStorage("user");
     const listing: Listing = jobDetails.listing;
 
     let url: string;
     let matched = null;
+    let questions: any;
 
     const coverLetterFlag = initialData.hr.coverLetter;
-    const questions = getQuestions(initialData, listing.questionsURL);
+
+    if (jobDetails.questionsUrl) {
+      questions = getQuestions(initialData, jobDetails.questionsUrl);
+    }
 
     let getCoverLetter: boolean =
       coverLetterFlag && coverLetterFlag !== "hidden" ? true : false;
@@ -140,6 +150,8 @@ async function beginApplyFlow(
 
     autoApply.listing = listing;
     autoApply.user = user;
+    autoApply.customResumeFlag = getResume;
+    autoApply.customCoverLetterFlag = getCoverLetter;
 
     const res = await fetch(`${apiUrl}/autoApply/create`, {
       method: "POST",
@@ -154,6 +166,12 @@ async function beginApplyFlow(
         questions: questions,
       }),
     });
+
+    if (res.status != 200) {
+      throw new Error(
+        "Failed to create autoApply: " + JSON.stringify(await res.json())
+      );
+    }
 
     const { documents }: { documents: Documents } = await res.json();
     answeredQuestions = documents.answeredQuestions;
@@ -247,7 +265,9 @@ async function beginApplyFlow(
           //   listing,
           //   user
           // );
-          (document.querySelector("#continueButton") as HTMLElement)?.click();
+          (
+            document.querySelector(continueButtonSelector) as HTMLElement
+          )?.click();
           await waitForElement(disabledButtonSelector, false);
           //TODO reintroduce below
           await waitForElement(".ia-PostApply-header", false);
@@ -293,9 +313,7 @@ async function beginApplyFlow(
         case "https://m5.apply.indeed.com/beta/indeedapply/form/documents":
           await waitForElement(continueButtonSelector, false);
 
-          await handleDocumentsPage(
-            documents.coverLetter
-          );
+          await handleDocumentsPage(documents.coverLetter);
           await (
             document.querySelector(continueButtonSelector) as HTMLElement
           ).click();

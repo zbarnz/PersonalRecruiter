@@ -66,8 +66,8 @@ async function getInitialData(
     if (message.getContext) {
       await Promise.race([
         //either external link or apply button
-        await waitForElement("#indeedApplyButton", true),
-        await waitForElement("#applyButtonLinkContainer", true),
+        waitForElement("#indeedApplyButton", true),
+        waitForElement("#applyButtonLinkContainer", true),
       ]);
     }
 

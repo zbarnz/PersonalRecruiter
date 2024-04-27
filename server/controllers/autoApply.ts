@@ -7,11 +7,15 @@ import { getApplyResourcesHelper } from "./applyResources";
 import { Request, Response } from "express";
 import { DataSource } from "typeorm";
 
+import { JobBoard } from "../entity/JobBoard";
+import { User } from "../entity/User";
+
 //helpers
 
 export const createApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
   const connection: DataSource = await getConnection();
-  const savedApply = await connection.manager.save(a);
+  const applyEntity = connection.manager.create(AutoApply, a);
+  const savedApply = await connection.manager.save(applyEntity);
   return savedApply;
 };
 
@@ -29,12 +33,15 @@ export const getApplyHelper = async (
 
 export const createApply = async (req: Request, res: Response) => {
   try {
-    const autoApply: AutoApply = req.body;
+    const autoApply: AutoApply = req.body.autoApply;
 
     const getCoverLetter: boolean = req.body.getCoverLetter;
     const getResume: boolean = req.body.getResume;
     const getAnswers: boolean = req.body.getAnswers;
     const questions: any = req.body.questions;
+
+    console.log(autoApply);
+    console.log(questions);
 
     let documents: Documents = {
       coverLetter: null,
@@ -46,8 +53,8 @@ export const createApply = async (req: Request, res: Response) => {
 
     if (getCoverLetter || getResume || getAnswers) {
       documents = await getApplyResourcesHelper(
-        autoApply.user,
-        autoApply.listing,
+        savedApply.user,
+        savedApply.listing,
         getCoverLetter,
         getResume,
         getAnswers,
@@ -84,8 +91,11 @@ export const getApply = async (req: Request, res: Response) => {
 export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
     let listings: string[] = req.body.jobKeys; // Assuming ID comes from URL parameters
-    let jobBoard: number = req.body.jobBoard;
-    let userId: number = req.body.userId;
+    let jobBoard: JobBoard = req.body.jobBoard;
+    let user: User = req.body.user;
+
+    let jobBoardId = jobBoard.id;
+    let userId = user.id;
 
     const connection = await getConnection();
 
@@ -94,22 +104,32 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
       const autoApplyRecords = await connection.manager
         .createQueryBuilder(AutoApply, "aop")
         .innerJoinAndSelect(
-          "aop.listingId",
-          "listing",
-          "listing.jobListingId = :listingId AND listing.jobBoard = :jobBoard",
-          { listingId, jobBoard }
+          "aop.listing",
+          "lis",
+          "lis.jobListingId = :listingId",
+          { listingId }
         )
+        .innerJoinAndSelect("lis.jobBoard", "job", "job.id = :jobBoardId", {
+          jobBoardId,
+        })
+        .innerJoinAndSelect("aop.user", "usr", "usr.id = :userId", { userId })
         .where("aop.failedFlag = :failedFlag", { failedFlag: false })
         .andWhere("aop.completedFlag = :completedFlag", { completedFlag: true })
-        .andWhere("aop.userId = :userId", { userId })
         .getMany();
 
       // Query Exception records
       const exceptionRecords = await connection.manager
         .createQueryBuilder(Exception, "exc")
-        .where("exc.listingId = :listingId", { listingId })
-        .andWhere("exc.jobBoard = :jobBoard", { jobBoard })
-        .andWhere("exc.userId = :userId", { userId })
+        .innerJoinAndSelect(
+          "exc.listing",
+          "lis",
+          "lis.jobListingId = :listingId",
+          { listingId }
+        )
+        .innerJoinAndSelect("lis.jobBoard", "job", "job.id = :jobBoardId", {
+          jobBoardId,
+        })
+        .innerJoinAndSelect("exc.user", "usr", "usr.id = :userId", { userId })
         .getMany();
 
       // Check if any AutoApply or Exception records exist

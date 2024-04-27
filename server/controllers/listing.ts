@@ -49,6 +49,7 @@ export const saveListing = async (req: Request, res: Response) => {
 
     if (existingListing) {
       // Update existing listing with new data from `listing`
+      console.log("Updating existing listing");
 
       if (listing.description && existingListing.description) {
         // Calculate similarity of both descriptions
@@ -61,7 +62,7 @@ export const saveListing = async (req: Request, res: Response) => {
         if (similarity < 0.95) {
           let summarizedJobDescription = await summarizeJobDescription(
             listing,
-            listing.requirementsObject
+            requiredQualifications
           );
 
           listing.summarizedJobDescription = summarizedJobDescription;
@@ -74,19 +75,27 @@ export const saveListing = async (req: Request, res: Response) => {
           existingListing[key] = listing[key];
         }
       });
-      existingListing.dateUpdated = unixDate;
     } else {
-      // Create new listing and set initial update time and summarize the description
-      listing.dateUpdated = unixDate;
+      console.log("Creating new listing");
+      // Create new listing before summarizing because GTP calls need to be
+      // associated to a listing
+      const listingEntity = connection.manager.create(Listing, listing);
+      const savedListingPreSummarize = await connection.manager.save(
+        listingEntity
+      );
+      console.log(JSON.stringify(listingEntity));
+
       let summarizedJobDescription = await summarizeJobDescription(
-        listing,
-        listing.requirementsObject
+        savedListingPreSummarize,
+        requiredQualifications
       );
 
-      listing.summarizedJobDescription = summarizedJobDescription;
+      savedListingPreSummarize.summarizedJobDescription =
+        summarizedJobDescription;
 
-      const listingEntity = connection.manager.create(Listing, listing);
-      res.json(listingEntity);
+      const savedListing = await connection.manager.save(listingEntity);
+
+      res.json(savedListing);
       return;
     }
 

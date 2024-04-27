@@ -111,6 +111,7 @@ export class Listing {
   @BeforeInsert()
   setDateCreated() {
     this.datePosted = Math.floor(Date.now() / 1000);
+    this.dateUpdated = Math.floor(Date.now() / 1000);
   }
 
   @BeforeUpdate()

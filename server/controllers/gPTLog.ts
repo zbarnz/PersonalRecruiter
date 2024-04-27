@@ -8,9 +8,14 @@ import { Request, Response } from "express";
 //helpers
 
 export const createGPTLogHelper = async (g: GPTLog): Promise<GPTLog> => {
-  const connection: DataSource = await getConnection();
-  const savedGPTLog = await connection.manager.save(g);
-  return savedGPTLog;
+  try {
+    const connection: DataSource = await getConnection();
+    const savedGPTLog = await connection.manager.save(g);
+    return savedGPTLog;
+  } catch (error) {
+    console.error("Error saving GPTLog:", error);
+    throw new Error("Failed to save GPTLog");
+  }
 };
 
 export const setGPTLogAsFailedHelper = async (

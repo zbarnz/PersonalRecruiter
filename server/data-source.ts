@@ -16,7 +16,7 @@ export const AppDataSource = new DataSource({
   password: "password",
   database: "autoapply",
   synchronize: true,
-  logging: false,
+  logging: true,
   entities: [Listing, JobBoard, AutoApply, GPTLog, User, Exception, PDF], //can also import like "src/entity/*.ts"
   migrations: [],
   subscribers: [],

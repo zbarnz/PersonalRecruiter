@@ -43,7 +43,8 @@ export async function getApplyResourcesHelper(
         pdfRecord.listing = listing;
         pdfRecord.type = "Cover Letter";
         pdfRecord.pdfData = coverLetter.buffer;
-        transactionalEntityManager.save(PDF);
+        const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
+        transactionalEntityManager.save(pdfEntity);
       }
 
       if (getResumeFlag) {
@@ -54,7 +55,8 @@ export async function getApplyResourcesHelper(
         pdfRecord.listing = listing;
         pdfRecord.type = "Resume";
         pdfRecord.pdfData = resume;
-        transactionalEntityManager.save(PDF);
+        const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
+        transactionalEntityManager.save(pdfEntity);
       }
 
       if (getAnswersFlag) {
@@ -76,7 +78,7 @@ export async function getApplyResourcesHelper(
         );
       }
 
-      throw new Error("Failed to get Documents " + err.message);
+      throw new Error("Failed to get Documents: " + err.message);
     }
   });
 }

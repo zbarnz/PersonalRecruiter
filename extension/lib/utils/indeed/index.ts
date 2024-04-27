@@ -77,7 +77,7 @@ function shortenCommonOptions(
  *
  * @param {any[]} questions - questions object array
  */
-function filterQuestionsObjects(questions: any[]): Question[] {
+export function filterQuestionsObjects(questions: any[]): Question[] {
   const excludedTypes = new Set(["INFORMATION", "PAGEBREAK"]);
 
   console.log("unfiltered questions: \n" + JSON.stringify(questions));

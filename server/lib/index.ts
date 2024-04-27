@@ -22,10 +22,16 @@ const start = async () => {
     app.use(
       cors({
         origin: (origin, callback) => {
+          const allowedOrigins = [
+            "https://smartapply.indeed.com",
+            "https://m5.apply.indeed.com",
+          ];
+
           if (
             !origin ||
             origin === "http://localhost:3000" ||
-            origin.startsWith("chrome-extension://")
+            origin.startsWith("chrome-extension://") ||
+            allowedOrigins.includes(origin)
           ) {
             callback(null, true);
           } else {

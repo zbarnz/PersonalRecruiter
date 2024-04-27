@@ -96,9 +96,6 @@ export class Listing {
   @Column({ name: "location_object", nullable: true, type: "jsonb" })
   locationObject: any | null;
 
-  @Column({ name: "questions_url", nullable: true })
-  questionsURL: string | null;
-
   @Column({ name: "questions_object", nullable: true, type: "jsonb" })
   questionsObject: any | null;
 

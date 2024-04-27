@@ -9,6 +9,7 @@ import {
 
 import { User } from "./User";
 import { JobBoard } from "./JobBoard";
+import { Listing } from "./Listing";
 
 @Entity()
 export class Exception {
@@ -19,8 +20,9 @@ export class Exception {
   @JoinColumn({ name: "job_board" })
   jobBoard: JobBoard;
 
-  @Column({ name: "listing_id" })
-  listingId: string;
+  @ManyToOne((type) => Listing)
+  @JoinColumn({ name: "listing" })
+  listing: Listing;
 
   @Column({ name: "date_updated", type: "bigint" })
   dateUpdated: number; //unix

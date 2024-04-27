@@ -13,11 +13,12 @@ type JobDetails = {
   showExperienceFlag: boolean;
   requiredQualifications: any;
   listing: Listing;
+  questionsUrl: string;
 };
 
 //testing stuff
 //TODO track these values in environment somehow
-const apiUrl = "http://localhost:4000/api/";
+const apiUrl = "http://localhost:4000/api";
 //
 
 let INDEED_BOARD: JobBoard;
@@ -82,7 +83,10 @@ chrome.runtime.onMessage.addListener(async (message, sender, sendResponse) => {
     console.log("received setup message");
     INDEED_BOARD = await readLocalStorage("jobBoard");
     REQUESTED_LISTINGS = await readLocalStorage("requestedListings");
-    CURRENT_USER = await readLocalStorage("User");
+    CURRENT_USER = await readLocalStorage("user");
+
+    console.log("current user: \n" + JSON.stringify(CURRENT_USER));
+    console.log("Job Board: \n" + JSON.stringify(INDEED_BOARD));
 
     chrome.tabs.create({ url: message.url }, (newTab) => {
       if (newTab.id !== undefined) {
@@ -330,7 +334,7 @@ async function parseListings(
         },
         body: JSON.stringify({
           jobKeys,
-          userId: CURRENT_USER.id,
+          user: CURRENT_USER,
           jobBoard: INDEED_BOARD,
         }),
       });
@@ -338,8 +342,6 @@ async function parseListings(
       if (res.status !== 200) {
         throw new Error(
           "Removing applied listings failed: " +
-            res.statusText +
-            ": " +
             JSON.stringify(await res.json())
         );
       }
@@ -507,7 +509,10 @@ async function parseListingDataListener(
       listing.minSalary = safeMath(Math.floor, minYearlySalary!) ?? null;
       listing.maxSalary = safeMath(Math.ceil, maxYearlySalary!) ?? null;
       listing.country =
-        contextData.jobLocation?.address?.addressCountry ?? null;
+        (initialData?.jobInfoWrapperModel?.jobInfoModel
+          ?.jobDescriptionSectionModel?.qualificationsSectionModel?.content ||
+          contextData.jobLocation?.address?.addressCountry) ??
+        null;
       listing.region1 =
         contextData.jobLocation?.address?.addressRegion1 ?? null;
       listing.region2 =
@@ -524,7 +529,7 @@ async function parseListingDataListener(
       listing.locationObject = contextData.jobLocation ?? null;
       listing.directApplyFlag = contextData.directApply;
       listing.questionsFlag =
-        applyButtonAttributes.questions || initialData.hr?.questions
+        applyButtonAttributes?.questions || initialData.hr?.questions
           ? true
           : false;
 
@@ -537,6 +542,15 @@ async function parseListingDataListener(
           listing,
         }),
       });
+
+      if (res.status !== 200) {
+        throw new Error(
+          "Failed to create listing: " + JSON.stringify(await res.json())
+        );
+      }
+
+      const createdListing = await res.json();
+      console.log(createdListing);
 
       if (!contextData.directApply) {
         //Create an exception for this user
@@ -591,11 +605,15 @@ async function parseListingDataListener(
         initialData.jobInfoWrapperModel.jobInfoModel.jobDescriptionSectionModel
           ?.qualificationsSectionModel?.content || null;
 
+      const questionsUrl =
+        applyButtonAttributes?.questions || initialData.hr?.questions;
+
       const jobDetails: JobDetails = {
         jobKey: initialData.jobKey,
-        listing: listing,
+        listing: createdListing,
         showExperienceFlag: showExperienceFlag,
         requiredQualifications: requiredQualifications,
+        questionsUrl: questionsUrl,
       };
 
       chrome.storage.local.set({

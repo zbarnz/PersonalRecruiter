@@ -8,6 +8,8 @@ import { isValidArray } from "../../lib/utils/parsing";
 
 import { compileHTMLtoPDF } from "../../lib/utils/pdf";
 
+import { setGPTLogAsFailedHelper } from "../../controllers/gPTLog";
+
 import { resumeWSkills } from "../../src/apply_assets/resume";
 
 import { GPTText } from "../index";
@@ -27,7 +29,10 @@ export async function getResume(
 
   console.log("Compiling Resume");
 
-  const skillsPrompt = getSkillsPrompt(listing.description, user.skills);
+  const skillsPrompt = getSkillsPrompt(
+    listing.summarizedJobDescription,
+    user.skills
+  );
 
   while (retries < MAX_RETRIES && !isValidArray(completionText)) {
     ({ text: completionText, prevLogId: previousLogId } = await GPTText(
@@ -40,10 +45,15 @@ export async function getResume(
       "Output in JSON"
     ));
     retries++;
+
+    completionText = completionText
+      .replace(/\`\`\`json\n/, "")
+      .replace(/\n\`\`\`/, "");
     console.log("GPT Attempt #:" + retries);
   }
 
   if (!isValidArray(completionText)) {
+    await setGPTLogAsFailedHelper(previousLogId);
     throw new Error("Could not get valid JSON from GPT call");
   }
 
@@ -67,6 +77,7 @@ export async function getResume(
   }
 
   if (!isValidArray(completionText)) {
+    await setGPTLogAsFailedHelper(previousLogId);
     throw new Error("Could not get valid JSON from GPT call");
   }
 

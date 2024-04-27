@@ -1,0 +1,85 @@
+{
+  "listing": {
+    "closedFlag": false,
+    "company": "Ready 123 Solutions, LLC",
+    "country": "US",
+    "coverLetterFlag": null,
+    "currency": "USD",
+    "datePosted": 1714191992,
+    "dateUpdated": 1714192002,
+    "description": "<p>Ready 123 Solutions provide Field Support to major brands ie., Walmart, Chase and more!</p>\n<p><b>CALLING ALL ENTRY LEVEL TECHS! </b>COME LEARN HANDS ON HARDWARE AND SOFTWARE SUPPORT SKILLS!</p>\n<p>Responsibilities:</p>\n<p>- Take ownership of assigned Works Orders to provide Onsite Field Support to major brands.</p>\n<p>- Install, configure, maintain network equipment to include Software upgrades, POS, Servers, Switches, Routers, SD-WANS, Card Readers, Printers, Cat 5/6, CCTV</p>\n<p>- Troubleshoot and resolve network issues, including connectivity problems and hardware failures</p>\n<p>- Collaborate with other Support team members to ensure smooth operation of the Break/Fix</p>\n<p>Qualifications:<br>- Solid understanding of computer networking principles and protocols, including TCP/IP, LAN/WAN, VPN, and DNS</p>\n<p>- Strong problem-solving skills and ability to communicate technical information effectively</p>\n<p>****Must provide your own basic tools when performing Break/Fix, ie. Butt Set, Punchdown tool, RJ45 Cable Tester, Cordless drill, Toner, standard screwdriver set****</p>\n<p><b>****We reimburse for Tools and Cat 5/6 purchases ****</b></p>\n<p><b>****Weekly Pay****</b></p>\n<p><b>****Mileage Reimbursement****</b></p>\n<p>Note: This is a general job description for an IT Technician position. The specific responsibilities and qualifications may vary depending on the organization's requirements.</p>\n<p>Job Types: Part-time, Contract</p>\n<p>Pay: $18.00 per hour</p>\n<p>Expected hours: 15 – 25 per week</p>\n<p>Benefits:</p>\n<ul>\n <li>Referral program</li>\n</ul>\n<p>Schedule:</p>\n<ul>\n <li>Day shift</li>\n <li>Evening shift</li>\n <li>Monday to Friday</li>\n <li>On call</li>\n <li>Weekends as needed</li>\n</ul>\n<p>Experience:</p>\n<ul>\n <li>Computer skills: 1 year (Required)</li>\n</ul>\n<p>Work Location: In person</p>",
+    "directApplyFlag": true,
+    "employmentType": ["CONTRACTOR", "PART_TIME"],
+    "id": 7,
+    "jobBoard": {
+      "id": 1,
+      "name": "Indeed"
+    },
+    "jobListingId": "7347682cb0122ee1",
+    "locality": "",
+    "locationObject": {
+      "@type": "Place",
+      "address": "[Object]"
+    },
+    "maxSalary": 37440,
+    "minSalary": null,
+    "oragnizationObject": {
+      "@type": "Organization",
+      "name": "Ready 123 Solutions, LLC",
+      "sameAs": "https://www.indeed.com/cmp/Ready-123-Solutions,-LLC"
+    },
+    "questionsFlag": false,
+    "questionsObject": null,
+    "questionsURL": null,
+    "region1": "CO",
+    "region2": null,
+    "remoteFlag": false,
+    "requirementsObject": null,
+    "salaryObject": {
+      "@type": "MonetaryAmount",
+      "currency": "USD",
+      "value": "[Object]"
+    },
+    "summarizedJobDescription": "Ready 123 Solutions, LLC specializes in providing onsite field support to prominent brands like Walmart and Chase. They are currently seeking entry-level technicians eager to develop hands-on skills in both hardware and software support. The role involves taking full responsibility for assigned work orders, which includes the installation, configuration, and maintenance of various network equipment such as POS systems, servers, routers, and CCTV. Technicians will also troubleshoot network issues and work in collaboration with the support team to ensure efficient break/fix operations.\n\nCandidates for this position should have a solid understanding of computer networking principles like TCP/IP and LAN/WAN. Strong problem-solving skills and the ability to effectively communicate technical information are essential. The job requires technicians to provide their own basic tools but does offer reimbursements for tools and network cable purchases. This part-time, contract position requires 15-25 hours of work per week and includes variable shifts, including day, evening, and weekends as needed.",
+    "title": "IT Field Technician"
+  },
+  "user": {
+    "createdAt": "1714156750",
+    "customResumeFlag": true,
+    "email": "zbarnz99@gmail.com",
+    "firstName": "Zach",
+    "id": 1,
+    "lastName": "Barnes",
+    "phone": "7207557572",
+    "skills": [
+      "REACT",
+      "NEXT.JS",
+      "MONGODB",
+      "GRAPHQL",
+      "NEST.JS",
+      "POSTGRESQL",
+      "PRISMA",
+      "EXPRESS",
+      "APOLLO",
+      "SQL SERVER",
+      "HTML",
+      "CSS",
+      "JAVASCRIPT",
+      "GIT",
+      "Docker",
+      "Axios",
+      "Mocha",
+      "Mongoose",
+      "MUI",
+      "ChatGPT API",
+      "Node.js",
+      "SQL",
+      "Puppeteer",
+      "C++"
+    ],
+    "summarizedResume": null,
+    "website": null
+  },
+  "customResumeFlag": true,
+  "customCoverLetterFlag": false
+}

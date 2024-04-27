@@ -13,8 +13,8 @@ jobQueryInput.addEventListener("click", () => {
 });
 
 button.addEventListener("click", async () => {
-  const apiUrl = "http://localhost:4000/api/";
-  const jobBoardName = "indeed";
+  const apiUrl = "http://localhost:4000/api";
+  const jobBoardName = "Indeed";
 
   if (!jobQueryInput.value) {
     // Apply red border and box shadow directly
@@ -44,12 +44,19 @@ button.addEventListener("click", async () => {
     method: "GET",
   }).then((response) => response.json());
 
-  const userPromise = fetch(`${apiUrl}/user/${userId}`, {
+  const userPromise = fetch(`${apiUrl}/user/${userId.value}`, {
     method: "GET",
   }).then((response) => response.json());
 
   Promise.all([jobBoardPromise, userPromise])
     .then(([jobBoardData, userData]) => {
+      if (jobBoardData.error || userData.error) {
+        throw new Error(
+          "Error fetching data:",
+          jobBoardData.error + userData.error
+        );
+      }
+
       chrome.storage.local
         .set({
           "jobQuery": jobQueryInput.value,
