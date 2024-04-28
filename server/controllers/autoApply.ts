@@ -14,8 +14,24 @@ import { User } from "../entity/User";
 
 export const createApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
   const connection: DataSource = await getConnection();
+
+  const existingApply = await connection.manager.findOne(AutoApply, {
+    where: { listing: a.listing, user: a.user },
+    relations: ["listing", "user"],
+  });
+
+  if (existingApply) {
+    return existingApply;
+  }
+
   const applyEntity = connection.manager.create(AutoApply, a);
   const savedApply = await connection.manager.save(applyEntity);
+  return savedApply;
+};
+
+export const saveApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
+  const connection: DataSource = await getConnection();
+  const savedApply = await connection.manager.save(a);
   return savedApply;
 };
 
@@ -52,6 +68,8 @@ export const createApply = async (req: Request, res: Response) => {
     };
 
     const savedApply = await createApplyHelper(autoApply);
+
+    console.log(savedApply);
 
     if (getCoverLetter || getResume || getAnswers) {
       documents = await getApplyResourcesHelper(
@@ -148,5 +166,30 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
   }
 };
 
-const autoApplyController = { getApply, createApply, removeAppliedListings };
+export const completeApply = async (req: Request, res: Response) => {
+  try {
+    const autoApplyId: AutoApply["id"] = Number(req.params.id); // Assuming ID comes from URL parameters
+    const autoApply = await getApplyHelper(autoApplyId);
+
+    if (!autoApply) {
+      return res.status(404).json({ error: "AutoApply not found." });
+    }
+
+    autoApply.completedFlag = true;
+    await saveApplyHelper(autoApply);
+
+    res.json(autoApply);
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
+};
+
+const autoApplyController = {
+  completeApply,
+  getApply,
+  createApply,
+  removeAppliedListings,
+};
 export default autoApplyController;

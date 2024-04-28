@@ -183,7 +183,7 @@ export async function fillQuestion(
             siblingElement.textContent &&
             siblingElement.textContent.trim() === answer
           ) {
-            inputCheckbox.checked = true;
+            inputCheckbox.click();
           }
         }
       });
@@ -196,7 +196,7 @@ export async function fillQuestion(
   ) {
     console.log("filling checkbox with " + question.answer);
     // For radio buttons and checkboxes not in a multi-select
-    inputElement.checked = question.answer.includes(inputElement.value);
+    inputElement.click();
     question.answered = true;
     return;
   } else if (inputElement instanceof HTMLInputElement && inputType === "date") {
@@ -214,6 +214,13 @@ export async function fillQuestion(
     question.answered = true;
     return;
   } else if (inputElement instanceof HTMLInputElement) {
+    // General handling for text, number, email, etc.
+    console.log("filling (other) input with " + question.answer);
+    changeInputValue(question.answer, inputElement);
+
+    question.answered = true;
+    return;
+  } else if (isTextarea) {
     // General handling for text, number, email, etc.
     console.log("filling (other) input with " + question.answer);
     changeInputValue(question.answer, inputElement);

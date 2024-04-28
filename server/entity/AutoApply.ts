@@ -5,12 +5,14 @@ import {
   ManyToOne,
   JoinColumn,
   BeforeInsert,
+  Unique,
 } from "typeorm";
 
 import { User } from "./User";
 import { Listing } from "./Listing";
 
 @Entity()
+@Unique(["listing", "user"])
 export class AutoApply {
   @PrimaryGeneratedColumn()
   id: number;

@@ -9,5 +9,5 @@ router.post(
   autoApplyController.removeAppliedListings
 );
 
+router.get("/complete/:_id", autoApplyController.completeApply);
 router.get("/:_id", autoApplyController.getApply);
-

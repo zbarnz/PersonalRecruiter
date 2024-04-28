@@ -175,7 +175,10 @@ async function beginApplyFlow(
       );
     }
 
-    const { documents }: { documents: Documents } = await res.json();
+    const {
+      savedApply,
+      documents,
+    }: { savedApply: AutoApply; documents: Documents } = await res.json();
     answeredQuestions = documents.answeredQuestions;
 
     console.log("got documents");
@@ -296,7 +299,6 @@ async function beginApplyFlow(
           await (
             document.querySelector(continueButtonSelector) as HTMLElement
           ).click();
-          await waitForElement(disabledButtonSelector, false);
           break;
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/qualification-questions":
@@ -339,5 +341,13 @@ async function beginApplyFlow(
 
       url = location.href;
     }
+
+    const completeMessage = {
+      message: "applyComplete",
+      autoApply,
+    };
+
+    console.log("sending apply complete message");
+    console.log(completeMessage);
   }
 }

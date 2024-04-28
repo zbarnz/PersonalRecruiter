@@ -7,6 +7,7 @@ import { JobBoard } from "../../src/entity/JobBoard";
 import { User } from "../../src/entity/User";
 
 import { readLocalStorage } from "../../lib/utils/chrome/storage";
+import { AutoApply } from "../../src/entity/AutoApply";
 
 type JobDetails = {
   jobKey: any;
@@ -466,6 +467,8 @@ async function parseListingDataListener(
       const contextData: any = msg.context;
       const applyButtonAttributes: IndeedApplyButtonAttributes =
         initialData?.indeedApplyButtonContainer?.indeedApplyButtonAttributes;
+      const isDisabled: boolean =
+        initialData?.indeedApplyButtonContainer?.disabled;
 
       let showExperienceFlag: boolean;
 
@@ -553,9 +556,45 @@ async function parseListingDataListener(
       const createdListing = await res.json();
       console.log(createdListing);
 
+      if (isDisabled) {
+        console.log("creating Exception for Job (apply button disabled)");
+        const res = await fetch(`${apiUrl}/exception/create`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            userId: CURRENT_USER.id,
+            jobBoard: INDEED_BOARD,
+            reason: "Extenal Apply Link",
+            listingId: initialData.jobKey,
+          }),
+        });
+
+        if (res.status != 200) {
+          console.log("failed to create exception");
+          console.log(res);
+          console.log(await res.json());
+          return;
+        }
+
+        const listings: string[] =
+          (await readLocalStorage("unappliedListings")) || [];
+
+        await chrome.storage.local.set({
+          "unappliedListings": listings.filter(
+            (item) => item !== initialData.jobKey
+          ),
+        });
+
+        await shortWait();
+        await getListingData(msg, sender);
+        return;
+      }
+
       if (!contextData.directApply) {
         //Create an exception for this user
-        console.log("creating Exception for Job");
+        console.log("creating Exception for Job (not direct apply)");
 
         const res = await fetch(`${apiUrl}/exception/create`, {
           method: "POST",
@@ -693,5 +732,35 @@ async function startApplyListner(tabId: number, changeInfo: any) {
         }
       }
     );
+  }
+}
+
+async function applyCompleteListner(
+  msg: any,
+  sender: chrome.runtime.MessageSender,
+  sendResponse: (response?: any) => void
+) {
+  if (msg.message === "applyComplete") {
+    console.log("Completed Apply!");
+    if (msg.autoApply) {
+      const autoApply: AutoApply = msg.autoApply;
+      const res = await fetch(`${apiUrl}/autoApply/complete`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          autoApply: autoApply.id,
+        }),
+      });
+
+      if (res.status != 200) {
+        throw new Error(
+          "Failed to complete autoApply: " + JSON.stringify(await res.json())
+        );
+      }
+    } else {
+      throw new Error("Apply completed but could not get auto apply record...");
+    }
   }
 }
