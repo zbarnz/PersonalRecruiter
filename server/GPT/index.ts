@@ -120,7 +120,7 @@ export async function GPTText( //TODO change args to options obj
     gptLog.systemFlag = systemFlag || false;
     gptLog.createdAt = Math.floor(Date.now() / 1000);
 
-    console.log("saving GPT log: " + JSON.stringify(gptLog));
+    console.log("saving GPT log");
     const savedLog = await createGPTLogHelper(gptLog);
 
     completionText = completion.choices[0].message;

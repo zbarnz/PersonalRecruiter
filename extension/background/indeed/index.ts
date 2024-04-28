@@ -523,7 +523,8 @@ async function parseListingDataListener(
       listing.jobBoard = INDEED_BOARD;
       listing.jobListingId = initialData.jobKey;
       listing.requirementsObject =
-        contextData.applicantLocationRequirements ?? null;
+        initialData.jobInfoWrapperModel?.jobDescriptionSectionModel
+          ?.qualificationsSectionModel?.content ?? null;
       listing.salaryObject = contextData.baseSalary ?? null;
       listing.oragnizationObject = contextData.hiringOrganization ?? null;
       listing.locationObject = contextData.jobLocation ?? null;
@@ -605,8 +606,7 @@ async function parseListingDataListener(
         initialData.jobInfoWrapperModel.jobInfoModel.jobDescriptionSectionModel
           ?.qualificationsSectionModel?.content || null;
 
-      const questionsUrl =
-        applyButtonAttributes?.questions || initialData.hr?.questions;
+      const questionsUrl = applyButtonAttributes?.questions;
 
       const jobDetails: JobDetails = {
         jobKey: initialData.jobKey,

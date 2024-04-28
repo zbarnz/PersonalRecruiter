@@ -12,12 +12,7 @@ export async function generateCoverLetter(
   user: User,
   listing: Listing
 ): Promise<{ buffer: Buffer; text: string }> {
-  if (
-    user &&
-    user.summarizedResume &&
-    listing &&
-    listing.summarizedJobDescription
-  ) {
+  try {
     const prompt = getCoverLetterPrompt(
       user.summarizedResume,
       listing.summarizedJobDescription
@@ -54,7 +49,7 @@ export async function generateCoverLetter(
     const pdfBuffer = await compileHTMLtoPDF(clHTML);
 
     return { buffer: pdfBuffer, text: parsedText };
-  } else {
-    throw new Error("User or listing missing summarization");
+  } catch (err) {
+    throw new Error("Failed to generate cover letter: " + err.message);
   }
 }

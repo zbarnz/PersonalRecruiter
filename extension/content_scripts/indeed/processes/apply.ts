@@ -76,11 +76,12 @@ function isIqURL(url: string): boolean {
 async function getQuestions(
   initialData: any,
   questionsURL: any
-): Promise<any | null> {
+): Promise<any[] | null> {
   const isIndeedURL = isIqURL(questionsURL);
+  let questions: any[] = [];
 
   if (isIndeedURL) {
-    let questions = initialData.screenerQuestions;
+    questions = initialData.screenerQuestions;
 
     if (questions.length) {
       questions = filterQuestionsObjects(questions);
@@ -100,13 +101,13 @@ async function getQuestions(
     if (questions.length) {
       questions = filterQuestionsObjects(questions);
     }
+  }
 
-    if (questions) {
-      console.log("got questions: \n" + JSON.stringify(questions));
-      return questions;
-    } else {
-      return null;
-    }
+  if (questions.length) {
+    console.log("got questions: \n" + JSON.stringify(questions));
+    return questions;
+  } else {
+    return null;
   }
 }
 
@@ -129,18 +130,20 @@ async function beginApplyFlow(
 
     let url: string;
     let matched = null;
-    let questions: any;
+    let questions: any[] | null = [];
+
+    const questionsUrl = jobDetails.questionsUrl || initialData.hr?.questions;
 
     const coverLetterFlag = initialData.hr.coverLetter;
 
-    if (jobDetails.questionsUrl) {
-      questions = getQuestions(initialData, jobDetails.questionsUrl);
+    if (questionsUrl) {
+      console.log("getting questions");
+      questions = await getQuestions(initialData, questionsUrl);
     }
 
     let getCoverLetter: boolean =
       coverLetterFlag && coverLetterFlag !== "hidden" ? true : false;
     let getResume: boolean = user.customResumeFlag;
-    let getAnswers: boolean = listing.questionsFlag ? true : false;
 
     let answeredQuestions: any[] | null = [];
 
@@ -162,7 +165,6 @@ async function beginApplyFlow(
         autoApply: autoApply,
         getCoverLetter: getCoverLetter,
         getResume: getResume,
-        getAnswers: getAnswers,
         questions: questions,
       }),
     });
@@ -175,6 +177,9 @@ async function beginApplyFlow(
 
     const { documents }: { documents: Documents } = await res.json();
     answeredQuestions = documents.answeredQuestions;
+
+    console.log("got documents");
+    console.log(documents);
 
     while (
       location.href.includes("m5.apply.indeed") ||

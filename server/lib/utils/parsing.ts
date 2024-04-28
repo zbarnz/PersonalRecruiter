@@ -8,16 +8,16 @@ export function isValidJson(text: string): boolean {
 }
 
 //epic comments below
-export function isValidArray(str: string): boolean {
-  try {
-    // Try to parse the string as JSON
-    const parsed = JSON.parse(str);
-
-    // Check if the parsed result is an array
-    return Array.isArray(parsed);
-  } catch (e) {
-    // If an error occurs during parsing, it's not a valid array string
-    return false;
+export function isValidArray(input: string | any[]): boolean {
+  if (typeof input === "string") {
+    try {
+      const parsed = JSON.parse(input);
+      return Array.isArray(parsed);
+    } catch (e) {
+      return false;
+    }
+  } else {
+    return Array.isArray(input);
   }
 }
 

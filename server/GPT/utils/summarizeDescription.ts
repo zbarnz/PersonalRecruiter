@@ -10,7 +10,7 @@ export async function summarizeJobDescription(
   requiredQualifications?: any,
   user?: User
 ): Promise<string> {
-  let completionText: string;
+  let completionText: any;
   let retries: number = 0;
 
   console.log("Summarizing Job description");
@@ -33,10 +33,8 @@ export async function summarizeJobDescription(
 
   if (requiredQualifications) {
     let qualificationsString = "\n\nMinimum Qualifications:\n";
-    for (const key in requiredQualifications) {
-      if (requiredQualifications.hasOwnProperty(key)) {
-        qualificationsString += requiredQualifications[key].join("\n") + "\n";
-      }
+    for (const qualification in requiredQualifications) {
+      qualificationsString += qualification + "\n";
     }
     completionText += qualificationsString;
   }

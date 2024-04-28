@@ -1,3 +1,17 @@
+import { mediumWait, shortWait } from "../../../lib/utils/waits";
+import { handleDocumentsPage } from "./handleDocumentsPage";
+
+//indeed is too smart for element.value so lets simulate user interaction
+function changeInputValue(value: string, inputElement: HTMLElement) {
+  const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+    window.HTMLInputElement.prototype,
+    "value"
+  )?.set;
+  nativeInputValueSetter?.call(inputElement, value);
+
+  inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
 export async function handleQuestionsPage(answeredQuestions: any) {
   let indeedStandardQuestions: any;
 
@@ -18,11 +32,20 @@ export async function handleQuestionsPage(answeredQuestions: any) {
   });
 
   for (let i = 0; i < answeredQuestions.length; i++) {
+    console.log("filling question: " + JSON.stringify(answeredQuestions[i]));
     await fillQuestion(answeredQuestions[i]);
   }
 }
 
-export async function fillQuestion(question: any) {
+export async function fillQuestion(
+  question: any,
+  coverLetter?: {
+    buffer: Buffer | null;
+    text: string | null;
+  } | null
+) {
+  let elementArr: HTMLElement[];
+
   if (question.answered) {
     console.log(
       "skipping answered question: " + question.viewId || question.name
@@ -32,22 +55,34 @@ export async function fillQuestion(question: any) {
 
   const elementIdSelectorId = `[id*="${question.viewId}"]`;
   const elementIdSelectorName = `[id*="${question.name}"]`;
-  const elementNameSelectorId = `[name*="${question.viewId}"]`;
-  const elementNameSelectorName = `[name*="${question.name}"]`;
 
   let elementsById = document.querySelectorAll(elementIdSelectorId);
   let elementsByName = document.querySelectorAll(elementIdSelectorName);
-  let elementArr = elementsByName.length ? elementsByName : elementsById;
+
+  elementArr =
+    ([...elementsByName] as HTMLElement[]) ||
+    ([...elementsById] as HTMLElement[]);
 
   const validElementTags = ["input", "textarea", "select"];
-  let filteredElements = Array.from(elementArr).filter((el) => {
-    const tagName = el.tagName.toLowerCase();
-    const containsFieldset =
-      tagName === "div" && el.querySelector("fieldset") !== null;
-    return containsFieldset || validElementTags.includes(tagName);
-  });
 
-  filteredElements;
+  let filteredElements = elementArr
+    .map((element) => {
+      const tagName = element.tagName.toLowerCase();
+      const containsFieldset =
+        tagName === "div" && element.querySelector("fieldset") !== null;
+
+      return containsFieldset || validElementTags.includes(tagName)
+        ? element
+        : null;
+    })
+    .filter((element) => element !== null);
+
+  console.log(
+    "element arr: \n" +
+      JSON.stringify(elementArr) +
+      "\n for question: \n" +
+      JSON.stringify(question)
+  );
 
   if (!filteredElements.length) {
     console.log(
@@ -62,7 +97,7 @@ export async function fillQuestion(question: any) {
       const element = el as HTMLInputElement;
 
       const inputValue = element.value;
-      const nextSibling = el.nextElementSibling;
+      const nextSibling = element.nextElementSibling;
       const spanInnerHTML = nextSibling ? nextSibling.innerHTML : "";
       return (
         inputValue === question.answer || spanInnerHTML === question.answer
@@ -84,11 +119,10 @@ export async function fillQuestion(question: any) {
 
   let inputElement = filteredElements[0];
 
-  if (
-    !(inputElement instanceof HTMLInputElement) ||
-    !(inputElement instanceof HTMLSelectElement)
-  ) {
-    throw new Error("Element not correct property");
+  if (!inputElement) {
+    throw new Error(
+      "This should never happen we ensure that above but if youre seeing this the evaluated input element doesnt exist for some reason"
+    );
   }
 
   const isInput = inputElement.tagName.toLowerCase() === "input";
@@ -98,17 +132,45 @@ export async function fillQuestion(question: any) {
 
   let inputType = isInput ? inputElement.getAttribute("type") : undefined;
 
+  if (!isInput && !isTextarea && !isSelect && !isMultiSelect) {
+    // Find the nearest child input element
+    const childInput = inputElement.querySelector("input");
+
+    if (childInput) {
+      // Replace the current element with the child input element
+      inputElement = childInput;
+      console.log("Replaced element with nearest child input element.");
+    } else {
+      console.log("No child input element found.");
+      // Handle the case where no child input is found
+    }
+  }
+
+  if (!inputType && isInput) {
+    const placeholder = inputElement.getAttribute("placeholder");
+    const slashCount = placeholder ? placeholder.split("/").length - 1 : 0;
+
+    if (slashCount == 2) {
+      inputType = "date";
+    }
+  }
+
+  /********************** 
+  START HANDLING ACTIONS
+  ***********************/
+
+  console.log(inputElement);
+  console.log("input type: " + inputType);
+
   // Handling for multi-select (checkboxes within a fieldset)
   if (isMultiSelect) {
-    // Assuming question.answer is an array for multi-select questions
+    console.log("filling multiSelect");
     let answers = Array.isArray(question.answer)
       ? question.answer
       : [question.answer];
     for (const answer of answers) {
-      //yucky type shit
       let checkboxes = inputElement.querySelectorAll("input[type=checkbox]");
       checkboxes.forEach((checkbox) => {
-        // First, assert that checkbox is indeed an HTMLInputElement
         const inputCheckbox = checkbox as HTMLInputElement;
 
         // Check if the next sibling is non-null and is an HTMLElement
@@ -126,31 +188,59 @@ export async function fillQuestion(question: any) {
         }
       });
     }
-  } else if (inputType === "radio" || inputType === "checkbox") {
+    question.answered = true;
+    return;
+  } else if (
+    inputElement instanceof HTMLInputElement &&
+    (inputType === "radio" || inputType === "checkbox")
+  ) {
+    console.log("filling checkbox with " + question.answer);
     // For radio buttons and checkboxes not in a multi-select
     inputElement.checked = question.answer.includes(inputElement.value);
-  } else if (inputType === "date") {
+    question.answered = true;
+    return;
+  } else if (inputElement instanceof HTMLInputElement && inputType === "date") {
+    console.log("filling date with " + question.answer);
     // Handling for date inputs
-    inputElement.value = question.answer; // Ensure question.answer is in YYYY-MM-DD format for date inputs
-  } else if (inputType === "file") {
+    changeInputValue(question.answer, inputElement);
+    question.answered = true;
+    return;
+  } else if (inputElement instanceof HTMLInputElement && inputType === "file") {
+    console.log("filling file input with " + question.answer);
     // File inputs require a different approach, potentially using URL.createObjectURL() or handling through background scripts due to security restrictions
-  } else {
+    if (coverLetter) {
+      await handleDocumentsPage(coverLetter);
+    }
+    question.answered = true;
+    return;
+  } else if (inputElement instanceof HTMLInputElement) {
     // General handling for text, number, email, etc.
-    inputElement.value = question.answer;
-  }
+    console.log("filling (other) input with " + question.answer);
+    changeInputValue(question.answer, inputElement);
 
-  // For SELECT elements, this requires iterating over options to find the match
-  if (isSelect) {
-    for (const option of inputElement.options) {
-      if (option.value === question.answer || option.text === question.answer) {
-        option.selected = true;
-        break;
+    question.answered = true;
+    return;
+  } else if (isSelect) {
+    console.log("filling select with " + question.answer);
+    // For SELECT elements, this requires iterating over options to find the match
+    if (inputElement instanceof HTMLSelectElement) {
+      for (const option of inputElement.options) {
+        if (
+          option.value === question.answer ||
+          option.text === question.answer
+        ) {
+          option.selected = true;
+          break;
+        }
       }
+      question.answered = true;
+      return;
     }
   }
 
-  // Mark question as answered
-  question.answered = true;
+  throw new Error(
+    "Cant handle " + inputElement.toString() + `\n` + "of type " + inputType
+  );
 }
 
 export async function isErrorPresent() {

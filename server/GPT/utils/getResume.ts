@@ -23,71 +23,80 @@ export async function getResume(
   user: User,
   listing?: Listing
 ): Promise<Buffer> {
-  let completionText: string = "";
+  let completionText: any = "";
   let retries: number = 0;
   let previousLogId: number;
 
   console.log("Compiling Resume");
 
-  const skillsPrompt = getSkillsPrompt(
-    listing.summarizedJobDescription,
-    user.skills
-  );
+  try {
+    const skillsPrompt = getSkillsPrompt(
+      listing.summarizedJobDescription,
+      user.skills
+    );
 
-  while (retries < MAX_RETRIES && !isValidArray(completionText)) {
-    ({ text: completionText, prevLogId: previousLogId } = await GPTText(
-      skillsPrompt,
-      user,
-      previousLogId!,
-      undefined,
-      listing,
-      undefined,
-      "Output in JSON"
-    ));
-    retries++;
+    while (retries < MAX_RETRIES && !isValidArray(completionText)) {
+      ({ text: completionText, prevLogId: previousLogId } = await GPTText(
+        skillsPrompt,
+        user,
+        previousLogId!,
+        undefined,
+        listing,
+        undefined,
+        "Output in JSON"
+      ));
+      retries++;
 
-    completionText = completionText
-      .replace(/\`\`\`json\n/, "")
-      .replace(/\n\`\`\`/, "");
-    console.log("GPT Attempt #:" + retries);
+      const arrayRegex = /\[.*?\]/gs;
+      completionText = JSON.parse(completionText.match(arrayRegex)[0]);
+      console.log(completionText);
+      console.log("GPT Attempt #:" + retries);
+    }
+
+    if (!isValidArray(completionText)) {
+      await setGPTLogAsFailedHelper(previousLogId);
+      throw new Error("Could not get valid JSON from GPT call");
+    }
+
+    console.log("getSkills GPT Completion w/ soft: " + completionText);
+    const skillsWithSoft: any = completionText;
+    const removeSoftSkills = removeSoftSkillsPrompt(skillsWithSoft);
+    retries = 0;
+
+    while (retries < MAX_RETRIES && !isValidArray(completionText)) {
+      ({ text: completionText, prevLogId: previousLogId } = await GPTText(
+        removeSoftSkills,
+        user,
+        previousLogId!,
+        undefined,
+        listing,
+        undefined,
+        "Output in JSON"
+      ));
+
+      retries++;
+      const arrayRegex = /\[.*?\]/gs;
+      completionText = JSON.parse(completionText.match(arrayRegex)[0]);
+      console.log(completionText);
+
+      console.log("GPT Attempt #:" + retries);
+    }
+
+    if (!isValidArray(completionText)) {
+      await setGPTLogAsFailedHelper(previousLogId);
+      throw new Error("Could not get valid JSON from GPT call");
+    }
+
+    console.log("getSkills GPT Completion: " + completionText);
+
+    const skillsArray: string[] = completionText;
+
+    const resume = resumeWSkills(skillsArray); //TODO custome resume handler
+
+    const pdfBuffer = await compileHTMLtoPDF(resume);
+
+    return pdfBuffer;
+  } catch (err) {
+    throw new Error("Failed to generate resume letter: " + err.message);
   }
-
-  if (!isValidArray(completionText)) {
-    await setGPTLogAsFailedHelper(previousLogId);
-    throw new Error("Could not get valid JSON from GPT call");
-  }
-
-  console.log("getSkills GPT Completion w/ soft: " + completionText);
-  const skillsWithSoft = JSON.parse(completionText);
-  const removeSoftSkills = removeSoftSkillsPrompt(skillsWithSoft);
-  retries = 0;
-
-  while (retries < MAX_RETRIES && !isValidArray(completionText)) {
-    ({ text: completionText, prevLogId: previousLogId } = await GPTText(
-      removeSoftSkills,
-      user,
-      previousLogId!,
-      undefined,
-      listing,
-      undefined,
-      "Output in JSON"
-    ));
-    retries++;
-    console.log("GPT Attempt #:" + retries);
-  }
-
-  if (!isValidArray(completionText)) {
-    await setGPTLogAsFailedHelper(previousLogId);
-    throw new Error("Could not get valid JSON from GPT call");
-  }
-
-  console.log("getSkills GPT Completion: " + completionText);
-
-  const skillsArray: string[] = JSON.parse(completionText);
-
-  const resume = resumeWSkills(skillsArray); //TODO custome resume handler
-
-  const pdfBuffer = await compileHTMLtoPDF(resume);
-
-  return pdfBuffer;
 }

@@ -31,11 +31,32 @@ export async function getApplyResourcesHelper(
     let resume: Buffer | null = null;
     let answeredQuestions: any[] = null;
 
+    if (!user) {
+      throw new Error("No user passed to apply resource handler");
+    }
+
+    if (!listing) {
+      throw new Error("No listing passed to apply resource handler");
+    }
+
+    //TODO summarize job desc if there is no summarized resume
+    //TODO summarize resume if there is no summarized resume
+
+    //we should never not have either of these. If this error is thrown 
+    //there is SERIOUS BUG RED ALERT
+    if (
+      (getCoverLetterFlag || getAnswersFlag) &&
+      (!user.summarizedResume || !listing.summarizedJobDescription)
+    ) {
+      throw new Error("Missing summarized resume or job description");
+    }
+
     //set batchId for marking as failed (we dont want to rollback gpt logs)
     const batchId = Math.floor(Date.now() / 1000); //unix
 
     try {
       if (getCoverLetterFlag) {
+        console.log("Generating Cover Letter");
         const coverLetter = await generateCoverLetter(user, listing);
 
         const pdfRecord = new PDF();
@@ -48,6 +69,8 @@ export async function getApplyResourcesHelper(
       }
 
       if (getResumeFlag) {
+        console.log("Generating Resume");
+
         resume = await getResume(user, listing);
 
         const pdfRecord = new PDF();
@@ -60,6 +83,7 @@ export async function getApplyResourcesHelper(
       }
 
       if (getAnswersFlag) {
+        console.log("Answering questions");
         answeredQuestions = await answerQuestions(
           autoApply,
           user,

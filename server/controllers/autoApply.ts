@@ -37,11 +37,13 @@ export const createApply = async (req: Request, res: Response) => {
 
     const getCoverLetter: boolean = req.body.getCoverLetter;
     const getResume: boolean = req.body.getResume;
-    const getAnswers: boolean = req.body.getAnswers;
-    const questions: any = req.body.questions;
+    const questions: any | null = req.body.questions;
+
+    const getAnswers = questions?.length ? true : false;
 
     console.log(autoApply);
     console.log(questions);
+    console.log({ getResume, getCoverLetter, getAnswers });
 
     let documents: Documents = {
       coverLetter: null,
