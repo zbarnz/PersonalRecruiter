@@ -282,8 +282,10 @@ async function beginApplyFlow(
           break;
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/post-apply": //final page
-          await waitForElement("#continueButton", false);
-          (document.querySelector("#continueButton") as HTMLElement)?.click();
+          await waitForElement(continueButtonSelector, false);
+          (
+            document.querySelector(continueButtonSelector) as HTMLElement
+          )?.click();
           break;
 
         case "https://m5.apply.indeed.com/beta/indeedapply/form/profile-location":

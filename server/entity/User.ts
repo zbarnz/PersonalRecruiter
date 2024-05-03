@@ -32,6 +32,9 @@ export class User {
   @Column({ name: "custom_resume_flag", default: true })
   customResumeFlag: boolean;
 
+  @Column()
+  points: number;
+
   @BeforeInsert()
   setDateCreated() {
     this.createdAt = Math.floor(Date.now() / 1000);

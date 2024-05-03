@@ -8,6 +8,7 @@ import {
 } from "typeorm";
 import { Listing } from "./Listing";
 import { User } from "./User";
+import { AutoApply } from "./AutoApply";
 
 @Entity()
 export class GPTLog {

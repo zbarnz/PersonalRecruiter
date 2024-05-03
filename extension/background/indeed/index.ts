@@ -512,10 +512,7 @@ async function parseListingDataListener(
       listing.minSalary = safeMath(Math.floor, minYearlySalary!) ?? null;
       listing.maxSalary = safeMath(Math.ceil, maxYearlySalary!) ?? null;
       listing.country =
-        (initialData?.jobInfoWrapperModel?.jobInfoModel
-          ?.jobDescriptionSectionModel?.qualificationsSectionModel?.content ||
-          contextData.jobLocation?.address?.addressCountry) ??
-        null;
+        contextData.jobLocation?.address?.addressCountry ?? null;
       listing.region1 =
         contextData.jobLocation?.address?.addressRegion1 ?? null;
       listing.region2 =
@@ -526,8 +523,9 @@ async function parseListingDataListener(
       listing.jobBoard = INDEED_BOARD;
       listing.jobListingId = initialData.jobKey;
       listing.requirementsObject =
-        initialData.jobInfoWrapperModel?.jobDescriptionSectionModel
-          ?.qualificationsSectionModel?.content ?? null;
+        initialData.jobInfoWrapperModel?.jobInfoWrapperModel
+          ?.jobDescriptionSectionModel?.qualificationsSectionModel?.content ??
+        null;
       listing.salaryObject = contextData.baseSalary ?? null;
       listing.oragnizationObject = contextData.hiringOrganization ?? null;
       listing.locationObject = contextData.jobLocation ?? null;
@@ -566,7 +564,7 @@ async function parseListingDataListener(
           body: JSON.stringify({
             userId: CURRENT_USER.id,
             jobBoard: INDEED_BOARD,
-            reason: "Extenal Apply Link",
+            reason: "Disabled Apply Button",
             listingId: initialData.jobKey,
           }),
         });

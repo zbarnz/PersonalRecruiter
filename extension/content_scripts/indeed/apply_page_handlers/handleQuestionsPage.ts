@@ -1,15 +1,29 @@
-import { mediumWait, shortWait } from "../../../lib/utils/waits";
 import { handleDocumentsPage } from "./handleDocumentsPage";
 
 //indeed is too smart for element.value so lets simulate user interaction
 function changeInputValue(value: string, inputElement: HTMLElement) {
-  const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
-    window.HTMLInputElement.prototype,
-    "value"
-  )?.set;
-  nativeInputValueSetter?.call(inputElement, value);
+  if (
+    inputElement instanceof HTMLInputElement ||
+    inputElement instanceof HTMLTextAreaElement
+  ) {
+    const elementPrototype =
+      inputElement instanceof HTMLInputElement
+        ? HTMLInputElement.prototype
+        : HTMLTextAreaElement.prototype;
 
-  inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+    const nativeInputValueSetter = Object.getOwnPropertyDescriptor(
+      elementPrototype,
+      "value"
+    )?.set;
+
+    if (nativeInputValueSetter) {
+      nativeInputValueSetter.call(inputElement, value);
+    }
+
+    inputElement.dispatchEvent(new Event("input", { bubbles: true }));
+  } else {
+    throw new Error("Incorrect Element type passed to change Input Value");
+  }
 }
 
 export async function handleQuestionsPage(answeredQuestions: any) {
@@ -222,7 +236,7 @@ export async function fillQuestion(
     return;
   } else if (isTextarea) {
     // General handling for text, number, email, etc.
-    console.log("filling (other) input with " + question.answer);
+    console.log("filling textarea input with " + question.answer);
     changeInputValue(question.answer, inputElement);
 
     question.answered = true;

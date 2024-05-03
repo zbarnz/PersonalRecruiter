@@ -38,8 +38,8 @@ export const saveListing = async (req: Request, res: Response) => {
     const connection: DataSource = await getConnection();
     const requiredQualifications = listing.requirementsObject;
 
-    const unixDate = Math.floor(Date.now() / 1000);
 
+    
     const existingListing = await connection.manager.findOne(Listing, {
       where: {
         jobListingId: listing.jobListingId,
