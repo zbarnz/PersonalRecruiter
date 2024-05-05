@@ -4,6 +4,9 @@ import { removeSoftSkillsPrompt } from "../prompts/removeSoftSkills";
 import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";
 
+import { logger } from "../../lib/logger/pino.config";
+
+
 import { isValidArray } from "../../lib/utils/parsing";
 
 import { compileHTMLtoPDF } from "../../lib/utils/pdf";
@@ -27,7 +30,7 @@ export async function getResume(
   let retries: number = 0;
   let previousLogId: number;
 
-  console.log("Compiling Resume");
+  logger.info("Compiling Resume");
 
   try {
     const skillsPrompt = getSkillsPrompt(
@@ -49,8 +52,8 @@ export async function getResume(
 
       const arrayRegex = /\[.*?\]/gs;
       completionText = JSON.parse(completionText.match(arrayRegex)[0]);
-      console.log(completionText);
-      console.log("GPT Attempt #:" + retries);
+      logger.info(completionText);
+      logger.info("GPT Attempt #:" + retries);
     }
 
     if (!isValidArray(completionText)) {
@@ -58,7 +61,7 @@ export async function getResume(
       throw new Error("Could not get valid JSON from GPT call");
     }
 
-    console.log("getSkills GPT Completion w/ soft: " + completionText);
+    logger.info("getSkills GPT Completion w/ soft: " + completionText);
     const skillsWithSoft: any = completionText;
     const removeSoftSkills = removeSoftSkillsPrompt(skillsWithSoft);
     retries = 0;
@@ -77,9 +80,9 @@ export async function getResume(
       retries++;
       const arrayRegex = /\[.*?\]/gs;
       completionText = JSON.parse(completionText.match(arrayRegex)[0]);
-      console.log(completionText);
+      logger.info(completionText);
 
-      console.log("GPT Attempt #:" + retries);
+      logger.info("GPT Attempt #:" + retries);
     }
 
     if (!isValidArray(completionText)) {
@@ -87,7 +90,7 @@ export async function getResume(
       throw new Error("Could not get valid JSON from GPT call");
     }
 
-    console.log("getSkills GPT Completion: " + completionText);
+    logger.info("getSkills GPT Completion: " + completionText);
 
     const skillsArray: string[] = completionText;
 

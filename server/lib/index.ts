@@ -2,6 +2,8 @@ import "reflect-metadata";
 
 import { AppDataSource } from "../data-source";
 
+import { logger } from "../lib/logger/pino.config";
+
 import express from "express";
 import router from "./routes";
 import cors from "cors";
@@ -10,14 +12,14 @@ import cors from "cors";
 
 const start = async () => {
   await AppDataSource.initialize();
-  console.log("Database initialized");
+  logger.info("Database initialized");
 
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
   if (process.env.NODE_ENV === "dev") {
-    console.log("Building for DEV");
+    logger.info("Building for DEV");
 
     app.use(
       cors({
@@ -52,7 +54,7 @@ const start = async () => {
 
   const port = process.env.PORT || 4000;
 
-  console.log("listening on port: " + port);
+  logger.info("listening on port: " + port);
   app.listen(port);
 };
 

@@ -5,6 +5,8 @@ import { User } from "../entity/User";
 import { AutoApply } from "../entity/AutoApply";
 import { PDF } from "../entity/PDF";
 
+import { logger } from "../lib/logger/pino.config";
+
 import { generateCoverLetter } from "../GPT/utils/getCoverLetter";
 import { answerQuestions } from "../GPT/utils/answerQuestions";
 import { getResume } from "../GPT/utils/getResume";
@@ -42,7 +44,7 @@ export async function getApplyResourcesHelper(
     //TODO summarize job desc if there is no summarized resume
     //TODO summarize resume if there is no summarized resume
 
-    //we should never not have either of these. If this error is thrown 
+    //we should never not have either of these. If this error is thrown
     //there is SERIOUS BUG RED ALERT
     if (
       (getCoverLetterFlag || getAnswersFlag) &&
@@ -56,7 +58,7 @@ export async function getApplyResourcesHelper(
 
     try {
       if (getCoverLetterFlag) {
-        console.log("Generating Cover Letter");
+        logger.info("Generating Cover Letter");
         const coverLetter = await generateCoverLetter(user, listing);
 
         const pdfRecord = new PDF();
@@ -69,7 +71,7 @@ export async function getApplyResourcesHelper(
       }
 
       if (getResumeFlag) {
-        console.log("Generating Resume");
+        logger.info("Generating Resume");
 
         resume = await getResume(user, listing);
 
@@ -83,7 +85,7 @@ export async function getApplyResourcesHelper(
       }
 
       if (getAnswersFlag) {
-        console.log("Answering questions");
+        logger.info("Answering questions");
         answeredQuestions = await answerQuestions(
           autoApply,
           user,

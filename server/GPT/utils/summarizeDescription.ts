@@ -1,6 +1,8 @@
 import { Listing } from "../../entity/Listing";
 import { User } from "../../entity/User";
 
+import { logger } from "../../lib/logger/pino.config";
+
 import { GPTText } from "../../GPT/index";
 
 import { summarizeDescriptionPrompt } from "../prompts/summarizeDescription";
@@ -13,7 +15,7 @@ export async function summarizeJobDescription(
   let completionText: any;
   let retries: number = 0;
 
-  console.log("Summarizing Job description");
+  logger.info("Summarizing Job description");
 
   const prompt = summarizeDescriptionPrompt(
     listing.company,

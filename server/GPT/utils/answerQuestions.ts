@@ -2,6 +2,9 @@ import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";
 import { AutoApply } from "../../entity/AutoApply";
 
+import { logger } from "../../lib/logger/pino.config";
+
+
 import { getAnswersPrompt } from "../../GPT/prompts/getAnswers";
 
 import { isValidArray, isValidJson } from "../../lib/utils/parsing";
@@ -45,8 +48,8 @@ export async function answerQuestions(
 
       const arrayRegex = /\[.*?\]/gs;
       completionText = JSON.parse(completionText.match(arrayRegex)[0]);
-      console.log(completionText);
-      console.log("GPT Attempt #:" + retries);
+      logger.info(completionText);
+      logger.info("GPT Attempt #:" + retries);
     }
 
     if (!isValidArray(completionText)) {

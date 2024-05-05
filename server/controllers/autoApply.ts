@@ -2,6 +2,8 @@ import { AutoApply } from "../entity/AutoApply";
 import { Exception } from "../entity/Exception";
 import { getConnection } from "../data-source";
 
+import { logger } from "../lib/logger/pino.config";
+
 import { getApplyResourcesHelper } from "./applyResources";
 
 import { Request, Response } from "express";
@@ -57,9 +59,9 @@ export const createApply = async (req: Request, res: Response) => {
 
     const getAnswers = questions?.length ? true : false;
 
-    console.log(autoApply);
-    console.log(questions);
-    console.log({ getResume, getCoverLetter, getAnswers });
+    logger.info(autoApply);
+    logger.info(questions);
+    logger.info({ getResume, getCoverLetter, getAnswers });
 
     let documents: Documents = {
       coverLetter: null,
@@ -69,7 +71,7 @@ export const createApply = async (req: Request, res: Response) => {
 
     const savedApply = await createApplyHelper(autoApply);
 
-    console.log(savedApply);
+    logger.info(savedApply);
 
     if (getCoverLetter || getResume || getAnswers) {
       documents = await getApplyResourcesHelper(

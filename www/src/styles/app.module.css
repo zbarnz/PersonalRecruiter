@@ -1,0 +1,9 @@
+.pageWrapper {
+  display: flex;
+  flex-direction: row; /* Align children horizontally */
+  width: 100%; /* Ensure it spans the full width of the viewport */
+}
+
+.main {
+  flex-grow: 1; /* Takes up remaining space after navbar */
+}

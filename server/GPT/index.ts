@@ -3,6 +3,9 @@ import { Listing } from "../entity/Listing";
 import { AutoApply } from "../entity/AutoApply";
 import { GPTLog } from "../entity/GPTLog";
 
+import { logger } from "../lib/logger/pino.config";
+
+
 import {
   ChatCompletionCreateParamsBase,
   ChatCompletionMessage,
@@ -98,7 +101,7 @@ export async function GPTText( //TODO change args to options obj
       messages.unshift({ role: "system", content: systemPrompt });
     }
 
-    console.log("Starting GPT call");
+    logger.info("Starting GPT call");
     const completion: ChatCompletion = await openai.chat.completions.create({
       messages: [
         { role: "system", content: systemPrompt || "" },
@@ -106,7 +109,7 @@ export async function GPTText( //TODO change args to options obj
       ],
       model: model,
     });
-    console.log("Ending GPT call");
+    logger.info("Ending GPT call");
 
     const gptLog = new GPTLog();
     gptLog.input = prompt;
@@ -120,7 +123,7 @@ export async function GPTText( //TODO change args to options obj
     gptLog.systemFlag = systemFlag || false;
     gptLog.createdAt = Math.floor(Date.now() / 1000);
 
-    console.log("saving GPT log");
+    logger.info("saving GPT log");
     const savedLog = await createGPTLogHelper(gptLog);
 
     completionText = completion.choices[0].message;

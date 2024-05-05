@@ -1,6 +1,8 @@
 import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
 import { coverLetter } from "../../src/apply_assets/coverletter";
 
+import { logger } from "../../lib/logger/pino.config";
+
 import { compileHTMLtoPDF } from "../../lib/utils/pdf";
 
 import { User } from "../../entity/User";
@@ -35,7 +37,7 @@ export async function generateCoverLetter(
 
     let parsedText = removePlaceholders(completionText);
 
-    console.log("GPT Attempt #:" + retries);
+    logger.info("GPT Attempt #:" + retries);
 
     let removedNewLines = parsedText.replace(/\n/g, "<br>");
     const clHTML = coverLetter(

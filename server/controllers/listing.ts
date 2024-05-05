@@ -1,6 +1,7 @@
 import { Listing } from "../entity/Listing";
 import { getConnection } from "../data-source";
 
+import { logger } from "../lib/logger/pino.config";
 import { User } from "../entity/User";
 import { AutoApply } from "../entity/AutoApply";
 
@@ -12,6 +13,9 @@ import { summarizeJobDescription } from "../GPT/utils/summarizeDescription"; //T
 import { DataSource } from "typeorm";
 
 const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
+
+
+
 
 //helpers
 
@@ -38,8 +42,6 @@ export const saveListing = async (req: Request, res: Response) => {
     const connection: DataSource = await getConnection();
     const requiredQualifications = listing.requirementsObject;
 
-
-    
     const existingListing = await connection.manager.findOne(Listing, {
       where: {
         jobListingId: listing.jobListingId,
@@ -49,7 +51,7 @@ export const saveListing = async (req: Request, res: Response) => {
 
     if (existingListing) {
       // Update existing listing with new data from `listing`
-      console.log("Updating existing listing");
+      logger.info("Updating existing listing");
 
       if (listing.description && existingListing.description) {
         // Calculate similarity of both descriptions
@@ -76,14 +78,14 @@ export const saveListing = async (req: Request, res: Response) => {
         }
       });
     } else {
-      console.log("Creating new listing");
+      logger.info("Creating new listing");
       // Create new listing before summarizing because GTP calls need to be
       // associated to a listing
       const listingEntity = connection.manager.create(Listing, listing);
       const savedListingPreSummarize = await connection.manager.save(
         listingEntity
       );
-      console.log(JSON.stringify(listingEntity));
+      logger.info(JSON.stringify(listingEntity));
 
       let summarizedJobDescription = await summarizeJobDescription(
         savedListingPreSummarize,
