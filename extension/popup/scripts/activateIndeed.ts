@@ -51,10 +51,10 @@ button.addEventListener("click", async () => {
   Promise.all([jobBoardPromise, userPromise])
     .then(([jobBoardData, userData]) => {
       if (jobBoardData.error || userData.error) {
-        throw new Error(
-          "Error fetching data:",
-          jobBoardData.error + userData.error
-        );
+        let errorMessage = "";
+        if (jobBoardData.error) errorMessage += jobBoardData.error;
+        if (userData.error) errorMessage += " " + userData.error;
+        throw new Error(errorMessage);
       }
 
       chrome.storage.local

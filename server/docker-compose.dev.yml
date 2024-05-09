@@ -3,26 +3,26 @@ version: "3"
 name: autoapply
 
 services:
-  postgres:
-    container_name: autoapply-postgres
-    image: postgres
-    environment:
-      POSTGRES_USER: admin
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: autoapply
+  cockroachdb:
+    container_name: autoapply-cockroachdb
+    image: cockroachdb/cockroach:latest-v23.1
+    command: start-single-node --insecure
     ports:
-      - "5436:5432"
+      - "26257:26257" # Default CockroachDB port for SQL
+      - "8080:8080" # Default CockroachDB port for the web UI
+    volumes:
+      - cockroachdb-data:/cockroach/cockroach-data
 
   api:
     build: ./
     container_name: autoapply-api
     environment:
       NODE_DEBUG: info
-      NODE_ENV: dev
-      DB_CONNECTION: "postgresql://admin:password@postgres/autoapply"
+      NODE_ENV: local
+      DB_CONNECTION: "postgresql://system@cockroachdb:26257/autoapply?sslmode=disable"
     ports:
       - 4000:4000
     depends_on:
-      - postgres
+      - cockroachdb
 volumes:
-  postgres-data:
+  cockroachdb-data:

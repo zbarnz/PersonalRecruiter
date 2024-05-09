@@ -1,5 +1,5 @@
 import "reflect-metadata";
-import { DataSource } from "typeorm";
+import { DataSource, DataSourceOptions } from "typeorm";
 import { Listing } from "./entity/Listing";
 import { JobBoard } from "./entity/JobBoard";
 import { AutoApply } from "./entity/AutoApply";
@@ -8,26 +8,29 @@ import { User } from "./entity/User";
 import { Exception } from "./entity/Exception";
 import { PDF } from "./entity/PDF";
 
-export const AppDataSource = new DataSource({
-  type: "postgres",
-  host: "postgres",
-  port: 5432,
-  username: "admin",
-  password: "password",
-  database: "autoapply",
+import { prodDataSource } from "secrets/dbconnection";
+
+const devDatasource: DataSourceOptions = {
+  type: "cockroachdb",
+  host: "cockroachdb",
+  port: 26257,
+  username: "root",
+  password: "",
+  database: "defaultdb",
   synchronize: true,
   logging: false,
   entities: [Listing, JobBoard, AutoApply, GPTLog, User, Exception, PDF], //can also import like "src/entity/*.ts"
   migrations: [],
   subscribers: [],
-});
+  timeTravelQueries: false,
+};
 
-let connection;
+export const AppDataSource = new DataSource(devDatasource);
 
 export const getConnection = async (): Promise<DataSource> => {
   try {
     if (!AppDataSource.isInitialized) {
-      connection = await AppDataSource.initialize();
+      const connection = await AppDataSource.initialize();
       return connection;
     } else {
       return AppDataSource;

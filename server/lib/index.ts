@@ -11,15 +11,18 @@ import cors from "cors";
 //For docker to init db
 
 const start = async () => {
-  await AppDataSource.initialize();
+  if (process.env.NODE_ENV == "local") {
+    logger.info("Initializing Database");
+    await AppDataSource.initialize();
+  }
   logger.info("Database initialized");
 
   const app = express();
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
-  if (process.env.NODE_ENV === "dev") {
-    logger.info("Building for DEV");
+  if (process.env.NODE_ENV === "local") {
+    logger.info("Configuring local routes");
 
     app.use(
       cors({

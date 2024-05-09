@@ -13,7 +13,6 @@ import {
 import { JobBoard } from "./JobBoard";
 
 @Unique(["jobListingId", "jobBoard"])
-@Index(["jobListingId", "jobBoard"])
 @Entity()
 export class Listing {
   @PrimaryGeneratedColumn()
@@ -81,12 +80,10 @@ export class Listing {
   @Column({ name: "cover_letter_flag", nullable: true })
   coverLetterFlag: boolean | null;
 
-  @Index()
   @ManyToOne((type) => JobBoard)
   @JoinColumn({ name: "job_board" })
   jobBoard: JobBoard;
 
-  @Index()
   @Column({ name: "job_listing_id" })
   jobListingId: string;
 

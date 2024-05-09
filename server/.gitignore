@@ -4,6 +4,9 @@ pids
 *.seed
 *.pid.lock
 
+#terraform 
+.terraform/
+
 # Dependency directories
 node_modules/
 
@@ -18,3 +21,6 @@ src/apply_assets/
 
 #env
 *.env
+
+#secrets
+secrets/

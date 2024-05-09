@@ -5,6 +5,7 @@ import { router as userRoute } from "./user";
 import { router as autoApplyRoute } from "./autoApply";
 import { router as exceptionRoute } from "./exception";
 import { router as jobBoardRoute } from "./jobBoard";
+import { router as healthRoute } from "./health";
 
 const router = express.Router();
 
@@ -14,5 +15,6 @@ router.use("/autoApply", autoApplyRoute);
 router.use("/gptLog", gptLogRoute);
 router.use("/exception", exceptionRoute);
 router.use("/jobBoard", jobBoardRoute);
+router.use("/health", healthRoute);
 
 export default router;
