@@ -21,17 +21,37 @@ const start = async () => {
   app.use(express.json());
   app.use(express.urlencoded({ extended: true }));
 
+  const allowedOrigins = [
+    "https://smartapply.indeed.com",
+    "https://m5.apply.indeed.com",
+  ];
+
   if (process.env.NODE_ENV === "local") {
     logger.info("Configuring local routes");
 
     app.use(
       cors({
         origin: (origin, callback) => {
-          const allowedOrigins = [
-            "https://smartapply.indeed.com",
-            "https://m5.apply.indeed.com",
-          ];
-
+          if (
+            !origin ||
+            origin === "http://localhost:3000" ||
+            origin.startsWith("chrome-extension://") ||
+            allowedOrigins.includes(origin)
+          ) {
+            callback(null, true);
+          } else {
+            callback(new Error("Not allowed by CORS"), false);
+          }
+        },
+        credentials: true, // if your API expects credentials
+        methods: ["GET", "POST", "PUT", "DELETE"], // Specify allowed methods
+        allowedHeaders: ["Content-Type", "Authorization"], // Specify allowed headers
+      })
+    );
+  } else if (process.env.NODE_ENV === "production") {
+    app.use(
+      cors({
+        origin: (origin, callback) => {
           if (
             !origin ||
             origin === "http://localhost:3000" ||
@@ -49,8 +69,7 @@ const start = async () => {
       })
     );
   } else {
-    //TODO setup prod
-    throw new Error("production ENV not setup");
+    throw new Error("ENV not valid");
   }
 
   app.use("/api/", router);

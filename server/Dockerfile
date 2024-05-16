@@ -3,7 +3,7 @@ FROM --platform=linux/x86_64 node:18 AS builder
 
 WORKDIR /app
 COPY . .
-RUN npm install \
+RUN npm install --only=production \
     && npm run build 
 
 # Production stage
@@ -15,11 +15,11 @@ COPY --from=builder /app/.env /app/.env
 
 # Install puppeteer browser
 # Update apt-get and install Chromium
-RUN apt-get update && apt-get install -y chromium \
-    && rm -rf /var/lib/apt/lists/* \
+RUN apt-get update && apt-get install -y chromium 
+RUN rm -rf /var/lib/apt/lists/* \
     && apt-get clean
 
-ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium-browser
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
 EXPOSE 8080

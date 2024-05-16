@@ -24,3 +24,7 @@ src/apply_assets/
 
 #secrets
 secrets/
+
+#migrations
+deployment/
+ormConfig.ts
