@@ -3,7 +3,7 @@ FROM --platform=linux/x86_64 node:18 AS builder
 
 WORKDIR /app
 COPY . .
-RUN npm install --only=production \
+RUN npm install --omit=dev \
     && npm run build 
 
 # Production stage

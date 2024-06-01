@@ -4,15 +4,16 @@ import { AutoApply } from "../../entity/AutoApply";
 
 import { logger } from "../../lib/logger/pino.config";
 
-
 import { getAnswersPrompt } from "../../GPT/prompts/getAnswers";
 
 import { isValidArray, isValidJson } from "../../lib/utils/parsing";
 
+import { summarizeJobDescription } from "./summarizeDescription";
+
 import { GPTText } from "../index";
 
 import dotenv from "dotenv";
-import { error } from "console";
+import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
 dotenv.config();
 
 const MAX_RETRIES = Number(process.env.MAX_GPT_RETRIES);
@@ -20,17 +21,31 @@ const MAX_RETRIES = Number(process.env.MAX_GPT_RETRIES);
 export async function answerQuestions(
   autoApply: AutoApply,
   user: User,
+  userApplicantConfig: UserApplicantConfig,
   listing: Listing,
   questions: any
 ) {
   try {
     let completionText: any = "";
     let retries: number = 0;
-    let previousLogId: number;
+    let previousLogId: number | null = null;
+    let summarizedDescription: string = "";
+
+    if (!userApplicantConfig.summarizedResume) {
+      throw new Error("user applicant summarized resume not found");
+    }
+
+    if (!listing.summarizedJobDescription) {
+      summarizedDescription = await summarizeJobDescription(listing, user);
+    }
+
+    if (!listing.summarizedJobDescription && !summarizedDescription) {
+      throw new Error("Cannot get summarized job description");
+    }
 
     const prompt = getAnswersPrompt(
-      listing.summarizedJobDescription,
-      user.summarizedResume,
+      listing.summarizedJobDescription || summarizedDescription,
+      userApplicantConfig.summarizedResume,
       JSON.stringify(questions)
     );
 

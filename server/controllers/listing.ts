@@ -2,20 +2,14 @@ import { Listing } from "../entity/Listing";
 import { getConnection } from "../data-source";
 
 import { logger } from "../lib/logger/pino.config";
-import { User } from "../entity/User";
 import { AutoApply } from "../entity/AutoApply";
 
 import { Request, Response } from "express";
 
 import { calculateStringSimilarity } from "../lib/utils/parsing";
 
-import { summarizeJobDescription } from "../GPT/utils/summarizeDescription"; //TODO empty page
+import { summarizeJobDescription } from "../GPT/src/summarizeDescription"; //TODO empty page
 import { DataSource } from "typeorm";
-
-const THIRTY_DAYS_IN_MILLISECONDS = 30 * 24 * 60 * 60 * 1000;
-
-
-
 
 //helpers
 

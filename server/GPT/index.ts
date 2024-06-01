@@ -5,7 +5,6 @@ import { GPTLog } from "../entity/GPTLog";
 
 import { logger } from "../lib/logger/pino.config";
 
-
 import {
   ChatCompletionCreateParamsBase,
   ChatCompletionMessage,
@@ -40,7 +39,7 @@ const openai = new OpenAI({
 export async function GPTText( //TODO change args to options obj
   prompt: string,
   user?: User,
-  prevLogId?: number,
+  prevLogId?: number | null,
   autoApply?: AutoApply,
   listing?: Listing,
   forceModel?: string,

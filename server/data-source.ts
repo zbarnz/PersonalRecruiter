@@ -7,6 +7,7 @@ import { GPTLog } from "./entity/GPTLog";
 import { User } from "./entity/User";
 import { Exception } from "./entity/Exception";
 import { PDF } from "./entity/PDF";
+import { UserApplicantConfig } from "./entity/UserApplicantConfig";
 
 import { logger } from "./lib/logger/pino.config";
 
@@ -19,19 +20,32 @@ const localDataSource: DataSourceOptions = {
   database: "defaultdb",
   synchronize: true,
   logging: false,
-  entities: [Listing, JobBoard, AutoApply, GPTLog, User, Exception, PDF], //can also import like "src/entity/*.ts"
+  entities: [
+    Listing,
+    JobBoard,
+    AutoApply,
+    GPTLog,
+    User,
+    Exception,
+    PDF,
+    UserApplicantConfig,
+  ], //can also import like "src/entity/*.ts"
   migrations: [],
   subscribers: [],
   timeTravelQueries: false,
 };
 
-const dbConnectionString = Buffer.from(
-  process.env.DB_CONNECTION_STRING,
-  "base64"
-).toString("utf-8");
+let dbConnectionString: string;
 
-if (process.env.NODE_ENV === "production" && !dbConnectionString) {
-  throw new Error("No connection string supplied");
+if (process.env.NODE_ENV === "production") {
+  dbConnectionString = Buffer.from(
+    process.env.DB_CONNECTION_STRING,
+    "base64"
+  ).toString("utf-8");
+
+  if (!dbConnectionString) {
+    throw new Error("No connection string supplied");
+  }
 }
 
 export const prodDataSource: DataSourceOptions = {
@@ -62,7 +76,7 @@ export const getConnection = async (): Promise<DataSource> => {
   } catch (error) {
     logger.info("Error initializing the database connection:", error);
 
-    if(process.env.NODE_ENV != 'production'){
+    if (process.env.NODE_ENV != "production") {
       throw error;
     } else {
       throw "Cannot connect to db"; // Rethrow or handle as appropriate for your application

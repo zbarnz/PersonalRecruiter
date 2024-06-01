@@ -1,15 +1,10 @@
 import { Entity, PrimaryGeneratedColumn, Column, BeforeInsert } from "typeorm";
+import { TemplateName, AvailableTemplates } from "resume-lite";
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
-
-  @Column({ name: "first_name" })
-  firstName: string;
-
-  @Column({ name: "last_name" })
-  lastName: string;
 
   @Column()
   email: string;
@@ -17,20 +12,8 @@ export class User {
   @Column()
   phone: string;
 
-  @Column({ nullable: true, type: "text" })
-  website: string | null;
-
   @Column({ name: "created_at", type: "bigint" }) //unix in seconds
   createdAt: number;
-
-  @Column({ name: "summarized_resume", nullable: true })
-  summarizedResume: string | null;
-
-  @Column({ type: "text", array: true })
-  skills: string[] | null;
-
-  @Column({ name: "custom_resume_flag", default: true })
-  customResumeFlag: boolean;
 
   @Column()
   points: number;

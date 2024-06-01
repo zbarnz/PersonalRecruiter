@@ -36,6 +36,12 @@ resource "google_cloud_run_v2_service" "pr-service" {
         value = "production"
       }
 
+      
+      env {
+        name = "FORCE"
+        value = "true"
+      }
+
       env {
         name = "DB_CONNECTION_STRING"
         
@@ -89,9 +95,9 @@ resource "google_secret_manager_secret_version" "typeorm-connection-version" {
   secret_data = base64encode(var.db_connection_string)
 }
 
-resource "google_cloud_run_domain_mapping" "default" {
+resource "google_cloud_run_domain_mapping" "pr-service" {
   location = "us-central1"
-  name     = "mygptstats.com"
+  name     = "www.snapcandidate.com"
 
   metadata {
     namespace = "personal-recruiter-422400"
@@ -99,5 +105,6 @@ resource "google_cloud_run_domain_mapping" "default" {
 
   spec {
     route_name = google_cloud_run_v2_service.pr-service.name
+    certificate_mode = "AUTOMATIC"
   }
 }

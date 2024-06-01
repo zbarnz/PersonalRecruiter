@@ -9,7 +9,6 @@ import { summarizeDescriptionPrompt } from "../prompts/summarizeDescription";
 
 export async function summarizeJobDescription(
   listing: Listing,
-  requiredQualifications?: any,
   user?: User
 ): Promise<string> {
   let completionText: any;
@@ -33,9 +32,9 @@ export async function summarizeJobDescription(
     user ? false : true
   ));
 
-  if (requiredQualifications) {
+  if (listing.questionsObject) {
     let qualificationsString = "\n\nMinimum Qualifications:\n";
-    for (const qualification in requiredQualifications) {
+    for (const qualification in listing.questionsObject) {
       qualificationsString += qualification + "\n";
     }
     completionText += qualificationsString;

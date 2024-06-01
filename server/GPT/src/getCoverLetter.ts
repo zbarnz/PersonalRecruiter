@@ -1,5 +1,5 @@
 import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
-import { coverLetter } from "../../src/apply_assets/coverletter";
+import { coverLetter } from "../../src/document_generators/coverLetter";
 
 import { logger } from "../../lib/logger/pino.config";
 
@@ -10,14 +10,33 @@ import { Listing } from "../../entity/Listing";
 
 import { GPTText } from "../index";
 
+import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
+
+import { summarizeJobDescription } from "./summarizeDescription";
+
 export async function generateCoverLetter(
   user: User,
-  listing: Listing
+  listing: Listing,
+  userApplicantConfig: UserApplicantConfig
 ): Promise<{ buffer: Buffer; text: string }> {
   try {
+    let summarizedDescription: string = "";
+
+    if (!userApplicantConfig.summarizedResume) {
+      throw new Error("user applicant summarized resume not found");
+    }
+
+    if (!listing.summarizedJobDescription) {
+      summarizedDescription = await summarizeJobDescription(listing, user);
+    }
+
+    if (!listing.summarizedJobDescription && !summarizedDescription) {
+      throw new Error("Cannot get summarized job description");
+    }
+
     const prompt = getCoverLetterPrompt(
-      user.summarizedResume,
-      listing.summarizedJobDescription
+      userApplicantConfig.summarizedResume,
+      listing.summarizedJobDescription || summarizedDescription
     );
 
     let retries: number = 0;
@@ -40,13 +59,7 @@ export async function generateCoverLetter(
     logger.info("GPT Attempt #:" + retries);
 
     let removedNewLines = parsedText.replace(/\n/g, "<br>");
-    const clHTML = coverLetter(
-      removedNewLines,
-      user.firstName + " " + user.lastName,
-      user.phone,
-      user.email,
-      user.website
-    );
+    const clHTML = coverLetter(removedNewLines, user, userApplicantConfig);
 
     const pdfBuffer = await compileHTMLtoPDF(clHTML);
 

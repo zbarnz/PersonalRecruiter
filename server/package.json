@@ -25,6 +25,7 @@
     "pino-pretty": "^11.0.0",
     "puppeteer": "^22.7.1",
     "reflect-metadata": "^0.2.1",
+    "resume-lite": "^1.0.9",
     "tiktoken": "^1.0.13",
     "typeorm": "^0.3.20"
   },
