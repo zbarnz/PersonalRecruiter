@@ -1,13 +1,13 @@
 import "reflect-metadata";
 import { DataSource, DataSourceOptions } from "typeorm";
-import { Listing } from "./entity/Listing";
-import { JobBoard } from "./entity/JobBoard";
-import { AutoApply } from "./entity/AutoApply";
-import { GPTLog } from "./entity/GPTLog";
-import { User } from "./entity/User";
-import { Exception } from "./entity/Exception";
-import { PDF } from "./entity/PDF";
-import { UserApplicantConfig } from "./entity/UserApplicantConfig";
+import { Listing } from "./src/entity/Listing";
+import { JobBoard } from "./src/entity/JobBoard";
+import { AutoApply } from "./src/entity/AutoApply";
+import { GPTLog } from "./src/entity/GPTLog";
+import { User } from "./src/entity/User";
+import { Exception } from "./src/entity/Exception";
+import { PDF } from "./src/entity/PDF";
+import { UserApplicantConfig } from "./src/entity/UserApplicantConfig";
 
 import { logger } from "./lib/logger/pino.config";
 

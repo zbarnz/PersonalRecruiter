@@ -1,9 +1,9 @@
 import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
-import { coverLetter } from "../../src/document_generators/coverLetter";
+import { coverLetter } from "../../document_generators/coverLetter";
 
-import { logger } from "../../lib/logger/pino.config";
+import { logger } from "../../../lib/logger/pino.config";
 
-import { compileHTMLtoPDF } from "../../lib/utils/pdf";
+import { compileHTMLtoPDF } from "../../../lib/utils/pdf";
 
 import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";

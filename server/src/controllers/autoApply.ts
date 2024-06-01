@@ -1,16 +1,16 @@
 import { AutoApply } from "../entity/AutoApply";
 import { Exception } from "../entity/Exception";
-import { getConnection } from "../data-source";
+import { JobBoard } from "../entity/JobBoard";
+import { User } from "../entity/User";
 
-import { logger } from "../lib/logger/pino.config";
+import { getConnection } from "../../data-source";
+
+import { logger } from "../../lib/logger/pino.config";
 
 import { getApplyResourcesHelper } from "./applyResources";
 
 import { Request, Response } from "express";
 import { DataSource } from "typeorm";
-
-import { JobBoard } from "../entity/JobBoard";
-import { User } from "../entity/User";
 
 //helpers
 

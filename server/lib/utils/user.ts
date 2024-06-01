@@ -1,5 +1,5 @@
-import { User } from "../../entity/User";
-import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
+import { User } from "../../src/entity/User";
+import { UserApplicantConfig } from "../../src/entity/UserApplicantConfig";
 
 import { ResumeData } from "resume-lite";
 

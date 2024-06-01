@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
-import { getConnection } from "../data-source";
-
-import { JobBoard } from "../entity/JobBoard";
+import { getConnection } from "../../data-source";
 
 import { Exception } from "../entity/Exception";
-
 
 export const createException = async (req: Request, res: Response) => {
   try {

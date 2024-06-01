@@ -1,7 +1,7 @@
 import { Listing } from "../../entity/Listing";
 import { User } from "../../entity/User";
 
-import { logger } from "../../lib/logger/pino.config";
+import { logger } from "../../../lib/logger/pino.config";
 
 import { GPTText } from "../../GPT/index";
 

@@ -1,6 +1,6 @@
 // Assume that GPTLog is in the same directory level as AutoApply
 import { GPTLog } from "../entity/GPTLog";
-import { getConnection } from "../data-source";
+import { getConnection } from "../../data-source";
 import { DataSource, UpdateResult } from "typeorm";
 
 import { Request, Response } from "express";

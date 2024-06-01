@@ -1,5 +1,5 @@
 import { JobBoard } from "../entity/JobBoard";
-import { getConnection } from "../data-source";
+import { getConnection } from "../../data-source";
 
 import { Request, Response } from "express";
 

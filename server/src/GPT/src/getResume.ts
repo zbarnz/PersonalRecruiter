@@ -5,15 +5,14 @@ import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";
 import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
 
-import { logger } from "../../lib/logger/pino.config";
+import { logger } from "../../../lib/logger/pino.config";
 
-import { isValidArray } from "../../lib/utils/parsing";
-import { compileHTMLtoPDF } from "../../lib/utils/pdf";
-import { buildUserResumeData } from "../../lib/utils/user";
+import { isValidArray } from "../../../lib/utils/parsing";
+import { buildUserResumeData } from "../../../lib/utils/user";
 
 import { setGPTLogAsFailedHelper } from "../../controllers/gPTLog";
 
-import { resumeGenerator } from "../../src/document_generators/resume";
+import { resumeGenerator } from "../../document_generators/resume";
 
 import { TemplateName, ResumeData } from "resume-lite";
 

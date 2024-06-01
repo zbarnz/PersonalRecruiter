@@ -4,20 +4,20 @@ import { Listing } from "../entity/Listing";
 import { User } from "../entity/User";
 import { AutoApply } from "../entity/AutoApply";
 import { PDF } from "../entity/PDF";
+import { UserApplicantConfig } from "../entity/UserApplicantConfig";
 
-import { logger } from "../lib/logger/pino.config";
+import { logger } from "../../lib/logger/pino.config";
 
-import { generateCoverLetter } from "../GPT/src/getCoverLetter";
-import { answerQuestions } from "../GPT/src/answerQuestions";
-import { getResume } from "../GPT/src/getResume";
+import { generateCoverLetter } from "../../GPT/src/getCoverLetter";
+import { answerQuestions } from "../../GPT/src/answerQuestions";
+import { getResume } from "../../GPT/src/getResume";
 
 import { setGPTLogBatchAsFailedHelper } from "./gPTLog";
 import { getListingByIdHelper } from "./listing";
 import { getApplyHelper } from "./autoApply";
 import { getUserHelper } from "./user";
 
-import { getConnection } from "../data-source";
-import { UserApplicantConfig } from "../entity/UserApplicantConfig";
+import { getConnection } from "../../data-source";
 
 export async function getApplyResourcesHelper(
   user: User,

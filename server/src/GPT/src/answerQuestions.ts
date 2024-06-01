@@ -2,11 +2,11 @@ import { User } from "../../entity/User";
 import { Listing } from "../../entity/Listing";
 import { AutoApply } from "../../entity/AutoApply";
 
-import { logger } from "../../lib/logger/pino.config";
+import { logger } from "../../../lib/logger/pino.config";
 
-import { getAnswersPrompt } from "../../GPT/prompts/getAnswers";
+import { getAnswersPrompt } from "../prompts/getAnswers";
 
-import { isValidArray, isValidJson } from "../../lib/utils/parsing";
+import { isValidArray, isValidJson } from "../../../lib/utils/parsing";
 
 import { summarizeJobDescription } from "./summarizeDescription";
 

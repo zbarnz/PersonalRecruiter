@@ -1,14 +1,14 @@
 import { Listing } from "../entity/Listing";
-import { getConnection } from "../data-source";
+import { getConnection } from "../../data-source";
 
-import { logger } from "../lib/logger/pino.config";
+import { logger } from "../../lib/logger/pino.config";
 import { AutoApply } from "../entity/AutoApply";
 
 import { Request, Response } from "express";
 
-import { calculateStringSimilarity } from "../lib/utils/parsing";
+import { calculateStringSimilarity } from "../../lib/utils/parsing";
 
-import { summarizeJobDescription } from "../GPT/src/summarizeDescription"; //TODO empty page
+import { summarizeJobDescription } from "../../GPT/src/summarizeDescription"; //TODO empty page
 import { DataSource } from "typeorm";
 
 //helpers

@@ -3,7 +3,7 @@ import { Listing } from "../entity/Listing";
 import { AutoApply } from "../entity/AutoApply";
 import { GPTLog } from "../entity/GPTLog";
 
-import { logger } from "../lib/logger/pino.config";
+import { logger } from "../../lib/logger/pino.config";
 
 import {
   ChatCompletionCreateParamsBase,
@@ -11,10 +11,8 @@ import {
   ChatCompletion,
 } from "openai/resources/chat/completions";
 import {
-  get_encoding,
   encoding_for_model,
   Tiktoken,
-  TiktokenModel,
 } from "tiktoken";
 
 import {
@@ -22,8 +20,6 @@ import {
   createGPTLogHelper,
 } from "../controllers/gPTLog";
 import { createApplyHelper } from "../controllers/autoApply";
-
-import { EntityManager } from "typeorm";
 
 import OpenAI from "openai";
 import dotenv from "dotenv";

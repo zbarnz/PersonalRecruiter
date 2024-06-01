@@ -1,6 +1,6 @@
 import { User } from "../entity/User";
-import { getConnection } from "../data-source";
-import { logger } from "../lib/logger/pino.config";
+import { getConnection } from "../../data-source";
+import { logger } from "../../lib/logger/pino.config";
 import { Request, Response } from "express";
 
 //helpers

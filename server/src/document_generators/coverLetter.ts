@@ -1,5 +1,5 @@
-import { User } from "../../entity/User";
-import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
+import { User } from "../entity/User";
+import { UserApplicantConfig } from "../entity/UserApplicantConfig";
 
 export function coverLetter(
   coverLetter: string,
@@ -28,7 +28,10 @@ export function coverLetter(
             <p style="margin: 0;">${userApplicantConfig.phone}</p>
             <span style="margin: 0 1em;">•</span>
             <p style="margin: 0;">${userApplicantConfig.email}</p>
-            ${userApplicantConfig.website && `<span style="margin: 0 1em;">•</span>`}
+            ${
+              userApplicantConfig.website &&
+              `<span style="margin: 0 1em;">•</span>`
+            }
             <p style="margin: 0;">${userApplicantConfig.website}</p>
         </div>
           <div style="line-height: 1.6;">
