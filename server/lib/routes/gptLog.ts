@@ -1,5 +1,5 @@
 import express from "express";
-import gptLogController from "../../controllers/gPTLog";
+import gptLogController from "../../src/controllers/gPTLog";
 
 export const router = express.Router();
 

@@ -1,5 +1,5 @@
 import express from "express";
-import autoApplyController from "../../controllers/autoApply";
+import autoApplyController from "../../src/controllers/autoApply";
 
 export const router = express.Router();
 

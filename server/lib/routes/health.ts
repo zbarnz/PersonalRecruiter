@@ -1,5 +1,4 @@
 import express from "express";
-import { Request, Response } from "express";
 
 import { logger } from "../../lib/logger/pino.config";
 

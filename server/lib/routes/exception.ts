@@ -1,5 +1,5 @@
 import express from "express";
-import exceptionController from "../../controllers/exception";
+import exceptionController from "../../src/controllers/exception";
 
 export const router = express.Router();
 

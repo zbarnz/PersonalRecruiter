@@ -1,5 +1,5 @@
 import express from "express";
-import listingController from "../../controllers/listing";
+import listingController from "../../src/controllers/listing";
 
 export const router = express.Router();
 

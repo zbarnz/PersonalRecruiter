@@ -8,9 +8,9 @@ import { UserApplicantConfig } from "../entity/UserApplicantConfig";
 
 import { logger } from "../../lib/logger/pino.config";
 
-import { generateCoverLetter } from "../../GPT/src/getCoverLetter";
-import { answerQuestions } from "../../GPT/src/answerQuestions";
-import { getResume } from "../../GPT/src/getResume";
+import { generateCoverLetter } from "../GPT/src/getCoverLetter";
+import { answerQuestions } from "../GPT/src/answerQuestions";
+import { getResume } from "../GPT/src/getResume";
 
 import { setGPTLogBatchAsFailedHelper } from "./gPTLog";
 import { getListingByIdHelper } from "./listing";

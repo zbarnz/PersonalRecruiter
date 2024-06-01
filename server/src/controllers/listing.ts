@@ -8,7 +8,7 @@ import { Request, Response } from "express";
 
 import { calculateStringSimilarity } from "../../lib/utils/parsing";
 
-import { summarizeJobDescription } from "../../GPT/src/summarizeDescription"; //TODO empty page
+import { summarizeJobDescription } from "../GPT/src/summarizeDescription"; //TODO empty page
 import { DataSource } from "typeorm";
 
 //helpers
