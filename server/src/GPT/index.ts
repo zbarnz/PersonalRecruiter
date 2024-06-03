@@ -1,28 +1,22 @@
-import { User } from "../entity/User";
-import { Listing } from "../entity/Listing";
-import { AutoApply } from "../entity/AutoApply";
-import { GPTLog } from "../entity/GPTLog";
+import { AutoApply, GPTLog, Listing, User } from "../entity";
 
 import { logger } from "../../lib/logger/pino.config";
 
 import {
+  ChatCompletion,
   ChatCompletionCreateParamsBase,
   ChatCompletionMessage,
-  ChatCompletion,
 } from "openai/resources/chat/completions";
-import {
-  encoding_for_model,
-  Tiktoken,
-} from "tiktoken";
+import { encoding_for_model, Tiktoken } from "tiktoken";
 
-import {
-  setGPTLogAsFailedHelper,
-  createGPTLogHelper,
-} from "../controllers/gPTLog";
 import { createApplyHelper } from "../controllers/autoApply";
+import {
+  createGPTLogHelper,
+  setGPTLogAsFailedHelper,
+} from "../controllers/gPTLog";
 
-import OpenAI from "openai";
 import dotenv from "dotenv";
+import OpenAI from "openai";
 
 dotenv.config();
 const GPT_API_KEY = process.env.GPT_API_KEY;
@@ -116,7 +110,7 @@ export async function GPTText( //TODO change args to options obj
     gptLog.listing = listing;
     gptLog.user = user || null;
     gptLog.systemFlag = systemFlag || false;
-    gptLog.createdAt = Math.floor(Date.now() / 1000);
+    gptLog.createdAt = new Date(Math.floor(Date.now()));
 
     logger.info("saving GPT log");
     const savedLog = await createGPTLogHelper(gptLog);

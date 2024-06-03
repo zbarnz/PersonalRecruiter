@@ -1,20 +1,18 @@
-import { Response, Request } from "express";
+import { Request, Response } from "express";
 
-import { Listing } from "../entity/Listing";
-import { User } from "../entity/User";
-import { AutoApply } from "../entity/AutoApply";
-import { PDF } from "../entity/PDF";
-import { UserApplicantConfig } from "../entity/UserApplicantConfig";
+import { AutoApply, Listing, User } from "../entity";
+import { PDF } from "../entity";
+import { UserApplicantConfig } from "../entity";
 
 import { logger } from "../../lib/logger/pino.config";
 
-import { generateCoverLetter } from "../GPT/src/getCoverLetter";
 import { answerQuestions } from "../GPT/src/answerQuestions";
+import { generateCoverLetter } from "../GPT/src/getCoverLetter";
 import { getResume } from "../GPT/src/getResume";
 
+import { getApplyHelper } from "./autoApply";
 import { setGPTLogBatchAsFailedHelper } from "./gPTLog";
 import { getListingByIdHelper } from "./listing";
-import { getApplyHelper } from "./autoApply";
 import { getUserHelper } from "./user";
 
 import { getConnection } from "../../data-source";
@@ -46,16 +44,6 @@ export async function getApplyResourcesHelper(
       await connection.manager.findOne(UserApplicantConfig, {
         where: { user },
       });
-
-    //we should never not have either of these. If this error is thrown
-    //there is SERIOUS BUG RED ALERT
-    // if (
-    //   (getCoverLetterFlag || getAnswersFlag) &&
-    //   (!userApplicantConfig.summarizedResume ||
-    //     !listing.summarizedJobDescription)
-    // ) {
-    //   throw new Error("Missing summarized resume or job description");
-    // }
 
     //set batchId for marking as failed (we dont want to rollback gpt logs)
     const batchId = Math.floor(Date.now() / 1000); //unix

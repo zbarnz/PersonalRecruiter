@@ -1,9 +1,7 @@
 import { getSkillsPrompt } from "../prompts/getSkills";
 import { removeSoftSkillsPrompt } from "../prompts/removeSoftSkills";
 
-import { User } from "../../entity/User";
-import { Listing } from "../../entity/Listing";
-import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
+import { Listing, User, UserApplicantConfig } from "../../entity";
 
 import { logger } from "../../../lib/logger/pino.config";
 
@@ -14,13 +12,14 @@ import { setGPTLogAsFailedHelper } from "../../controllers/gPTLog";
 
 import { resumeGenerator } from "../../document_generators/resume";
 
-import { TemplateName, ResumeData } from "resume-lite";
+import { TemplateName } from "resume-lite";
 
 import { GPTText } from "../index";
 
 import dotenv from "dotenv";
 dotenv.config();
 
+// TODO: use config
 const MAX_RETRIES = Number(process.env.MAX_GPT_RETRIES);
 
 export async function getResume(

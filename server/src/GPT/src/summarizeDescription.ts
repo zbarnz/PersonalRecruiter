@@ -1,5 +1,4 @@
-import { Listing } from "../../entity/Listing";
-import { User } from "../../entity/User";
+import { Listing, User } from "../../entity";
 
 import { logger } from "../../../lib/logger/pino.config";
 

@@ -1,19 +1,17 @@
-import { User } from "../../entity/User";
-import { Listing } from "../../entity/Listing";
-import { AutoApply } from "../../entity/AutoApply";
+import { AutoApply, Listing, User, UserApplicantConfig } from "../../entity";
 
 import { logger } from "../../../lib/logger/pino.config";
 
 import { getAnswersPrompt } from "../prompts/getAnswers";
 
-import { isValidArray, isValidJson } from "../../../lib/utils/parsing";
+import { isValidArray } from "../../../lib/utils/parsing";
 
 import { summarizeJobDescription } from "./summarizeDescription";
 
+import dotenv from "dotenv";
+
 import { GPTText } from "../index";
 
-import dotenv from "dotenv";
-import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
 dotenv.config();
 
 const MAX_RETRIES = Number(process.env.MAX_GPT_RETRIES);

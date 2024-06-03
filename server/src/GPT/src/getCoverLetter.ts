@@ -1,16 +1,13 @@
-import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
 import { coverLetter } from "../../document_generators/coverLetter";
+import { getCoverLetterPrompt } from "../prompts/getCoverLetter";
 
 import { logger } from "../../../lib/logger/pino.config";
 
 import { compileHTMLtoPDF } from "../../../lib/utils/pdf";
 
-import { User } from "../../entity/User";
-import { Listing } from "../../entity/Listing";
+import { Listing, User, UserApplicantConfig } from "../../entity";
 
 import { GPTText } from "../index";
-
-import { UserApplicantConfig } from "../../entity/UserApplicantConfig";
 
 import { summarizeJobDescription } from "./summarizeDescription";
 

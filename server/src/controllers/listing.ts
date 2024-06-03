@@ -1,8 +1,8 @@
-import { Listing } from "../entity/Listing";
+import { Listing } from "../entity";
 import { getConnection } from "../../data-source";
 
 import { logger } from "../../lib/logger/pino.config";
-import { AutoApply } from "../entity/AutoApply";
+import { AutoApply } from "../entity";
 
 import { Request, Response } from "express";
 
@@ -166,7 +166,7 @@ export const getUnappliedListing = async (req: Request, res: Response) => {
       requiredMatches || Math.ceil((skills?.length || 0) * 0.1);
     let subQueries = (skills || [])
       .map(
-        (skill) =>
+        (skill: string) =>
           `(CASE WHEN lower(listing.description) ILIKE '%${skill.toLowerCase()}%' THEN 1 ELSE 0 END)`
       )
       .join(" + ");

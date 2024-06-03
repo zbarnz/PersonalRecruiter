@@ -1,4 +1,4 @@
-import { User } from "../entity/User";
+import { User } from "../entity";
 import { getConnection } from "../../data-source";
 import { logger } from "../../lib/logger/pino.config";
 import { Request, Response } from "express";
@@ -17,7 +17,7 @@ export const getUserHelper = async (id: User["id"]): Promise<User> => {
 export const createUser = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
-    logger.info(req);
+    logger.info("Create user request", req);
     const userData = req.body;
     const user = connection.manager.create(User, userData);
     const savedUser = await connection.manager.save(user);

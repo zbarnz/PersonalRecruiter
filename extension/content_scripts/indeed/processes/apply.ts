@@ -149,12 +149,12 @@ async function beginApplyFlow(
 
     console.log("Creating AutoApply and getting documents!");
 
-    const autoApply = new AutoApply();
+    const autoApplyEntity = new AutoApply();
 
-    autoApply.listing = listing;
-    autoApply.user = user;
-    autoApply.customResumeFlag = getResume;
-    autoApply.customCoverLetterFlag = getCoverLetter;
+    autoApplyEntity.listing = listing;
+    autoApplyEntity.user = user;
+    autoApplyEntity.customResumeFlag = getResume;
+    autoApplyEntity.customCoverLetterFlag = getCoverLetter;
 
     const res = await fetch(`${apiUrl}/autoApply/create`, {
       method: "POST",
@@ -162,7 +162,7 @@ async function beginApplyFlow(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        autoApply: autoApply,
+        autoApply: autoApplyEntity,
         getCoverLetter: getCoverLetter,
         getResume: getResume,
         questions: questions,
@@ -176,7 +176,7 @@ async function beginApplyFlow(
     }
 
     const {
-      savedApply,
+      savedApply: autoApply,
       documents,
     }: { savedApply: AutoApply; documents: Documents } = await res.json();
     answeredQuestions = documents.answeredQuestions;

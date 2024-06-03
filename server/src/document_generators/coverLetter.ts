@@ -1,5 +1,4 @@
-import { User } from "../entity/User";
-import { UserApplicantConfig } from "../entity/UserApplicantConfig";
+import { User, UserApplicantConfig } from "../entity";
 
 export function coverLetter(
   coverLetter: string,

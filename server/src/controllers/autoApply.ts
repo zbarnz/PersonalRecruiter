@@ -1,7 +1,4 @@
-import { AutoApply } from "../entity/AutoApply";
-import { Exception } from "../entity/Exception";
-import { JobBoard } from "../entity/JobBoard";
-import { User } from "../entity/User";
+import { AutoApply, Exception, JobBoard, User } from "../entity";
 
 import { getConnection } from "../../data-source";
 
@@ -14,20 +11,30 @@ import { DataSource } from "typeorm";
 
 //helpers
 
+// TODO use better variable name for auto apply
 export const createApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
   const connection: DataSource = await getConnection();
-
   const existingApply = await connection.manager.findOne(AutoApply, {
-    where: { listing: a.listing, user: a.user },
-    relations: ["listing", "user"],
+    where: {
+      listing: { id: a.listing.id },
+      user: { id: a.user.id },
+    },
+    relations: ["listing", "user", "listing.jobBoard"],
+  });
+
+  const user = await connection.manager.findOne(User, {
+    where: {
+      id: a.user.id,
+    },
   });
 
   if (existingApply) {
     return existingApply;
   }
-
   const applyEntity = connection.manager.create(AutoApply, a);
+
   const savedApply = await connection.manager.save(applyEntity);
+
   return savedApply;
 };
 
@@ -59,10 +66,6 @@ export const createApply = async (req: Request, res: Response) => {
 
     const getAnswers = questions?.length ? true : false;
 
-    logger.info(autoApply);
-    logger.info(questions);
-    logger.info({ getResume, getCoverLetter, getAnswers });
-
     let documents: Documents = {
       coverLetter: null,
       resume: null,
@@ -71,7 +74,7 @@ export const createApply = async (req: Request, res: Response) => {
 
     const savedApply = await createApplyHelper(autoApply);
 
-    logger.info(savedApply);
+    logger.info("apply saved", savedApply);
 
     if (getCoverLetter || getResume || getAnswers) {
       documents = await getApplyResourcesHelper(
@@ -84,7 +87,7 @@ export const createApply = async (req: Request, res: Response) => {
         savedApply
       );
     }
-    res.json({ savedApply, documents });
+    res.json({ autoApply: savedApply, documents });
   } catch (error) {
     res
       .status(500)

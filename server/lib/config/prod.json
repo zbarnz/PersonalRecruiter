@@ -1,0 +1,5 @@
+{
+  "openAI": {
+    "models": ["GPT-4o", "GPT-3.5 Turbo"]
+  }
+}
