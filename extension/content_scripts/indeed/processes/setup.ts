@@ -1,11 +1,7 @@
 import {
-  waitForNavigationComplete,
   waitForURL,
   waitForElement,
   shortWait,
-  tinyWait,
-  mediumWait,
-  longWait,
 } from "../../../lib/utils/waits";
 
 function generateUniqueNavId(): string {

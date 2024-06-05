@@ -1,17 +1,14 @@
+import { shortWait, waitForElement } from "../../../lib/utils/waits";
+
 import {
-  longWait,
-  mediumWait,
-  shortWait,
-  tinyWait,
-  waitForElement,
-} from "../../../lib/utils/waits";
+  AutoApply,
+  Listing,
+  User,
+  UserApplicantConfig,
+} from "../../../src/entity";
 
-import { Listing } from "../../../src/entity/Listing";
-import { AutoApply } from "../../../src/entity/AutoApply";
-import { User } from "../../../src/entity/User";
-
-import { standardizeIndeedApplyUrl } from "../../../lib/utils/parsing";
 import { filterQuestionsObjects } from "../../../lib/utils/indeed";
+import { standardizeIndeedApplyUrl } from "../../../lib/utils/parsing";
 
 import { handleContactInfoPage } from "../apply_page_handlers/handleContactInfoPage";
 import { handleDocumentsPage } from "../apply_page_handlers/handleDocumentsPage";
@@ -20,7 +17,6 @@ import {
   isErrorPresent,
 } from "../apply_page_handlers/handleQuestionsPage";
 import { handleResumePage } from "../apply_page_handlers/handleResumePage";
-import { handleReviewPage } from "../apply_page_handlers/handleReviewPage";
 import { handleWorkExperiencePage } from "../apply_page_handlers/handleWorkExperiencePage";
 import { getInitialDataInjection } from "./getInitialData";
 
@@ -126,6 +122,7 @@ async function beginApplyFlow(
       "currentListingContext"
     );
     const user: User = await readLocalStorage("user");
+    const config: UserApplicantConfig = await readLocalStorage("config");
     const listing: Listing = jobDetails.listing;
 
     let url: string;
@@ -143,7 +140,7 @@ async function beginApplyFlow(
 
     let getCoverLetter: boolean =
       coverLetterFlag && coverLetterFlag !== "hidden" ? true : false;
-    let getResume: boolean = user.customResumeFlag;
+    let getResume: boolean = config.customResumeFlag;
 
     let answeredQuestions: any[] | null = [];
 
@@ -153,8 +150,8 @@ async function beginApplyFlow(
 
     autoApplyEntity.listing = listing;
     autoApplyEntity.user = user;
-    autoApplyEntity.customResumeFlag = getResume;
-    autoApplyEntity.customCoverLetterFlag = getCoverLetter;
+    autoApplyEntity.customResume = getResume;
+    autoApplyEntity.customCoverLetter = getCoverLetter;
 
     const res = await fetch(`${apiUrl}/autoApply/create`, {
       method: "POST",

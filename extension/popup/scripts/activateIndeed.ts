@@ -48,20 +48,26 @@ button.addEventListener("click", async () => {
     method: "GET",
   }).then((response) => response.json());
 
-  Promise.all([jobBoardPromise, userPromise])
-    .then(([jobBoardData, userData]) => {
-      if (jobBoardData.error || userData.error) {
+  const configPromise = fetch(`${apiUrl}/uconfig/${userId.value}`, {
+    method: "GET",
+  }).then((response) => response.json());
+
+  Promise.all([jobBoardPromise, userPromise, configPromise])
+    .then(([jobBoardData, userData, configData]) => {
+      if (jobBoardData.error || userData.error || configData.error) {
         let errorMessage = "";
         if (jobBoardData.error) errorMessage += jobBoardData.error;
         if (userData.error) errorMessage += " " + userData.error;
+        if (configData.error) errorMessage += " " + configData.error;
         throw new Error(errorMessage);
       }
 
       chrome.storage.local
         .set({
-          "jobQuery": jobQueryInput.value,
-          "jobBoard": jobBoardData,
-          "user": userData,
+          jobQuery: jobQueryInput.value,
+          jobBoard: jobBoardData,
+          user: userData,
+          config: configData,
         })
         .then(() => {
           chrome.runtime.sendMessage({

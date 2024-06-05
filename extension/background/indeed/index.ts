@@ -1,13 +1,9 @@
-import { shortWait } from "../../lib/utils/waits";
 import { calculateYearlySalary, safeMath } from "../../lib/utils/math";
-import { utcToUnix } from "../../lib/utils/date";
-
-import { Listing } from "../../src/entity/Listing";
-import { JobBoard } from "../../src/entity/JobBoard";
-import { User } from "../../src/entity/User";
+import { shortWait } from "../../lib/utils/waits";
 
 import { readLocalStorage } from "../../lib/utils/chrome/storage";
-import { AutoApply } from "../../src/entity/AutoApply";
+
+import { AutoApply, JobBoard, Listing, User } from "../../src/entity";
 
 type JobDetails = {
   jobKey: any;
@@ -355,14 +351,14 @@ async function parseListings(
 
       updatedListings = [...new Set([...existingListings, ...newListingIds])];
 
-      chrome.storage.local.set({ "unappliedListings": updatedListings });
+      chrome.storage.local.set({ unappliedListings: updatedListings });
 
       //set pages crawled
       //using local stroage for syncronous nature
       const pagesCrawled: number =
         (await readLocalStorage("pagesCrawled")) || 0;
 
-      chrome.storage.local.set({ "pagesCrawled": pagesCrawled + 1 });
+      chrome.storage.local.set({ pagesCrawled: pagesCrawled + 1 });
 
       console.log(
         "Scraped " +
@@ -506,7 +502,7 @@ async function parseListingDataListener(
       listing.title = contextData.title;
       listing.description = contextData.description;
       listing.company = contextData.hiringOrganization.name;
-      listing.datePosted = utcToUnix(contextData.datePosted);
+      listing.datePosted = new Date(Date.now());
       listing.employmentType = contextData.employmentType ?? null;
       listing.currency = contextData.baseSalary?.currency ?? null;
       listing.minSalary = safeMath(Math.floor, minYearlySalary!) ?? null;
@@ -580,7 +576,7 @@ async function parseListingDataListener(
           (await readLocalStorage("unappliedListings")) || [];
 
         await chrome.storage.local.set({
-          "unappliedListings": listings.filter(
+          unappliedListings: listings.filter(
             (item) => item !== initialData.jobKey
           ),
         });
@@ -618,7 +614,7 @@ async function parseListingDataListener(
           (await readLocalStorage("unappliedListings")) || [];
 
         await chrome.storage.local.set({
-          "unappliedListings": listings.filter(
+          unappliedListings: listings.filter(
             (item) => item !== initialData.jobKey
           ),
         });
@@ -654,7 +650,7 @@ async function parseListingDataListener(
       };
 
       chrome.storage.local.set({
-        "currentListingContext": jobDetails,
+        currentListingContext: jobDetails,
       });
 
       await shortWait();

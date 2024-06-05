@@ -1,5 +1,4 @@
-import { Listing } from "../../../src/entity/Listing";
-import { User } from "../../../src/entity/User";
+import { Listing, User } from "../../../src/entity";
 
 import { tinyWait } from "../../../lib/utils/waits";
 

@@ -1,4 +1,3 @@
-import { Context } from "vm";
 import { waitForElement } from "../../../lib/utils/waits";
 
 chrome.runtime.onMessage.addListener(getInitialData);

@@ -59,7 +59,6 @@ export async function getApplyResourcesHelper(
 
         const pdfRecord = new PDF();
         pdfRecord.user = user;
-        pdfRecord.listing = listing;
         pdfRecord.type = "Cover Letter";
         pdfRecord.pdfData = coverLetter.buffer;
         const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
@@ -73,7 +72,6 @@ export async function getApplyResourcesHelper(
 
         const pdfRecord = new PDF();
         pdfRecord.user = user;
-        pdfRecord.listing = listing;
         pdfRecord.type = "Resume";
         pdfRecord.pdfData = resume;
         const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
