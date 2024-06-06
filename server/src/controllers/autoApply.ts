@@ -64,6 +64,9 @@ export const createApply = async (req: Request, res: Response) => {
     const getResume: boolean = req.body.getResume;
     const questions: any | null = req.body.questions;
 
+    autoApply.customCoverLetter = getCoverLetter;
+    autoApply.customResume = getResume;
+
     const getAnswers = questions?.length ? true : false;
 
     let documents: Documents = {

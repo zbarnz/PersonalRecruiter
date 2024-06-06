@@ -11,6 +11,8 @@ import { GPTText } from "../index";
 
 import { summarizeJobDescription } from "./summarizeDescription";
 
+import fs from "fs/promises";
+
 export async function generateCoverLetter(
   user: User,
   listing: Listing,
@@ -57,6 +59,8 @@ export async function generateCoverLetter(
 
     let removedNewLines = parsedText.replace(/\n/g, "<br>");
     const clHTML = coverLetter(removedNewLines, user, userApplicantConfig);
+
+    console.log(clHTML);
 
     const pdfBuffer = await compileHTMLtoPDF(clHTML);
 

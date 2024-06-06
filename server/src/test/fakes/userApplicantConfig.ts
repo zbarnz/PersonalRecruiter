@@ -11,7 +11,7 @@ import {
 } from "resume-lite";
 import { User, UserApplicantConfig } from "../../entity";
 
-function createFakeUserApplicantConfig(user: User) {
+export function createFakeUserApplicantConfig(user: User) {
   const userApplicantConfig = new UserApplicantConfig();
   userApplicantConfig.user = user;
   userApplicantConfig.firstName = faker.person.firstName();
@@ -78,5 +78,3 @@ function createFakeUserApplicantConfig(user: User) {
 
   return userApplicantConfig;
 }
-
-module.exports = createFakeUserApplicantConfig;

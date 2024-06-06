@@ -27,8 +27,8 @@ const localDataSource: DataSourceOptions = {
   synchronize: true,
   logging: false,
   entities: [
-    path.join(__dirname, "../**/*.entity{.ts,.js}"),
-    path.join(__dirname, "../**/*.schema{.ts,.js}"),
+    path.join(__dirname, "./**/*.entity{.ts,.js}"),
+    path.join(__dirname, "./**/*.schema{.ts,.js}"),
   ],
   migrations: [],
   subscribers: [],
@@ -45,8 +45,8 @@ export const testDataSource: DataSourceOptions = {
   synchronize: true,
   logging: false,
   entities: [
-    path.join(__dirname, "../**/*.entity{.ts,.js}"),
-    path.join(__dirname, "../**/*.schema{.ts,.js}"),
+    path.join(__dirname, "./**/*.entity{.ts,.js}"),
+    path.join(__dirname, "./**/*.schema{.ts,.js}"),
   ],
   migrations: [],
   subscribers: [],

@@ -13,7 +13,7 @@ import { User } from "../user/User.entity";
 
 export class UserApplicantConfig {
   id: number;
-  user: User;
+  user: User | number;
   firstName: string;
   lastName: string;
   email: string;

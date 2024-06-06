@@ -1,8 +1,6 @@
 import { Request, Response } from "express";
 
-import { AutoApply, Listing, User } from "../entity";
-import { PDF } from "../entity";
-import { UserApplicantConfig } from "../entity";
+import { AutoApply, Listing, PDF, User, UserApplicantConfig } from "../entity";
 
 import { logger } from "../../lib/logger/pino.config";
 
@@ -42,7 +40,7 @@ export async function getApplyResourcesHelper(
 
     const userApplicantConfig: UserApplicantConfig =
       await connection.manager.findOne(UserApplicantConfig, {
-        where: { user },
+        where: { user: user.id },
       });
 
     //set batchId for marking as failed (we dont want to rollback gpt logs)
@@ -51,7 +49,7 @@ export async function getApplyResourcesHelper(
     try {
       if (getCoverLetterFlag) {
         logger.info("Generating Cover Letter");
-        const coverLetter = await generateCoverLetter(
+        coverLetter = await generateCoverLetter(
           user,
           listing,
           userApplicantConfig
@@ -62,7 +60,7 @@ export async function getApplyResourcesHelper(
         pdfRecord.type = "Cover Letter";
         pdfRecord.pdfData = coverLetter.buffer;
         const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
-        transactionalEntityManager.save(pdfEntity);
+        await transactionalEntityManager.save(pdfEntity);
       }
 
       if (getResumeFlag) {
@@ -75,7 +73,7 @@ export async function getApplyResourcesHelper(
         pdfRecord.type = "Resume";
         pdfRecord.pdfData = resume;
         const pdfEntity = transactionalEntityManager.create(PDF, pdfRecord);
-        transactionalEntityManager.save(pdfEntity);
+        await transactionalEntityManager.save(pdfEntity);
       }
 
       if (getAnswersFlag) {

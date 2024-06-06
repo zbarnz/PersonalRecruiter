@@ -28,3 +28,6 @@ secrets/
 #migrations
 deployment/
 ormConfig.ts
+
+#tests
+src/test/jest/output_files

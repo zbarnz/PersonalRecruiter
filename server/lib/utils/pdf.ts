@@ -1,7 +1,7 @@
 import puppeteer from "puppeteer";
 import { Page, PDFOptions } from "puppeteer";
 
-async function generatePdf(html) {
+async function generatePdf(html: string) {
   // we are using headless mode
   const args = ["--no-sandbox", "--disable-setuid-sandbox"];
   const pdfOptions: PDFOptions = {
@@ -36,14 +36,6 @@ async function generatePdf(html) {
 }
 
 export async function compileHTMLtoPDF(coverLetter: string): Promise<Buffer> {
-  // Create a File object for the generatePdfPromise function
-  const contentObj = {
-    content: coverLetter, // Set the HTML content
-  };
-
-  // Generate PDF buffer from HTML content
-  const generatedPdfBuffer = await generatePdf(contentObj);
-
-  // Write the generated PDF to the file system
+  const generatedPdfBuffer = await generatePdf(coverLetter);
   return generatedPdfBuffer;
 }

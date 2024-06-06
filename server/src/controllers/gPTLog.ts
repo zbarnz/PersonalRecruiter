@@ -1,7 +1,9 @@
 // Assume that GPTLog is in the same directory level as AutoApply
-import { GPTLog } from "../entity";
-import { getConnection } from "../../data-source";
 import { DataSource, UpdateResult } from "typeorm";
+import { getConnection } from "../../data-source";
+import { GPTLog } from "../entity";
+
+import { logger } from "../../lib/logger/pino.config";
 
 import { Request, Response } from "express";
 
@@ -13,7 +15,7 @@ export const createGPTLogHelper = async (g: GPTLog): Promise<GPTLog> => {
     const savedGPTLog = await connection.manager.save(g);
     return savedGPTLog;
   } catch (error) {
-    console.error("Error saving GPTLog:", error);
+    logger.error("Error saving GPTLog:", error);
     throw new Error("Failed to save GPTLog");
   }
 };
