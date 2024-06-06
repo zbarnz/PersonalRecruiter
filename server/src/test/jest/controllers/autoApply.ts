@@ -129,7 +129,7 @@ describe("getApplyResources", () => {
     expect(res1.data.autoApply).toStrictEqual(res2.data.autoApply);
   });
 
-  it.only("should return documents successfully", async () => {
+  it("should return documents successfully", async () => {
     const autoApplyEntity: AutoApply = createFakeAutoApply(user1, listing1);
 
     const res: AxiosResponse = await client.post("/autoapply/create", {
