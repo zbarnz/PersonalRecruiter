@@ -1,7 +1,7 @@
-import { User } from "../entity";
+import { Request, Response } from "express";
 import { getConnection } from "../../data-source";
 import { logger } from "../../lib/logger/pino.config";
-import { Request, Response } from "express";
+import { User } from "../entity";
 
 //helpers
 export const getUserHelper = async (id: User["id"]): Promise<User> => {
@@ -17,8 +17,22 @@ export const getUserHelper = async (id: User["id"]): Promise<User> => {
 export const createUser = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
-    logger.info("Create user request", req);
+
     const userData = req.body;
+
+    if (!userData.phone) {
+      return res
+        .status(400)
+        .json({ error: "Cannot create user without phone number" });
+    }
+    if (!userData.email) {
+      return res
+        .status(400)
+        .json({ error: "Cannot create user without email" });
+    }
+
+    logger.info("Creating new user");
+
     const user = connection.manager.create(User, userData);
     const savedUser = await connection.manager.save(user);
     res.json(savedUser);

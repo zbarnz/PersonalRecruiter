@@ -12,6 +12,7 @@
     "build": "tsc -p tsconfig.build.json",
     "tap": "bash -c 'terraform apply -var=\"db_connection_string=${DB_CONN_STRING}\"'",
     "test": "set NODE_ENV=test&& set PORT=4001&& set NOLOG=true&& jest --config jest.config.ts",
+    "test-one": "set NODE_ENV=test&& set PORT=4001&& jest --config jest.config.ts -t",
     "test-log": "set NODE_ENV=test&& set PORT=4001&& jest --config jest.config.ts",
     "typeorm": "typeorm-ts-node-esm"
   },

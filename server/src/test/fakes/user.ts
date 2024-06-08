@@ -2,7 +2,7 @@ import { User } from "../../entity";
 
 import { faker } from "@faker-js/faker";
 
-export async function createFakeUser() {
+export function createFakeUser() {
   const user = new User();
   user.email = faker.internet.email();
   user.phone = faker.phone.number();
