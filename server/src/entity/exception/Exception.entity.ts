@@ -4,7 +4,6 @@ import { User } from "../user/User.entity";
 
 export class Exception {
   id: number;
-  jobBoard: JobBoard;
   listing: Listing;
   dateUpdated: Date;
   reason: string;

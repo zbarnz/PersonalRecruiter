@@ -6,12 +6,10 @@ import { Exception } from "../entity";
 export const createException = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
-    const exceptionData = {
-      listingId: req.body.listingId,
-      dateUpdated: Math.floor(Date.now() / 1000), // Current time in UNIX timestamp
+    const exceptionData: any = {
+      listing: req.body.listing,
       reason: req.body.reason,
-      jobBoard: req.body.jobBoard,
-      userId: req.body.userId,
+      user: req.body.user,
     };
     const exception = connection.manager.create(Exception, exceptionData);
     const savedException = await connection.manager.save(exception);
