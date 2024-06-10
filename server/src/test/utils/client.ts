@@ -14,11 +14,11 @@ client.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response) {
-      logger.error("Error data: " + JSON.stringify(error.response.data));
+      logger.error("Error data: " ,error.response.data);
     } else if (error.request) {
-      logger.error("Error request:", JSON.stringify(error.request.data));
+      logger.error("Error request:", error.request.data);
     } else {
-      logger.error("Unexpected Error:", JSON.stringify(error.message));
+      logger.error("Unexpected Error:",error.message);
     }
     return Promise.reject(error);
   }

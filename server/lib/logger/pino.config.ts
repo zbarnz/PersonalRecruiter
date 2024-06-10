@@ -1,5 +1,5 @@
-import { name, version } from "../../package.json";
 import pino, { LoggerOptions } from "pino";
+import { name, version } from "../../package.json";
 
 const isNolog = process.env.NOLOG === "true";
 
@@ -35,7 +35,11 @@ export const logger = {
       baseLogger.info(context, msg);
     }
   },
-  error: baseLogger.error.bind(baseLogger),
+  error: (msg: string, context?: Record<string, any>) => {
+    if (typeof msg !== "undefined") {
+      baseLogger.error(context, msg);
+    }
+  },
   warn: baseLogger.warn.bind(baseLogger),
   debug: baseLogger.debug.bind(baseLogger),
 };

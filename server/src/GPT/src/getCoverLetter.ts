@@ -26,7 +26,7 @@ export async function generateCoverLetter(
     }
 
     if (!listing.summarizedJobDescription) {
-      summarizedDescription = await summarizeJobDescription(listing, user);
+      summarizedDescription = await summarizeJobDescription(listing);
     }
 
     if (!listing.summarizedJobDescription && !summarizedDescription) {
@@ -59,8 +59,6 @@ export async function generateCoverLetter(
 
     let removedNewLines = parsedText.replace(/\n/g, "<br>");
     const clHTML = coverLetter(removedNewLines, user, userApplicantConfig);
-
-    console.log(clHTML);
 
     const pdfBuffer = await compileHTMLtoPDF(clHTML);
 

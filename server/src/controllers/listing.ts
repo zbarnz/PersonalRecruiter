@@ -57,8 +57,7 @@ export const saveListing = async (req: Request, res: Response) => {
         //if the description has been updated since last save then we need to resummarize the description
         if (similarity < 0.95) {
           let summarizedJobDescription = await summarizeJobDescription(
-            listing,
-            requiredQualifications
+            listing
           );
 
           listing.summarizedJobDescription = summarizedJobDescription;
@@ -82,8 +81,7 @@ export const saveListing = async (req: Request, res: Response) => {
       logger.info(JSON.stringify(listingEntity));
 
       let summarizedJobDescription = await summarizeJobDescription(
-        savedListingPreSummarize,
-        requiredQualifications
+        savedListingPreSummarize
       );
 
       savedListingPreSummarize.summarizedJobDescription =

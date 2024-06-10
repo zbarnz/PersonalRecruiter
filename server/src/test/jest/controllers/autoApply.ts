@@ -143,8 +143,6 @@ describe("autoApplyController", () => {
       const autoApplyResponse = new AutoApply();
       Object.assign(autoApplyResponse, res.data.autoApply);
 
-      console.log(res.data.documents.coverLetter.buffer.data);
-
       const resumeBuffer = Buffer.from(res.data.documents.resume.data);
       const coverLetterBuffer = Buffer.from(
         res.data.documents.coverLetter.buffer.data

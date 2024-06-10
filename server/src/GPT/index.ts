@@ -110,7 +110,6 @@ export async function GPTText( //TODO change args to options obj
     gptLog.listing = listing;
     gptLog.user = user || null;
     gptLog.systemFlag = systemFlag || false;
-    gptLog.createdAt = new Date(Math.floor(Date.now()));
 
     logger.info("saving GPT log");
     const savedLog = await createGPTLogHelper(gptLog);
@@ -128,6 +127,6 @@ export async function GPTText( //TODO change args to options obj
       );
     }
   } catch (err) {
-    throw new Error("GPT call failed");
+    throw new Error("GPT call failed: " + JSON.stringify(err));
   }
 }

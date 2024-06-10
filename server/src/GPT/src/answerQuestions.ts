@@ -34,7 +34,7 @@ export async function answerQuestions(
     }
 
     if (!listing.summarizedJobDescription) {
-      summarizedDescription = await summarizeJobDescription(listing, user);
+      summarizedDescription = await summarizeJobDescription(listing);
     }
 
     if (!listing.summarizedJobDescription && !summarizedDescription) {

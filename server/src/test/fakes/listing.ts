@@ -42,6 +42,8 @@ export function createFakeListing(jobBoard: JobBoard) {
   listing.questionsObject = JSON.stringify({
     questions: faker.lorem.sentence(),
   });
+  listing.directApplyFlag = faker.datatype.boolean();
+  listing.remoteFlag = faker.datatype.boolean();
 
   return listing;
 }

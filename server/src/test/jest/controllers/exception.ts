@@ -57,7 +57,7 @@ describe("exceptionController", () => {
         ...res.data.user,
         createdAt: new Date(res.data.user.createdAt),
       });
-      Object.assign(listingResponseJB, jobBoard1);
+      Object.assign(listingResponseJB, res.data.listing.jobBoard);
       Object.assign(listingResponse, {
         ...res.data.listing,
         datePosted: new Date(res.data.listing.datePosted),

@@ -1,4 +1,4 @@
-import { Listing, User } from "../../entity";
+import { Listing } from "../../entity";
 
 import { logger } from "../../../lib/logger/pino.config";
 
@@ -7,11 +7,9 @@ import { GPTText } from "../../GPT/index";
 import { summarizeDescriptionPrompt } from "../prompts/summarizeDescription";
 
 export async function summarizeJobDescription(
-  listing: Listing,
-  user?: User
+  listing: Listing
 ): Promise<string> {
   let completionText: any;
-  let retries: number = 0;
 
   logger.info("Summarizing Job description");
 
@@ -22,13 +20,13 @@ export async function summarizeJobDescription(
 
   ({ text: completionText } = await GPTText(
     prompt,
-    user,
+    null,
     undefined,
     undefined,
     listing,
     undefined,
     undefined,
-    user ? false : true
+    true
   ));
 
   if (listing.questionsObject) {
