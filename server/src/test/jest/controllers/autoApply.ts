@@ -25,7 +25,7 @@ import { createFakeListing } from "../../fakes/listing";
 import { createFakeUserApplicantConfig } from "../../fakes/userApplicantConfig";
 
 describe("autoApplyController", () => {
-  let user1: User;
+  let user1: User = new User();
   let user1Config: UserApplicantConfig;
   let listing1: Listing;
   let jobBoard1: JobBoard;
@@ -45,9 +45,14 @@ describe("autoApplyController", () => {
     );
     jobBoard1 = await connection.manager.save(createdJobBoard);
 
-    const userEntity1 = await createFakeUser();
+    const { user: userEntity1 } = createFakeUser(false);
     const createdUser = connection.manager.create(User, userEntity1);
-    user1 = await connection.manager.save(createdUser);
+    const {
+      salt: newSalt,
+      hash: newHash,
+      ...savedUser
+    } = await connection.manager.save(createdUser);
+    Object.assign(user1, savedUser);
 
     const listingEntity1 = createFakeListing(jobBoard1);
     const createdListing = connection.manager.create(Listing, listingEntity1);

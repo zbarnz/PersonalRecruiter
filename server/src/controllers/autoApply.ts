@@ -22,12 +22,6 @@ export const createApplyHelper = async (a: AutoApply): Promise<AutoApply> => {
     relations: ["listing", "user", "listing.jobBoard"],
   });
 
-  const user = await connection.manager.findOne(User, {
-    where: {
-      id: a.user.id,
-    },
-  });
-
   if (existingApply) {
     return existingApply;
   }

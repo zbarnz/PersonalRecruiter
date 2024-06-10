@@ -27,5 +27,13 @@ export const UserSchema = new EntitySchema<User>({
       type: Number,
       default: 0,
     },
+    hash: {
+      type: "varchar",
+      select: false,
+    },
+    salt: {
+      type: "varchar",
+      select: false
+    },
   },
 });

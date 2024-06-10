@@ -558,10 +558,9 @@ async function parseListingDataListener(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: CURRENT_USER.id,
-            jobBoard: INDEED_BOARD,
+            user: CURRENT_USER.id,
             reason: "Disabled Apply Button",
-            listingId: initialData.jobKey,
+            listing: initialData.jobKey,
           }),
         });
 
@@ -596,10 +595,9 @@ async function parseListingDataListener(
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            userId: CURRENT_USER.id,
-            jobBoard: INDEED_BOARD,
+            user: CURRENT_USER.id,
             reason: "Extenal Apply Link",
-            listingId: initialData.jobKey,
+            listing: initialData.jobKey,
           }),
         });
 

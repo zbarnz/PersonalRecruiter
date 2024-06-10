@@ -11,8 +11,9 @@ import { clean } from "../../utils/db";
 
 describe("listingController", () => {
   let connection: DataSource;
-  let user1: User;
   let jobBoard1: JobBoard;
+
+  jest.setTimeout(60000);
 
   beforeAll(async () => {
     await startServer();
@@ -25,10 +26,6 @@ describe("listingController", () => {
       jobBoardEntity1
     );
     jobBoard1 = await connection.manager.save(createdJobBoard);
-
-    const userEntity1 = createFakeUser();
-    const createdUser = connection.manager.create(User, userEntity1);
-    user1 = await connection.manager.save(createdUser);
   });
 
   afterAll(async () => {
@@ -56,9 +53,8 @@ describe("listingController", () => {
       expect(listingResponseJB).toEqual(jobBoard1);
     });
 
-    it.skip("should convert salaries approperiatly"), async () => {
+    it.skip("should convert salaries approperiatly", async () => {
       //sometimes salaries on job websites are placeholder values / need to figure out the exact rules for this
-    }
-    
+    });
   });
 });

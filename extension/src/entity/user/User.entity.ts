@@ -4,6 +4,8 @@ export class User {
   phone: string;
   createdAt: Date;
   points: number;
+  hash: string;
+  salt: string;
 
   constructor() {}
 }

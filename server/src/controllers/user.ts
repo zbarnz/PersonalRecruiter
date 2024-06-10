@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { getConnection } from "../../data-source";
 import { logger } from "../../lib/logger/pino.config";
+import { passwordUtils } from "../../lib/utils/password";
 import { User } from "../entity";
 
 //helpers
@@ -18,23 +19,28 @@ export const createUser = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
 
-    const userData = req.body;
+    const userData = req.body.user;
+    const password = req.body.password;
 
-    if (!userData.phone) {
-      return res
-        .status(400)
-        .json({ error: "Cannot create user without phone number" });
+    if (!userData.phone || !userData.email || !password) {
+      return res.status(400).json({ error: "Invalid Credentials" });
     }
-    if (!userData.email) {
-      return res
-        .status(400)
-        .json({ error: "Cannot create user without email" });
+
+    const existingUser = await connection.manager.findOne(User, {
+      where: { email: userData.email },
+    });
+
+    if (existingUser) {
+      return res.status(409).json({ error: "Email already registered" });
     }
+
+    ({ hash: userData.hash, salt: userData.salt } =
+      passwordUtils.genPassword(password));
 
     logger.info("Creating new user");
 
     const user = connection.manager.create(User, userData);
-    const savedUser = await connection.manager.save(user);
+    const { salt, hash, ...savedUser } = await connection.manager.save(user);
     res.json(savedUser);
   } catch (error) {
     res

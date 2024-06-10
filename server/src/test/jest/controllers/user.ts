@@ -8,12 +8,21 @@ import { clean } from "../../utils/db";
 
 describe("userController", () => {
   let connection: DataSource;
-  let existingUser: User;
+  let existingUser: User = new User();
 
   beforeAll(async () => {
     await startServer();
     await clean();
     connection = await getConnection();
+
+    const { user: userEntity1 } = createFakeUser(false);
+    const createdUser = connection.manager.create(User, userEntity1);
+    const {
+      salt: newSalt,
+      hash: newHash,
+      ...savedUser
+    } = await connection.manager.save(createdUser);
+    Object.assign(existingUser, savedUser);
   });
 
   afterEach(async () => {
@@ -27,9 +36,12 @@ describe("userController", () => {
 
   describe("createUser", () => {
     it("should create a new user and return it", async () => {
-      const user: User = createFakeUser();
+      const { user, password } = createFakeUser(true) as {
+        user: User;
+        password: string;
+      };
 
-      const res = await client.post("/user/create", user);
+      const res = await client.post("/user/create", { user, password });
 
       const userResponse = new User();
       Object.assign(userResponse, {
@@ -37,25 +49,53 @@ describe("userController", () => {
         createdAt: new Date(res.data.createdAt),
       });
 
-      existingUser = userResponse;
-
       expect(userResponse).toBeInstanceOf(User);
       expect(userResponse.email).toEqual(user.email);
       expect(userResponse.phone).toEqual(user.phone);
     });
 
     it("should not create user without phone number", async () => {
-      const user = createFakeUser();
+      const { user, password } = createFakeUser(true) as {
+        user: User;
+        password: string;
+      };
 
-      const res = await client.post("/user/create", { ...user, phone: null });
+      const res = await client.post("/user/create", {
+        user: { ...user, phone: null },
+        password,
+      });
 
       expect(res.status).toEqual(400);
+    });
+
+    it("should not create user without email", async () => {
+      const { user, password } = createFakeUser(true) as {
+        user: User;
+        password: string;
+      };
+
+      const res = await client.post("/user/create", {
+        user: { ...user, email: null },
+        password,
+      });
+      expect(res.status).toEqual(400);
+    });
+
+    it("should not create user with an already registered email", async () => {
+      const res = await client.post("/user/create", {
+        user: existingUser,
+        password: "SecureP@ssword12",
+      });
+
+      expect(res.status).toEqual(409);
     });
   });
 
   describe("getUser", () => {
     it("should return the user if found", async () => {
-      const user: User = createFakeUser();
+      const { user } = createFakeUser(true) as {
+        user: User;
+      };
 
       const res = await client.get(`/user/${existingUser.id}`);
 
