@@ -1,5 +1,5 @@
-import jsonWebToken from "jsonwebtoken";
 import fs from "fs";
+import jsonWebToken, { JwtPayload } from "jsonwebtoken";
 import path from "path";
 
 const pathToPrivKey = path.join(__dirname, "../../keys/id_rsa_priv.pem");
@@ -13,13 +13,9 @@ export const jwtUtils = {
    * Create a JWT (json web token) for a successfully authenticated user.
    *
    * @param {object} sub - user or participant doc from db
-   * @param {boolean} usr - if they are a user (not participant)
    * @return {object} object containing new JWT (token) and expires date
    */
-  issueJWT(
-    sub: { _id: string },
-    usr: boolean
-  ): { token: string; expiresIn: string } {
+  issueJWT(sub: { _id: string }): { token: string; expiresIn: string } {
     const _id = sub._id;
 
     const expiresIn = "1d";
@@ -27,7 +23,6 @@ export const jwtUtils = {
     const payload = {
       sub: _id, // sub property of jwt (subject) identified who it is for
       iat: Date.now(), // iat issued at identified when token was issued
-      usr, // whether this is for a user or participant
     };
 
     const signedToken = jsonWebToken.sign(payload, PRIV_KEY, {
@@ -48,7 +43,7 @@ export const jwtUtils = {
    * @return decrypted jwt
    * @throws {Error} if invalid or expired token
    */
-  verifyJWT(authorization: string): object {
+  verifyJWT(authorization: string): JwtPayload {
     const [bearer, token] = authorization.split(" ");
 
     if (bearer !== "Bearer") {
@@ -61,7 +56,7 @@ export const jwtUtils = {
 
     const decrypted = jsonWebToken.verify(token, PUB_KEY, {
       algorithms: ["RS256"],
-    }) as { iat: number };
+    }) as JwtPayload;
 
     const oneDayMs = 1e3 * 24 * 60 * 60;
 
