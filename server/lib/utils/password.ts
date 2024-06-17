@@ -26,7 +26,7 @@ export const passwordUtils = {
    * @param {string} password - user's new password
    * @return {Object} - object containing salt and hash
    */
-  genPassword(password: string): { salt: string; hash: string }{
+  genPassword(password: string): { salt: string; hash: string } {
     // create salt (random information)
     const salt = crypto.randomBytes(32).toString("hex");
 

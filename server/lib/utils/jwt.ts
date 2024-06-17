@@ -2,10 +2,10 @@ import fs from "fs";
 import jsonWebToken, { JwtPayload } from "jsonwebtoken";
 import path from "path";
 
-const pathToPrivKey = path.join(__dirname, "../../keys/id_rsa_priv.pem");
-const pathToPubKey = path.join(__dirname, "../../keys/id_rsa_pub.pem");
+const pathToPrvKey = path.join(__dirname, "../../secrets/keys/id_rsa_priv.pem");
+const pathToPubKey = path.join(__dirname, "../../secrets/keys/id_rsa_pub.pem");
 
-const PRIV_KEY = fs.readFileSync(pathToPrivKey, "utf8");
+const PRIV_KEY = fs.readFileSync(pathToPrvKey, "utf8");
 const PUB_KEY = fs.readFileSync(pathToPubKey, "utf8");
 
 export const jwtUtils = {
@@ -15,13 +15,13 @@ export const jwtUtils = {
    * @param {object} sub - user or participant doc from db
    * @return {object} object containing new JWT (token) and expires date
    */
-  issueJWT(sub: { _id: string }): { token: string; expiresIn: string } {
-    const _id = sub._id;
+  issueJWT(sub: { id: number }): { token: string; expiresIn: string } {
+    const id = sub.id;
 
     const expiresIn = "1d";
 
     const payload = {
-      sub: _id, // sub property of jwt (subject) identified who it is for
+      sub: id, // sub property of jwt (subject) identified who it is for
       iat: Date.now(), // iat issued at identified when token was issued
     };
 
@@ -54,7 +54,7 @@ export const jwtUtils = {
       throw new Error("unauthorized");
     }
 
-    const decrypted = jsonWebToken.verify(token, PUB_KEY, {
+    const decrypted: JwtPayload = jsonWebToken.verify(token, PUB_KEY, {
       algorithms: ["RS256"],
     }) as JwtPayload;
 

@@ -9,7 +9,7 @@ export const createException = async (req: Request, res: Response) => {
     const exceptionData: any = {
       listing: req.body.listing,
       reason: req.body.reason,
-      user: req.body.user,
+      user: req.credentials.user,
     };
     const exception = connection.manager.create(Exception, exceptionData);
     const savedException = await connection.manager.save(exception);

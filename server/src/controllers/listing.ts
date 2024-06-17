@@ -1,5 +1,5 @@
-import { Listing } from "../entity";
 import { getConnection } from "../../data-source";
+import { Listing } from "../entity";
 
 import { logger } from "../../lib/logger/pino.config";
 import { AutoApply } from "../entity";
@@ -8,8 +8,8 @@ import { Request, Response } from "express";
 
 import { calculateStringSimilarity } from "../../lib/utils/parsing";
 
-import { summarizeJobDescription } from "../GPT/src/summarizeDescription"; //TODO empty page
 import { DataSource } from "typeorm";
+import { summarizeJobDescription } from "../GPT/src/summarizeDescription"; //TODO empty page
 
 //helpers
 
@@ -34,7 +34,6 @@ export const saveListing = async (req: Request, res: Response) => {
   try {
     const listing: Listing = req.body.listing;
     const connection: DataSource = await getConnection();
-    const requiredQualifications = listing.requirementsObject;
 
     const existingListing = await connection.manager.findOne(Listing, {
       where: {
@@ -56,9 +55,7 @@ export const saveListing = async (req: Request, res: Response) => {
 
         //if the description has been updated since last save then we need to resummarize the description
         if (similarity < 0.95) {
-          let summarizedJobDescription = await summarizeJobDescription(
-            listing
-          );
+          let summarizedJobDescription = await summarizeJobDescription(listing);
 
           listing.summarizedJobDescription = summarizedJobDescription;
         }
@@ -149,15 +146,9 @@ export const getListingById = async (req: Request, res: Response) => {
  */
 export const getUnappliedListing = async (req: Request, res: Response) => {
   try {
-    const {
-      user,
-      minSalary,
-      remote,
-      skills,
-      matchSkills,
-      requiredMatches,
-      limit,
-    } = req.body;
+    const { minSalary, remote, skills, matchSkills, requiredMatches, limit } =
+      req.body;
+    const user = req.credentials.user;
     const connection = await getConnection();
 
     let calculatedRequiredMatches =

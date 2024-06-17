@@ -9,13 +9,15 @@ import { clean } from "../../utils/db";
 describe("userController", () => {
   let connection: DataSource;
   let existingUser: User = new User();
+  let existingUserPassword: string;
 
   beforeAll(async () => {
     await startServer();
     await clean();
     connection = await getConnection();
 
-    const { user: userEntity1 } = createFakeUser(false);
+    const { user: userEntity1, password: userPassword1 } =
+      createFakeUser(false);
     const createdUser = connection.manager.create(User, userEntity1);
     const {
       salt: newSalt,
@@ -23,6 +25,7 @@ describe("userController", () => {
       ...savedUser
     } = await connection.manager.save(createdUser);
     Object.assign(existingUser, savedUser);
+    existingUserPassword = userPassword1;
   });
 
   afterEach(async () => {
@@ -34,14 +37,14 @@ describe("userController", () => {
     await stopServer();
   });
 
-  describe("createUser", () => {
-    it("should create a new user and return it", async () => {
+  describe("registerUser", () => {
+    it("should register a new user and return it", async () => {
       const { user, password } = createFakeUser(true) as {
         user: User;
         password: string;
       };
 
-      const res = await client.post("/user/create", { user, password });
+      const res = await client.post("/user/register", { user, password });
 
       const userResponse = new User();
       Object.assign(userResponse, {
@@ -54,13 +57,13 @@ describe("userController", () => {
       expect(userResponse.phone).toEqual(user.phone);
     });
 
-    it("should not create user without phone number", async () => {
+    it("should not register user without phone number", async () => {
       const { user, password } = createFakeUser(true) as {
         user: User;
         password: string;
       };
 
-      const res = await client.post("/user/create", {
+      const res = await client.post("/user/register", {
         user: { ...user, phone: null },
         password,
       });
@@ -68,21 +71,21 @@ describe("userController", () => {
       expect(res.status).toEqual(400);
     });
 
-    it("should not create user without email", async () => {
+    it("should not register user without email", async () => {
       const { user, password } = createFakeUser(true) as {
         user: User;
         password: string;
       };
 
-      const res = await client.post("/user/create", {
+      const res = await client.post("/user/register", {
         user: { ...user, email: null },
         password,
       });
       expect(res.status).toEqual(400);
     });
 
-    it("should not create user with an already registered email", async () => {
-      const res = await client.post("/user/create", {
+    it("should not register user with an already registered email", async () => {
+      const res = await client.post("/user/register", {
         user: existingUser,
         password: "SecureP@ssword12",
       });
@@ -91,28 +94,51 @@ describe("userController", () => {
     });
   });
 
-  describe("getUser", () => {
-    it("should return the user if found", async () => {
-      const { user } = createFakeUser(true) as {
-        user: User;
-      };
-
-      const res = await client.get(`/user/${existingUser.id}`);
-
-      const userResponse = new User();
-      Object.assign(userResponse, {
-        ...res.data,
-        createdAt: new Date(res.data.createdAt),
+  describe("loginUser", () => {
+    it("should login an existing user", async () => {
+      const res = await client.post("/user/login", {
+        email: existingUser.email,
+        password: existingUserPassword,
       });
 
       expect(res.status).toEqual(200);
-      expect(userResponse).toEqual(existingUser);
+      expect(existingUser.email).toEqual(res.data.user.email);
+      expect(existingUser.points).toEqual(0);
+      expect(existingUser.phone).toEqual(res.data.user.phone);
     });
 
-    it("should return 404 if user not found", async () => {
-      const res = await client.get(`/user/404`);
+    it("should not login an existing user with invalid password", async () => {
+      const res = await client.post("/user/login", {
+        email: existingUser.email,
+        password: existingUserPassword + "!",
+      });
 
-      expect(res.status).toEqual(404);
+      expect(res.status).toEqual(401);
     });
   });
+
+  // describe.skip("getUser", () => { //removed get user route.
+  //   it("should return the user if found", async () => {
+  //     const { user } = createFakeUser(true) as {
+  //       user: User;
+  //     };
+
+  //     const res = await client.get(`/user/${existingUser.id}`);
+
+  //     const userResponse = new User();
+  //     Object.assign(userResponse, {
+  //       ...res.data,
+  //       createdAt: new Date(res.data.createdAt),
+  //     });
+
+  //     expect(res.status).toEqual(200);
+  //     expect(userResponse).toEqual(existingUser);
+  //   });
+
+  //   it("should return 404 if user not found", async () => {
+  //     const res = await client.get(`/user/404`);
+
+  //     expect(res.status).toEqual(404);
+  //   });
+  // });
 });

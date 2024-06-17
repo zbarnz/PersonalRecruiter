@@ -2,15 +2,20 @@ import { User } from "../../entity";
 
 import { faker } from "@faker-js/faker";
 
+import { passwordUtils } from "../../../lib/utils/password";
+
 export function createFakeUser(noHash: boolean) {
+  const password = faker.internet.password();
   const user = new User();
+
   user.email = faker.internet.email();
   user.phone = faker.phone.number();
-  user.points = faker.number.int({ min: 0, max: 1000 });
+
   if (!noHash) {
-    user.hash = faker.string.alpha({ length: 256 });
-    user.salt = faker.string.alpha({ length: 16 });
+    const { salt, hash } = passwordUtils.genPassword(password);
+    user.salt = salt;
+    user.hash = hash;
   }
 
-  return { user, password: faker.internet.password() };
+  return { user, password };
 }

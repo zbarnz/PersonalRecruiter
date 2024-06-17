@@ -114,7 +114,7 @@ export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
     let listings: string[] = req.body.jobKeys; // Assuming ID comes from URL parameters
     let jobBoard: JobBoard = req.body.jobBoard;
-    let user: User = req.body.user;
+    let user: User = req.credentials.user;
 
     let jobBoardId = jobBoard.id;
     let userId = user.id;
