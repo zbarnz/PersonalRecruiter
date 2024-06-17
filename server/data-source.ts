@@ -97,12 +97,9 @@ export const AppDataSource = new DataSource(dataSource);
 export const getConnection = async (): Promise<DataSource> => {
   try {
     if (!AppDataSource.isInitialized) {
-      logger.info("new init");
       const connection = await AppDataSource.initialize();
       return connection;
     } else {
-      logger.info("existing con");
-
       return AppDataSource;
     }
   } catch (error) {
