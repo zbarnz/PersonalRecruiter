@@ -48,7 +48,7 @@ describe("userController", () => {
 
       const userResponse = new User();
       Object.assign(userResponse, {
-        ...res.data,
+        ...res.data.user,
         createdAt: new Date(res.data.createdAt),
       });
 

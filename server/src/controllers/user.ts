@@ -43,7 +43,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const user = connection.manager.create(User, userData);
     const { salt, hash, ...savedUser } = await connection.manager.save(user);
     const { token, expiresIn } = jwtUtils.issueJWT(userData);
-    res.json({ savedUser, jwt: { token, expiresIn } });
+    res.json({ user: savedUser, jwt: { token, expiresIn } });
   } catch (error) {
     res
       .status(500)
