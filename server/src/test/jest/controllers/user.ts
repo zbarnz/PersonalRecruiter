@@ -39,17 +39,14 @@ describe("userController", () => {
 
   describe("registerUser", () => {
     it("should register a new user and return it", async () => {
-      const { user, password } = createFakeUser(true) as {
-        user: User;
-        password: string;
-      };
+      const { user, password } = createFakeUser(true)
 
       const res = await client.post("/user/register", { user, password });
 
       const userResponse = new User();
       Object.assign(userResponse, {
         ...res.data.user,
-        createdAt: new Date(res.data.createdAt),
+        createdAt: new Date(res.data.user.createdAt),
       });
 
       expect(userResponse).toBeInstanceOf(User);

@@ -64,6 +64,12 @@ describe("autoApplyController", () => {
       userApplicantConfigEnitity1
     );
     user1Config = await connection.manager.save(createdApplicantConfig);
+
+    const { user, password } = createFakeUser(true);
+
+    const res = await client.post("/user/register", { user, password });
+
+    client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
   beforeEach(async () => {

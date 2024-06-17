@@ -24,7 +24,15 @@ export const authenticate = async (
     const auth = req.headers.authorization;
     const decoded: JwtPayload = jwtUtils.verifyJWT(auth);
 
-    const user = await connection.manager.findOne(User, { where: { id: 1 } });
+    const userId = Number(decoded.sub);
+
+    if (!userId) {
+      throw new Error("cannot get auth sub");
+    }
+
+    const user = await connection.manager.findOne(User, {
+      where: { id: userId },
+    });
 
     if (user) {
       req.credentials = {

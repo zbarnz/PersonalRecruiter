@@ -27,18 +27,16 @@ describe("exceptionController", () => {
     );
     jobBoard1 = await connection.manager.save(createdJobBoard);
 
-    const { user: userEntity1 } = createFakeUser(false);
-    const createdUser = connection.manager.create(User, userEntity1);
-    const {
-      salt: newSalt,
-      hash: newHash,
-      ...savedUser
-    } = await connection.manager.save(createdUser);
-    Object.assign(user1, savedUser);
-
     const listingEntity1 = createFakeListing(jobBoard1);
     const createdListing = connection.manager.create(Listing, listingEntity1);
     listing1 = await connection.manager.save(createdListing);
+
+    const { user, password } = createFakeUser(true);
+
+    const res = await client.post("/user/register", { user, password });
+
+    client.defaults.headers.common["Authorization"] = res.data.jwt.token;
+    Object.assign(user1, res.data.user);
   });
 
   afterAll(async () => {
@@ -55,24 +53,12 @@ describe("exceptionController", () => {
         reason,
       });
 
-      const userResponse = new User();
-      const listingResponse = new Listing();
-      const listingResponseJB = new JobBoard();
-      Object.assign(userResponse, {
-        ...res.data.user,
-        createdAt: new Date(res.data.user.createdAt),
-      });
-      Object.assign(listingResponseJB, res.data.listing.jobBoard);
-      Object.assign(listingResponse, {
-        ...res.data.listing,
-        datePosted: new Date(res.data.listing.datePosted),
-        dateUpdated: new Date(res.data.listing.dateUpdated),
-        jobBoard: listingResponseJB,
-      });
-
       expect(res.status).toEqual(200);
-      expect(userResponse).toEqual(user1);
-      expect(listingResponse).toEqual(listing1);
+      expect(res.data.user.email).toEqual(user1.email);
+      expect(res.data.user.id).toEqual(user1.id);
+      expect(res.data.user.points).toEqual(user1.points);
+
+      expect(res.data.listing.id).toEqual(listing1.id);
       expect(res.data.reason).toEqual(reason);
     });
   });

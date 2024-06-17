@@ -12,6 +12,7 @@ import { clean } from "../../utils/db";
 describe("listingController", () => {
   let connection: DataSource;
   let jobBoard1: JobBoard;
+  let user1: User = new User();
 
   jest.setTimeout(60000);
 
@@ -26,6 +27,12 @@ describe("listingController", () => {
       jobBoardEntity1
     );
     jobBoard1 = await connection.manager.save(createdJobBoard);
+
+    const { user, password } = createFakeUser(true);
+
+    const res = await client.post("/user/register", { user, password });
+
+    client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
   afterAll(async () => {
