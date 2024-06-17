@@ -3,7 +3,7 @@ import { getConnection } from "../../../../data-source";
 
 import { User } from "../../../entity";
 import { createFakeUser } from "../../fakes/user";
-import { client, startServer, stopServer } from "../../utils/client";
+import { client } from "../../utils/client";
 import { clean } from "../../utils/db";
 
 describe("userController", () => {
@@ -12,8 +12,7 @@ describe("userController", () => {
   let existingUserPassword: string;
 
   beforeAll(async () => {
-    await startServer();
-    await clean();
+    //await clean();
     connection = await getConnection();
 
     const { user: userEntity1, password: userPassword1 } =
@@ -27,19 +26,19 @@ describe("userController", () => {
     Object.assign(existingUser, savedUser);
     existingUserPassword = userPassword1;
   });
+  
 
-  afterEach(async () => {
-    await clean(["User"]);
-  });
+  // afterEach(async () => {
+  //   await clean(["User"]);
+  // });
 
-  afterAll(async () => {
-    await clean();
-    await stopServer();
-  });
+  // afterAll(async () => {
+  //   await clean();
+  // });
 
   describe("registerUser", () => {
     it("should register a new user and return it", async () => {
-      const { user, password } = createFakeUser(true)
+      const { user, password } = createFakeUser(true);
 
       const res = await client.post("/user/register", { user, password });
 

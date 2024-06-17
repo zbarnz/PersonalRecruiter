@@ -17,7 +17,7 @@ import { AxiosResponse } from "axios";
 
 import { DataSource } from "typeorm";
 
-import { client, startServer, stopServer } from "../../utils/client";
+import { client } from "../../utils/client";
 
 import { getConnection } from "../../../../data-source";
 import { createFakeJobBoard } from "../../fakes/jobBoard";
@@ -34,8 +34,8 @@ describe("autoApplyController", () => {
   jest.setTimeout(60000);
 
   beforeAll(async () => {
-    await startServer();
-    await clean();
+    //await clean();
+
     connection = await getConnection();
 
     const jobBoardEntity1 = createFakeJobBoard();
@@ -72,14 +72,10 @@ describe("autoApplyController", () => {
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
-  beforeEach(async () => {
-    await clean(["User", "Listing", "JobBoard", "userApplicantConfig"]);
-  });
+  // beforeEach(async () => {
+  //   await clean(["User", "Listing", "JobBoard", "userApplicantConfig"]);
+  // });
 
-  afterAll(async () => {
-    await clean();
-    await stopServer();
-  });
 
   describe("createAutoApply", () => {
     it("should create autoapply record for user", async () => {

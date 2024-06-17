@@ -6,8 +6,7 @@ import { JobBoard, Listing, User } from "../../../entity";
 import { createFakeJobBoard } from "../../fakes/jobBoard";
 import { createFakeListing } from "../../fakes/listing";
 import { createFakeUser } from "../../fakes/user";
-import { client, startServer, stopServer } from "../../utils/client";
-import { clean } from "../../utils/db";
+import { client } from "../../utils/client";
 
 describe("exceptionController", () => {
   let connection: DataSource;
@@ -16,8 +15,8 @@ describe("exceptionController", () => {
   let jobBoard1: JobBoard;
 
   beforeAll(async () => {
-    await startServer();
-    await clean();
+    //await clean();
+
     connection = await getConnection();
 
     const jobBoardEntity1 = createFakeJobBoard();
@@ -39,10 +38,9 @@ describe("exceptionController", () => {
     Object.assign(user1, res.data.user);
   });
 
-  afterAll(async () => {
-    await clean();
-    await stopServer();
-  });
+  // afterAll(async () => {
+  //   await clean();
+  // });
 
   describe("createException", () => {
     it("should create a new exception", async () => {

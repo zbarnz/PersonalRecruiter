@@ -12,4 +12,6 @@ module.exports = {
     ],
   },
   modulePathIgnorePatterns: ["<rootDir>/build/", "<rootDir>/node_modules/"],
+  globalSetup: "<rootDir>/src/test/config/globalSetup.ts",
+  globalTeardown: "<rootDir>/src/test/config/globalTeardown.ts",
 };

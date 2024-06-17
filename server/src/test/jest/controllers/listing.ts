@@ -1,24 +1,23 @@
 import { DataSource } from "typeorm";
 import { getConnection } from "../../../../data-source";
 
-import { JobBoard, Listing, User } from "../../../entity";
+import { JobBoard, Listing } from "../../../entity";
 
 import { createFakeJobBoard } from "../../fakes/jobBoard";
 import { createFakeListing } from "../../fakes/listing";
 import { createFakeUser } from "../../fakes/user";
-import { client, startServer, stopServer } from "../../utils/client";
+import { client } from "../../utils/client";
 import { clean } from "../../utils/db";
 
 describe("listingController", () => {
   let connection: DataSource;
   let jobBoard1: JobBoard;
-  let user1: User = new User();
 
   jest.setTimeout(60000);
 
   beforeAll(async () => {
-    await startServer();
-    await clean();
+    //await clean();
+
     connection = await getConnection();
 
     const jobBoardEntity1 = createFakeJobBoard();
@@ -35,10 +34,9 @@ describe("listingController", () => {
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
-  afterAll(async () => {
-    await clean();
-    await stopServer();
-  });
+  // afterAll(async () => {
+  //   await clean();
+  // });
 
   describe("createListing", () => {
     it("should create a new listing", async () => {

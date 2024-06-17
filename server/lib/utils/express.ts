@@ -6,16 +6,16 @@ import { logger } from "../../lib/logger/pino.config";
 
 import { Server } from "http";
 
+import cors from "cors";
 import express from "express";
 import router from "../routes";
-import cors from "cors";
 
 //For docker to init db
 
 let server: Server;
 
 export const start = async () => {
-  if (process.env.NODE_ENV == "local") {
+  if (process.env.NODE_ENV == "local" || "test") {
     logger.info("Initializing Database");
     await AppDataSource.initialize();
   }
