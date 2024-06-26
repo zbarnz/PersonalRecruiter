@@ -2,14 +2,15 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import styles from "../styles/app.module.css";
 
-import { Header } from "./componenets/Header";
+import { Header } from "./components/Header";
+import { Footer } from "./components/Footer";
 
 import "@mantine/core/styles.css";
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 
 const inter = Inter({ subsets: ["latin"] });
 
-export const metadata: Metadata = {
+const metadata: Metadata = {
   title: "Snap Candidate",
   description: "Quick apply now!",
 };
@@ -28,6 +29,7 @@ export default function RootLayout({
         <MantineProvider>
           <Header />
           <main className={styles.main}>{children}</main>
+          <Footer />
         </MantineProvider>
       </body>
     </html>
