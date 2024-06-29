@@ -33,7 +33,7 @@ class userAPI extends RestAPI {
         return null;
       }
       notifications.show({
-        message: `Failed to get takeaways for topic (${err.message})`,
+        message: `Failed to register user (${err.message})`,
         type: "danger",
       });
 
@@ -62,7 +62,7 @@ class userAPI extends RestAPI {
         return null;
       }
       notifications.show({
-        message: `Failed to get action items for topic (${err.message})`,
+        message: `Failed to login User (${err.message})`,
         type: "danger",
       });
 
@@ -71,7 +71,7 @@ class userAPI extends RestAPI {
   }
 
   /**
-   * Login a user
+   * Refresh a user
    * @param payload - email and password
    * @returns - user + token
    */
@@ -85,7 +85,7 @@ class userAPI extends RestAPI {
         return null;
       }
       notifications.show({
-        message: `Failed to get action items for topic (${err.message})`,
+        message: `Failed to refresh user (${err.message})`,
         type: "danger",
       });
 
