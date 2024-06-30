@@ -1,4 +1,4 @@
-import { NextFunction, Request, Response } from "express";
+import { NextFunction, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { DataSource } from "typeorm";
 import { getConnection } from "../../data-source";
@@ -6,15 +6,8 @@ import { User } from "../../src/entity";
 import { logger } from "../logger/pino.config";
 import { jwtUtils } from "../utils/jwt";
 
-interface AuthenticatedRequest extends Request {
-  credentials?: {
-    user: User;
-    [key: string]: any;
-  };
-}
-
 export const authenticate = async (
-  req: AuthenticatedRequest,
+  req: any, 
   res: Response,
   next: NextFunction
 ) => {

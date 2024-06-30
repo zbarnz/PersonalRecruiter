@@ -1,12 +1,12 @@
-import fs from "fs";
 import jsonWebToken, { JwtPayload } from "jsonwebtoken";
 import path from "path";
 
-const pathToPrvKey = path.join(__dirname, "../../secrets/keys/id_rsa_priv.pem");
-const pathToPubKey = path.join(__dirname, "../../secrets/keys/id_rsa_pub.pem");
-
-const PRIV_KEY = fs.readFileSync(pathToPrvKey, "utf8");
-const PUB_KEY = fs.readFileSync(pathToPubKey, "utf8");
+const PRIV_KEY = Buffer.from(process.env.JWT_PRIV_KEY, "base64").toString(
+  "ascii"
+);
+const PUB_KEY = Buffer.from(process.env.JWT_PUB_KEY, "base64").toString(
+  "ascii"
+);
 
 export const jwtUtils = {
   /**

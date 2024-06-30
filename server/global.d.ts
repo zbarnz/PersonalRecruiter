@@ -34,5 +34,3 @@ type Documents = {
   resume: Buffer | null;
   answeredQuestions: any[] | null;
 };
-
-
