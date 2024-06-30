@@ -1,9 +1,9 @@
 import { notifications } from "@mantine/notifications";
-import { User } from "../../src/entity";
+import { User } from "../../../src/entity";
 import client from "../client";
 import RestAPI from "./restAPI";
 
-class userAPI extends RestAPI {
+class UserAPI extends RestAPI {
   /**
    * Create an instance of userAPI
    *
@@ -63,7 +63,7 @@ class userAPI extends RestAPI {
       }
       notifications.show({
         message: `Failed to login User (${err.message})`,
-        type: "danger",
+        color: "red",
       });
 
       return null;
@@ -94,4 +94,4 @@ class userAPI extends RestAPI {
   }
 }
 
-export default userAPI;
+export default UserAPI;
