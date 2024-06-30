@@ -1,5 +1,12 @@
 import jsonWebToken, { JwtPayload } from "jsonwebtoken";
-import path from "path";
+
+import dotenv from "dotenv";
+
+dotenv.config();
+
+if (!process.env.JWT_PRIV_KEY || !process.env.JWT_PRIV_KEY) {
+  throw new Error("Failed to get keys");
+}
 
 const PRIV_KEY = Buffer.from(process.env.JWT_PRIV_KEY, "base64").toString(
   "ascii"

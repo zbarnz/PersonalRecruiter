@@ -1,4 +1,4 @@
-import { NextFunction, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { JwtPayload } from "jsonwebtoken";
 import { DataSource } from "typeorm";
 import { getConnection } from "../../data-source";
@@ -6,8 +6,16 @@ import { User } from "../../src/entity";
 import { logger } from "../logger/pino.config";
 import { jwtUtils } from "../utils/jwt";
 
+declare global {
+  namespace Express {
+    interface Request {
+      credentials?: JwtPayload & { user: User };
+    }
+  }
+}
+
 export const authenticate = async (
-  req: any, 
+  req: Request,
   res: Response,
   next: NextFunction
 ) => {
