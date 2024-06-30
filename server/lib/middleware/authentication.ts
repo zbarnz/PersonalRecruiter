@@ -6,14 +6,15 @@ import { User } from "../../src/entity";
 import { logger } from "../logger/pino.config";
 import { jwtUtils } from "../utils/jwt";
 
-declare module "express" {
-  interface Request {
-    credentials?: any;
-  }
+interface AuthenticatedRequest extends Request {
+  credentials?: {
+    user: User;
+    [key: string]: any;
+  };
 }
 
 export const authenticate = async (
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
   next: NextFunction
 ) => {
