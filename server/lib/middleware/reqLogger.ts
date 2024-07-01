@@ -3,7 +3,6 @@ import { logger } from "../logger/pino.config";
 
 export const reqLog = (req: Request, res: Response, next: NextFunction) => {
   try {
-    
     const logBody = { ...req.body };
     if (req.originalUrl.includes("/user") && logBody.password) {
       logBody.password = "********";
@@ -14,17 +13,15 @@ export const reqLog = (req: Request, res: Response, next: NextFunction) => {
       url: req.originalUrl,
       body: logBody,
     });
-    logger.debug("Full request", { req });
 
-    const baseSend = res.send;
+    const originalSend = res.send.bind(res);
 
     res.send = (data) => {
       logger.debug("Response payload", { payload: data });
 
-      res.send = baseSend;
-
-      return res.send(data);
+      return originalSend(data);
     };
+
     // eslint-disable-next-line no-empty
   } catch (error) {}
 
