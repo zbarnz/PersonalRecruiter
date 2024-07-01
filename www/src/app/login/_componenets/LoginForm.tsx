@@ -10,10 +10,12 @@ import {
   Text,
   Container,
   Group,
-  Button,
+  Button, Divider
 } from "@mantine/core";
 import styles from "./LoginForm.module.css";
 import { useEffect, useState } from "react";
+import { GoogleButton } from "./GoogleButton";
+import { TwitterButton } from "./TwitterButton";
 //import UserAPI from "../../../../api/classes/userAPI";
 import { notifications } from "@mantine/notifications";
 import userAPI from "../../../../lib/api/user";
@@ -97,6 +99,15 @@ export function LoginForm() {
         <Button fullWidth mt="xl" onClick={handleSubmit} loading={loggingIn}>
           Sign in
         </Button>
+        <Divider
+          label="Or continue with email"
+          labelPosition="center"
+          my="lg"
+        />
+        <Group grow mb="md" mt="md">
+          <GoogleButton radius="xl">Google</GoogleButton>
+          <TwitterButton radius="xl">Twitter</TwitterButton>
+        </Group>
       </Paper>
     </Container>
   );
