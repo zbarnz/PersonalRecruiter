@@ -18,12 +18,14 @@ class UserAPI extends RestAPI {
    * @returns  - the user and token
    */
   async register(payload: {
-    user: User;
+    email: string;
+    phone?: string;
     password: string;
   }): Promise<User | null> {
     try {
       const res = await client.post("/user/register", {
-        user: payload.user,
+        email: payload.email,
+        phone: payload.phone,
         password: payload.password,
       });
 
@@ -34,7 +36,7 @@ class UserAPI extends RestAPI {
       }
       notifications.show({
         message: `Failed to register user (${err.message})`,
-        type: "danger",
+        color: "red",
       });
 
       return null;
@@ -77,7 +79,7 @@ class UserAPI extends RestAPI {
    */
   async refresh(): Promise<User | null> {
     try {
-      const res = await client.get("/user/refresh")
+      const res = await client.get("/user/refresh");
 
       return res.data;
     } catch (err) {

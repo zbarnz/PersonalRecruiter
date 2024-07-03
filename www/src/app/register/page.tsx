@@ -1,11 +1,11 @@
-import { LoginForm } from "./_components/LoginForm";
+import { RegisterForm } from "./_components/RegisterForm";
 
 export default function Home() {
   //console.log(styles.main);
   return (
-    <div>
+    <div >
       <section>
-        <LoginForm />
+        <RegisterForm />
       </section>
     </div>
   );

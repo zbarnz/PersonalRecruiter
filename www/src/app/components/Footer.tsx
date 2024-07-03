@@ -43,7 +43,7 @@ const data = [
 export function Footer() {
   const pathname = usePathname();
 
-  const excludeNavPages = ["/login", "register"];
+  const excludeNavPages = ["/login", "/register"];
 
   if (excludeNavPages.includes(pathname)) return null;
   const groups = data.map((group) => {
