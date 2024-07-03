@@ -4,7 +4,6 @@ import { getConnection } from "../../../../data-source";
 import { User } from "../../../entity";
 import { createFakeUser } from "../../fakes/user";
 import { client } from "../../utils/client";
-import { clean } from "../../utils/db";
 
 describe("userController", () => {
   let connection: DataSource;
@@ -26,7 +25,6 @@ describe("userController", () => {
     Object.assign(existingUser, savedUser);
     existingUserPassword = userPassword1;
   });
-  
 
   // afterEach(async () => {
   //   await clean(["User"]);
@@ -40,7 +38,11 @@ describe("userController", () => {
     it("should register a new user and return it", async () => {
       const { user, password } = createFakeUser(true);
 
-      const res = await client.post("/user/register", { user, password });
+      const res = await client.post("/user/register", {
+        phone: user.phone,
+        email: user.email,
+        password,
+      });
 
       const userResponse = new User();
       Object.assign(userResponse, {
@@ -53,18 +55,20 @@ describe("userController", () => {
       expect(userResponse.phone).toEqual(user.phone);
     });
 
-    it("should not register user without phone number", async () => {
+    it("should register user without phone number", async () => {
       const { user, password } = createFakeUser(true) as {
         user: User;
         password: string;
       };
 
       const res = await client.post("/user/register", {
-        user: { ...user, phone: null },
+        email: user.email,
+        phone: null,
         password,
       });
 
-      expect(res.status).toEqual(400);
+      expect(res.status).toEqual(200);
+      expect(res.data.user.email).toEqual(user.email);
     });
 
     it("should not register user without email", async () => {
@@ -74,7 +78,8 @@ describe("userController", () => {
       };
 
       const res = await client.post("/user/register", {
-        user: { ...user, email: null },
+        phone: user.phone,
+        email: null,
         password,
       });
       expect(res.status).toEqual(400);
@@ -82,7 +87,8 @@ describe("userController", () => {
 
     it("should not register user with an already registered email", async () => {
       const res = await client.post("/user/register", {
-        user: existingUser,
+        phone: existingUser.phone,
+        email: existingUser.email,
         password: "SecureP@ssword12",
       });
 

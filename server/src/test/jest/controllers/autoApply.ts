@@ -1,5 +1,3 @@
-import { clean } from "../../utils/db";
-
 import { createFakeAutoApply } from "../../fakes/autoApply";
 import { createFakeUser } from "../../fakes/user";
 
@@ -67,15 +65,17 @@ describe("autoApplyController", () => {
 
     const { user, password } = createFakeUser(true);
 
-    const res = await client.post("/user/register", { user, password });
-
+    const res = await client.post("/user/register", {
+      email: user.email,
+      phone: user.phone,
+      password,
+    });
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
   // beforeEach(async () => {
   //   await clean(["User", "Listing", "JobBoard", "userApplicantConfig"]);
   // });
-
 
   describe("createAutoApply", () => {
     it("should create autoapply record for user", async () => {

@@ -32,7 +32,11 @@ describe("exceptionController", () => {
 
     const { user, password } = createFakeUser(true);
 
-    const res = await client.post("/user/register", { user, password });
+    const res = await client.post("/user/register", {
+      phone: user.phone,
+      email: user.email,
+      password,
+    });
 
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
     Object.assign(user1, res.data.user);

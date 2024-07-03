@@ -7,7 +7,6 @@ import { createFakeJobBoard } from "../../fakes/jobBoard";
 import { createFakeListing } from "../../fakes/listing";
 import { createFakeUser } from "../../fakes/user";
 import { client } from "../../utils/client";
-import { clean } from "../../utils/db";
 
 describe("listingController", () => {
   let connection: DataSource;
@@ -29,7 +28,11 @@ describe("listingController", () => {
 
     const { user, password } = createFakeUser(true);
 
-    const res = await client.post("/user/register", { user, password });
+    const res = await client.post("/user/register", {
+      phone: user.phone,
+      email: user.email,
+      password,
+    });
 
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });

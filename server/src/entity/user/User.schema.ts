@@ -17,6 +17,7 @@ export const UserSchema = new EntitySchema<User>({
     },
     phone: {
       type: "varchar",
+      nullable: true,
     },
     createdAt: {
       name: "created_at",
@@ -33,7 +34,7 @@ export const UserSchema = new EntitySchema<User>({
     },
     salt: {
       type: "varchar",
-      select: false
+      select: false,
     },
   },
 });

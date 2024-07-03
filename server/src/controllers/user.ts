@@ -19,21 +19,37 @@ export const getUserHelper = async (id: User["id"]): Promise<User> => {
 export const registerUser = async (req: Request, res: Response) => {
   try {
     const connection = await getConnection();
+    const userData: User = new User();
 
-    const userData: User = req.body.user;
+    const email = req.body.email;
+    const phone = req.body.phone;
     const password = req.body.password;
 
-    if (!userData.phone || !userData.email || !password) {
+    if (!email || !password) {
       return res.status(400).json({ error: "Invalid Credentials" });
     }
 
-    const existingUser = await connection.manager.findOne(User, {
-      where: { email: userData.email },
+    const existingUserEmail = await connection.manager.findOne(User, {
+      where: { email: email },
     });
 
-    if (existingUser) {
+    if (existingUserEmail) {
       return res.status(409).json({ error: "Email already registered" });
     }
+
+    if (phone) {
+      const existingUserPhone = await connection.manager.findOne(User, {
+        where: { phone: phone },
+      });
+
+      if (existingUserPhone) {
+        return res
+          .status(409)
+          .json({ error: "Phone number already registered" });
+      }
+    }
+
+    Object.assign(userData, { email, phone });
 
     ({ hash: userData.hash, salt: userData.salt } =
       passwordUtils.genPassword(password));
