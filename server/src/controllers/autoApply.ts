@@ -110,6 +110,39 @@ export const getApply = async (req: Request, res: Response) => {
   }
 };
 
+export const getApplysForUser = async (req: Request, res: Response) => {
+  try {
+    const userId = req.credentials.user.id; // Assuming user ID is available in credentials
+    const page = Number(req.query.page) || 1; // Default to page 1
+    const pageSize = Number(req.query.pageSize) || 10; // Default to 10 items per page
+
+    const connection = await getConnection();
+
+    const [results, total] = await connection.manager.findAndCount(AutoApply, {
+      where: { user: { id: userId } },
+      relations: ["listing", "listing.jobBoard"],
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: { createdAt: "DESC" }, // Example: Sort by creation date
+    });
+
+    res.json({
+      data: results,
+      pagination: {
+        total,
+        page,
+        pageSize,
+        totalPages: Math.ceil(total / pageSize),
+      },
+    });
+  } catch (error) {
+    res
+      .status(500)
+      .json({ error: "Internal server error", details: error.message });
+  }
+};
+
+
 export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
     let listings: string[] = req.body.jobKeys; // Assuming ID comes from URL parameters

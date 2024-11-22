@@ -4,14 +4,14 @@ import { User } from "../../entity";
 interface UserState {
   user: User | null;
   loading: boolean;
-  loggedOut: boolean;
+  loggedIn: boolean;
   error: string | null;
 }
 
 const initialState: UserState = {
   user: null,
   loading: false,
-  loggedOut: true,
+  loggedIn: false,
   error: null,
 };
 
@@ -25,8 +25,8 @@ const userSlice = createSlice({
     setLoading(state, action: PayloadAction<boolean>) {
       state.loading = action.payload;
     },
-    setLoggedOut(state, action: PayloadAction<boolean>) {
-      state.loggedOut = action.payload;
+    setLoggedIn(state, action: PayloadAction<boolean>) {
+      state.loggedIn = action.payload;
     },
     setError(state, action: PayloadAction<string | null>) {
       state.error = action.payload;
@@ -34,5 +34,5 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setLoading, setError } = userSlice.actions;
+export const { setUser, setLoading, setError, setLoggedIn } = userSlice.actions;
 export default userSlice.reducer;

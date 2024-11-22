@@ -1,6 +1,6 @@
 import { store } from "../store";
 import UserAPI from "../../lib/api/classes/userAPI";
-import { setUser, setLoading, setError } from "../store/slices/userSlice";
+import { setUser, setLoading, setError, setLoggedIn } from "../store/slices/userSlice";
 
 class UserService {
   private api: UserAPI;
@@ -14,6 +14,7 @@ class UserService {
     const res = await this.api.register(payload);
     if (res) {
       store.dispatch(setUser(res.user));
+      store.dispatch(setLoggedIn(true));
       store.dispatch(setError(null));
     } else {
       store.dispatch(setError("Failed to register"));
@@ -26,6 +27,7 @@ class UserService {
     const res = await this.api.login(payload);
     if (res) {
       store.dispatch(setUser(res.user));
+      store.dispatch(setLoggedIn(true));
       store.dispatch(setError(null));
     } else {
       store.dispatch(setError("Failed to login"));
@@ -38,6 +40,7 @@ class UserService {
     const res = await this.api.refresh();
     if (res) {
       store.dispatch(setUser(res.user));
+      store.dispatch(setLoggedIn(true));
       store.dispatch(setError(null));
     } else {
       store.dispatch(setError("Failed to refresh user"));
