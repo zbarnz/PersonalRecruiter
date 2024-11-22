@@ -10,7 +10,8 @@ import {
   Text,
   Container,
   Group,
-  Button, Divider
+  Button,
+  Divider,
 } from "@mantine/core";
 import styles from "./LoginForm.module.css";
 import { useEffect, useState } from "react";
@@ -18,7 +19,7 @@ import { GoogleButton } from "./GoogleButton";
 import { TwitterButton } from "./TwitterButton";
 //import UserAPI from "../../../../api/classes/userAPI";
 import { notifications } from "@mantine/notifications";
-import userAPI from "../../../../lib/api/user";
+import userService from "../../../services/userService";
 
 const initialState = {
   email: "",
@@ -32,7 +33,7 @@ export function LoginForm() {
   useEffect(() => {
     const login = async () => {
       try {
-        userAPI.login({ email: fields.email, password: fields.password });
+        userService.login({ email: fields.email, password: fields.password });
       } catch (err) {
         if (!(err instanceof Error)) {
           return;

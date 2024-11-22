@@ -32,7 +32,9 @@ import {
 import styles from "../../styles/components/Header.module.css";
 import { usePathname } from "next/navigation";
 import { Logo } from "../../../public/icons";
+import { Provider, useSelector } from "react-redux";
 import Link from "next/link";
+import { store, RootState } from "../../store";
 
 const mockdata = [
   {
@@ -76,6 +78,9 @@ export function Header() {
 
   const excludeNavPages = ["/dashboard"];
 
+  const user = useSelector((state: RootState) => state.user);
+  console.log(user);
+
   if (excludeNavPages.includes(pathname)) return null;
 
   const links = mockdata.map((item) => (
@@ -104,7 +109,6 @@ export function Header() {
       <header className={styles.header}>
         <Group justify="space-between" h="100%">
           <Logo size={150} />
-
           <Group h="100%" gap={0} visibleFrom="sm">
             <a href="#" className={styles.link}>
               Home
@@ -168,12 +172,20 @@ export function Header() {
           </Group>
 
           <Group visibleFrom="sm">
-            <Button variant="default" component={Link} href="/login">
-              Log in
-            </Button>
-            <Button component={Link} href="/register">
-              Sign up
-            </Button>
+            {user ? (
+              <Button variant="default" component={Link} href="/profile">
+                Profile {user.user?.email}
+              </Button>
+            ) : (
+              <>
+                <Button variant="default" component={Link} href="/login">
+                  Log in
+                </Button>
+                <Button component={Link} href="/register">
+                  Sign up
+                </Button>
+              </>
+            )}
           </Group>
 
           <Burger
@@ -222,7 +234,7 @@ export function Header() {
 
           <Group justify="center" grow pb="xl" px="md">
             <Button component={Link} variant="default" href="/login">
-              Log ins
+              Log in
             </Button>
             <Button component="a" variant="default" href="/register">
               Sign up

@@ -13,7 +13,7 @@ class UserAPI extends RestAPI {
   }
 
   /**
-   * Register a user
+   * Register a user and jwt
    * @param payload - credentials for registration
    * @returns  - the user and token
    */
@@ -21,7 +21,7 @@ class UserAPI extends RestAPI {
     email: string;
     phone?: string;
     password: string;
-  }): Promise<User | null> {
+  }): Promise<{ user: User; jwt: string } | null> {
     try {
       const res = await client.post("/user/register", {
         email: payload.email,
@@ -51,7 +51,7 @@ class UserAPI extends RestAPI {
   async login(payload: {
     email: string;
     password: string;
-  }): Promise<User | null> {
+  }): Promise<{ user: User; jwt: string } | null> {
     try {
       const res = await client.post("/user/login", {
         email: payload.email,
@@ -77,7 +77,7 @@ class UserAPI extends RestAPI {
    * @param payload - email and password
    * @returns - user + token
    */
-  async refresh(): Promise<User | null> {
+  async refresh(): Promise<{ user: User; jwt: string } | null> {
     try {
       const res = await client.get("/user/refresh");
 

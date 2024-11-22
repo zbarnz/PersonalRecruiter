@@ -1,3 +1,5 @@
+"use client";
+
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import styles from "../styles/app.module.css";
@@ -10,6 +12,12 @@ import "@mantine/notifications/styles.css";
 
 import { ColorSchemeScript, MantineProvider } from "@mantine/core";
 import { Notifications } from "@mantine/notifications";
+import { Provider, useSelector, useStore } from "react-redux";
+
+import { store, RootState } from "../store";
+import { useRouter, usePathname } from "next/navigation";
+import userService from "../services/userService";
+import { useEffect } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,6 +25,47 @@ const metadata: Metadata = {
   title: "Snap Candidate",
   description: "Quick apply now!",
 };
+
+const pagesNeedingAuth: Set<string> = new Set([]);
+
+function AppContent({ children }: { children: React.ReactNode }) {
+  const store = useStore<RootState>();
+  const router = useRouter();
+  const userInfo = store.getState().user;
+  console.log(userInfo);
+
+  useEffect(() => {
+    async function refresh() {
+      if (!userInfo.user?.id) {
+        await userService.refresh();
+      }
+
+      const user = store.getState().user;
+      console.log(user);
+      const page = usePathname();
+      const blockPage = pagesNeedingAuth.has(page as string);
+
+      if (!user.user && blockPage) {
+        router.push("/login");
+      }
+    }
+
+    if (!userInfo.loggedOut) {
+      refresh();
+    }
+  }, [userInfo, store, router]);
+
+  return (
+    <>
+      <MantineProvider>
+        <Notifications />
+        <Header />
+        <main className={styles.main}>{children}</main>
+        <Footer />
+      </MantineProvider>
+    </>
+  );
+}
 
 export default function RootLayout({
   children,
@@ -29,12 +78,9 @@ export default function RootLayout({
         <ColorSchemeScript />
       </head>
       <body>
-        <MantineProvider>
-          <Notifications />
-          <Header />
-          <main className={styles.main}>{children}</main>
-          <Footer />
-        </MantineProvider>
+        <Provider store={store}>
+          <AppContent>{children}</AppContent>
+        </Provider>
       </body>
     </html>
   );

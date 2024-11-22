@@ -19,14 +19,13 @@ import { GoogleButton } from "./GoogleButton";
 import { TwitterButton } from "./TwitterButton";
 //import UserAPI from "../../../../api/classes/userAPI";
 import { notifications } from "@mantine/notifications";
-import userAPI from "../../../../lib/api/user";
-import { User } from "../../../entity";
+import userService from "../../../services/userService";
 
 const initialState = {
   email: "",
   phone: "",
   password: "",
-  passwordConfirmation: ''
+  passwordConfirmation: "",
 };
 
 export function RegisterForm() {
@@ -36,7 +35,7 @@ export function RegisterForm() {
   useEffect(() => {
     const register = async () => {
       try {
-        userAPI.register({
+        userService.register({
           email: fields.email,
           phone: fields.phone,
           password: fields.password,
@@ -112,7 +111,7 @@ export function RegisterForm() {
           mt="md"
         />
         <Button fullWidth mt="xl" onClick={handleSubmit} loading={registering}>
-          Sign up
+          Sign up 
         </Button>
         <Divider
           label="Or continue with email"
