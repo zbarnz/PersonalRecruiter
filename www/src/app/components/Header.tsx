@@ -79,7 +79,7 @@ export function Header() {
   const excludeNavPages = ["/dashboard"];
 
   const user = useSelector((state: RootState) => state.user);
-  console.log(user);
+  console.log('user: ', user);
 
   if (excludeNavPages.includes(pathname)) return null;
 
@@ -104,13 +104,13 @@ export function Header() {
     </UnstyledButton>
   ));
 
-  return (
+   return (
     <Box>
       <header className={styles.header}>
         <Group justify="space-between" h="100%">
           <Logo size={150} />
           <Group h="100%" gap={0} visibleFrom="sm">
-            <a href="#" className={styles.link}>
+            <a href="/" className={styles.link}>
               Home
             </a>
             <HoverCard
@@ -171,9 +171,12 @@ export function Header() {
             </a>
           </Group>
 
-          <Group visibleFrom="sm">
-            {user ? (
-              <Button variant="default" component={Link} href="/profile">
+          <Group
+            visibleFrom="sm"
+            style={{ minWidth: "220px", justifyContent: "flex-end" }}
+          >
+            {user.loggedIn ? (
+              <Button variant="default" component={Link} href="/dashboard">
                 Profile {user.user?.email}
               </Button>
             ) : (

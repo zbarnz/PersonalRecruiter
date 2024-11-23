@@ -17,7 +17,7 @@ import { Provider, useSelector, useStore } from "react-redux";
 import { store, RootState } from "../store";
 import { useRouter, usePathname } from "next/navigation";
 import userService from "../services/userService";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -32,8 +32,11 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const store = useStore<RootState>();
   const router = useRouter();
   const userInfo = store.getState().user;
-  console.log(userInfo);
-
+  console.log('layout top user: ', userInfo);
+  const page = usePathname();
+  const blockPage = pagesNeedingAuth.has(page as string);
+  console.log('blockpage: ', blockPage)
+  const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function refresh() {
       if (!userInfo.user?.id) {
@@ -41,28 +44,30 @@ function AppContent({ children }: { children: React.ReactNode }) {
       }
 
       const user = store.getState().user;
-      console.log(user);
-      const page = usePathname();
-      const blockPage = pagesNeedingAuth.has(page as string);
+      console.log('user in layout useeffect: ', user)
+      console.log('userInfo in layout useeffect: ', userInfo)
 
       if (!user.user && blockPage) {
         router.push("/login");
       }
     }
 
-    if (!userInfo.loggedOut) {
+    if (!userInfo.loggedIn) {
       refresh();
     }
+    setLoading(false);
   }, [userInfo, store, router]);
 
   return (
     <>
+    { loading ? <div /> :
       <MantineProvider>
         <Notifications />
         <Header />
         <main className={styles.main}>{children}</main>
         <Footer />
       </MantineProvider>
+    }
     </>
   );
 }
