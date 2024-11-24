@@ -112,7 +112,6 @@ export const getApply = async (req: Request, res: Response) => {
 
 export const getApplysForUser = async (req: Request, res: Response) => {
   try {
-    logger.debug("WHAT THE FUCKING FUCK");
     const userId = req.credentials.user.id;
     const page = Number(req.query.page) || 1;
     const pageSize = Number(req.query.pageSize) || 10;
