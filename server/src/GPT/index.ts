@@ -50,10 +50,10 @@ export async function GPTText( //TODO change args to options obj
       model = forceModel;
     }
 
-    if (!model || model == "gpt-3.5-turbo-1106") {
-      encoder = encoding_for_model("gpt-3.5-turbo");
+    if (!model || model == "gpt-4o-mini") {
+      encoder = encoding_for_model("gpt-4o-mini");
     } else {
-      encoder = encoding_for_model("gpt-4");
+      encoder = encoding_for_model("gpt-4o");
     }
 
     if (!listing) {
