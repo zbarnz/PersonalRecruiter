@@ -54,7 +54,7 @@ export async function answerQuestions(
         previousLogId,
         autoApply,
         listing,
-        "gpt-4-1106-preview",
+        "gpt-4o",
         "Output in JSON"
       ));
       retries++;

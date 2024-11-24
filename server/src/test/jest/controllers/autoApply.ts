@@ -28,6 +28,7 @@ describe("autoApplyController", () => {
   let listing1: Listing;
   let jobBoard1: JobBoard;
   let connection: DataSource;
+  let currentUser = new User();
 
   jest.setTimeout(60000);
 
@@ -70,6 +71,7 @@ describe("autoApplyController", () => {
       phone: user.phone,
       password,
     });
+    Object.assign(currentUser, res.data.user);
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
@@ -168,6 +170,67 @@ describe("autoApplyController", () => {
         "./src/test/jest/output_files/coverLetterOutput.pdf",
         coverLetterBuffer
       );
+    });
+  });
+
+  describe.only("getApplysForUser", () => {
+    beforeAll(async () => {
+      // Create AutoApply records
+      for (let i = 0; i < 15; i++) {
+        let savedListing: Listing;
+        const listingEntity = createFakeListing(jobBoard1);
+        const createdListing = connection.manager.create(
+          Listing,
+          listingEntity
+        );
+        savedListing = await connection.manager.save(createdListing);
+
+        const autoApplyEntity = createFakeAutoApply(currentUser, savedListing);
+        const createdAutoApply = connection.manager.create(
+          AutoApply,
+          autoApplyEntity
+        );
+        await connection.manager.save(createdAutoApply);
+      }
+    });
+
+    it("should retrieve paginated autoapply records for a user", async () => {
+      const page = 1;
+      const pageSize = 5;
+
+      const res: AxiosResponse = await client.get(`/autoapply/`, {
+        params: { page, pageSize },
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data).toHaveProperty("pagination");
+      expect(res.data.pagination.page).toBe(page);
+      expect(res.data.pagination.pageSize).toBe(pageSize);
+      expect(res.data.pagination.total).toBeGreaterThanOrEqual(15);
+      expect(res.data.data.length).toBeLessThanOrEqual(pageSize);
+
+      res.data.data.forEach((autoApply: AutoApply) => {
+        expect(autoApply).toHaveProperty("user");
+        expect(autoApply.user.id).toBe(currentUser.id);
+        expect(autoApply).toHaveProperty("listing");
+        expect(autoApply.listing).toHaveProperty("jobBoard");
+      });
+    });
+
+    it("should return an empty array if no records exist for the page", async () => {
+      const page = 4; // Assuming there are less than 40 records.
+      const pageSize = 10;
+
+      const res: AxiosResponse = await client.get(`/autoapply/`, {
+        params: { page, pageSize },
+      });
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data.data).toEqual([]);
+      expect(res.data.pagination.page).toBe(page);
+      expect(res.data.pagination.totalPages).toBeGreaterThanOrEqual(1);
     });
   });
 });

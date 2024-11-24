@@ -10,4 +10,4 @@ router.post(
 );
 
 router.get("/complete/:_id", autoApplyController.completeApply);
-router.get("/", autoApplyController.getApply);
+router.get("/", autoApplyController.getApplysForUser);

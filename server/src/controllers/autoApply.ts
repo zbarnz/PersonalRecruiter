@@ -112,18 +112,18 @@ export const getApply = async (req: Request, res: Response) => {
 
 export const getApplysForUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.credentials.user.id; // Assuming user ID is available in credentials
-    const page = Number(req.query.page) || 1; // Default to page 1
-    const pageSize = Number(req.query.pageSize) || 10; // Default to 10 items per page
+    logger.debug("WHAT THE FUCKING FUCK");
+    const userId = req.credentials.user.id;
+    const page = Number(req.query.page) || 1;
+    const pageSize = Number(req.query.pageSize) || 10;
 
     const connection = await getConnection();
 
     const [results, total] = await connection.manager.findAndCount(AutoApply, {
-      where: { user: { id: userId } },
-      relations: ["listing", "listing.jobBoard"],
+      relations: ["listing", "listing.jobBoard", "user"],
       skip: (page - 1) * pageSize,
       take: pageSize,
-      order: { createdAt: "DESC" }, // Example: Sort by creation date
+      order: { dateApplied: "DESC" },
     });
 
     res.json({
@@ -141,7 +141,6 @@ export const getApplysForUser = async (req: Request, res: Response) => {
       .json({ error: "Internal server error", details: error.message });
   }
 };
-
 
 export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
@@ -226,5 +225,6 @@ const autoApplyController = {
   getApply,
   createApply,
   removeAppliedListings,
+  getApplysForUser,
 };
 export default autoApplyController;
