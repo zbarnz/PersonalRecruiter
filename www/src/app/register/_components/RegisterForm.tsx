@@ -17,7 +17,6 @@ import styles from "./RegisterForm.module.css";
 import { useEffect, useState } from "react";
 import { GoogleButton } from "./GoogleButton";
 import { TwitterButton } from "./TwitterButton";
-//import UserAPI from "../../../../api/classes/userAPI";
 import { notifications } from "@mantine/notifications";
 import userService from "../../../services/userService";
 

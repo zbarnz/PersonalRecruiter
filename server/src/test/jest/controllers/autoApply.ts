@@ -28,6 +28,7 @@ describe("autoApplyController", () => {
   let listing1: Listing;
   let jobBoard1: JobBoard;
   let connection: DataSource;
+  let currentUser = new User();
 
   jest.setTimeout(60000);
 
@@ -70,6 +71,7 @@ describe("autoApplyController", () => {
       phone: user.phone,
       password,
     });
+    Object.assign(currentUser, res.data.user);
     client.defaults.headers.common["Authorization"] = res.data.jwt.token;
   });
 
@@ -168,6 +170,106 @@ describe("autoApplyController", () => {
         "./src/test/jest/output_files/coverLetterOutput.pdf",
         coverLetterBuffer
       );
+    });
+  });
+
+  describe.only("getApplysForUser", () => {
+    beforeAll(async () => {
+      // Create AutoApply records
+      for (let i = 0; i < 15; i++) {
+        let savedListing: Listing;
+        const listingEntity = createFakeListing(jobBoard1);
+        const createdListing = connection.manager.create(
+          Listing,
+          listingEntity
+        );
+        savedListing = await connection.manager.save(createdListing);
+
+        const autoApplyEntity = createFakeAutoApply(currentUser, savedListing);
+        const createdAutoApply = connection.manager.create(
+          AutoApply,
+          autoApplyEntity
+        );
+        await connection.manager.save(createdAutoApply);
+      }
+    });
+
+    it("should retrieve paginated autoapply records for a user", async () => {
+      const body = {
+        page: 1,
+        pageSize: 5,
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data).toHaveProperty("pagination");
+      expect(res.data.pagination.page).toBe(body.page);
+      expect(res.data.pagination.pageSize).toBe(body.pageSize);
+      expect(res.data.pagination.total).toBeGreaterThanOrEqual(15);
+      expect(res.data.data.length).toBeLessThanOrEqual(body.pageSize);
+
+      res.data.data.forEach((autoApply: AutoApply) => {
+        expect(autoApply).toHaveProperty("user");
+        expect(autoApply.user.id).toBe(currentUser.id);
+        expect(autoApply).toHaveProperty("listing");
+        expect(autoApply.listing).toHaveProperty("jobBoard");
+      });
+    });
+
+    it("should return an empty array if no records exist for the page", async () => {
+      const body = {
+        page: 4, // Assuming there are less than 40 records.
+        pageSize: 10,
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data.data).toEqual([]);
+      expect(res.data.pagination.page).toBe(body.page);
+      expect(res.data.pagination.totalPages).toBeGreaterThanOrEqual(1);
+    });
+
+    it("should order the results correctly based on the orderBy column and orderDirection", async () => {
+      const body = {
+        page: 1,
+        pageSize: 5,
+        orderBy: "dateApplied",
+        orderDirection: "ASC",
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data.data.length).toBeGreaterThan(0);
+
+      const dates = res.data.data.map((autoApply: AutoApply) =>
+        new Date(autoApply.dateApplied).getTime()
+      );
+
+      // Check if the dates are sorted in ascending order
+      for (let i = 1; i < dates.length; i++) {
+        expect(dates[i]).toBeGreaterThanOrEqual(dates[i - 1]);
+      }
+    });
+
+    it("should return an error if an invalid orderBy column is provided", async () => {
+      const body = {
+        page: 1,
+        pageSize: 5,
+        orderBy: "nonExistentColumn",
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body, {
+        validateStatus: () => true, // Allows validation of non-200 responses
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.data).toHaveProperty("error");
     });
   });
 });

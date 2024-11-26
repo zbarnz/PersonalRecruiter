@@ -112,18 +112,54 @@ export const getApply = async (req: Request, res: Response) => {
 
 export const getApplysForUser = async (req: Request, res: Response) => {
   try {
-    const userId = req.credentials.user.id; // Assuming user ID is available in credentials
-    const page = Number(req.query.page) || 1; // Default to page 1
-    const pageSize = Number(req.query.pageSize) || 10; // Default to 10 items per page
+    const userId = req.credentials.user.id;
+    const {
+      page = 1,
+      pageSize = 10,
+      orderBy = "dateApplied",
+      orderDirection = "DESC",
+      filters = {},
+    } = req.body;
 
     const connection = await getConnection();
+    const metadata = connection.getMetadata(AutoApply);
+
+    if (!metadata.columns.some((column) => column.propertyName === orderBy)) {
+      return res.status(400).json({
+        error: `Ordering error. Please try again`,
+      });
+    }
+
+    // Validate orderDirection
+    const validDirections = ["ASC", "DESC"];
+    if (!validDirections.includes(orderDirection.toUpperCase())) {
+      return res.status(400).json({
+        error: `Ordering error. Please try again`,
+      });
+    }
+
+    // Validate and process filters
+    const where = Object.keys(filters).reduce(
+      (where, key) => {
+        if (metadata.columns.some((column) => column.propertyName === key)) {
+          where[key] = filters[key];
+        } else {
+          res.status(400).json({
+            error: `Filtering error. Please try again`,
+          });
+          return where;
+        }
+        return where;
+      },
+      { user: { id: userId } } as Record<string, any>
+    ); // Include user filter
 
     const [results, total] = await connection.manager.findAndCount(AutoApply, {
-      where: { user: { id: userId } },
-      relations: ["listing", "listing.jobBoard"],
+      relations: ["listing", "listing.jobBoard", "user"],
+      where,
       skip: (page - 1) * pageSize,
       take: pageSize,
-      order: { createdAt: "DESC" }, // Example: Sort by creation date
+      order: { [orderBy]: orderDirection.toUpperCase() as "ASC" | "DESC" },
     });
 
     res.json({
@@ -141,7 +177,6 @@ export const getApplysForUser = async (req: Request, res: Response) => {
       .json({ error: "Internal server error", details: error.message });
   }
 };
-
 
 export const removeAppliedListings = async (req: Request, res: Response) => {
   try {
@@ -226,5 +261,6 @@ const autoApplyController = {
   getApply,
   createApply,
   removeAppliedListings,
+  getApplysForUser,
 };
 export default autoApplyController;

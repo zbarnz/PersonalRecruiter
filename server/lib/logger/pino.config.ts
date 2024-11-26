@@ -9,6 +9,11 @@ const pinoConfig: LoggerOptions = {
     level(label) {
       return {
         level: label,
+      };
+    },
+    log(object) {
+      return {
+        ...object, // Include all log metadata
         service: name,
         env: process.env.NODE_ENV,
         version,
@@ -32,14 +37,22 @@ const baseLogger = pino(pinoConfig);
 export const logger = {
   info: (msg: string, context?: Record<string, any>) => {
     if (typeof msg !== "undefined" && !isNolog) {
-      baseLogger.info(context, msg);
+      baseLogger.info({ ...(context || {}) }, msg);
     }
   },
   error: (msg: string, context?: Record<string, any>) => {
     if (typeof msg !== "undefined") {
-      baseLogger.error(context, msg);
+      baseLogger.error({ ...(context || {}) }, msg);
     }
   },
-  warn: baseLogger.warn.bind(baseLogger),
-  debug: baseLogger.debug.bind(baseLogger),
+  warn: (msg: string, context?: Record<string, any>) => {
+    if (typeof msg !== "undefined") {
+      baseLogger.warn({ ...(context || {}) }, msg);
+    }
+  },
+  debug: (msg: string, context?: Record<string, any>) => {
+    if (typeof msg !== "undefined") {
+      baseLogger.debug({ ...(context || {}) }, msg);
+    }
+  },
 };
