@@ -195,20 +195,20 @@ describe("autoApplyController", () => {
     });
 
     it("should retrieve paginated autoapply records for a user", async () => {
-      const page = 1;
-      const pageSize = 5;
+      const body = {
+        page: 1,
+        pageSize: 5,
+      };
 
-      const res: AxiosResponse = await client.get(`/autoapply/`, {
-        params: { page, pageSize },
-      });
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
 
       expect(res.status).toBe(200);
       expect(res.data).toHaveProperty("data");
       expect(res.data).toHaveProperty("pagination");
-      expect(res.data.pagination.page).toBe(page);
-      expect(res.data.pagination.pageSize).toBe(pageSize);
+      expect(res.data.pagination.page).toBe(body.page);
+      expect(res.data.pagination.pageSize).toBe(body.pageSize);
       expect(res.data.pagination.total).toBeGreaterThanOrEqual(15);
-      expect(res.data.data.length).toBeLessThanOrEqual(pageSize);
+      expect(res.data.data.length).toBeLessThanOrEqual(body.pageSize);
 
       res.data.data.forEach((autoApply: AutoApply) => {
         expect(autoApply).toHaveProperty("user");
@@ -219,18 +219,57 @@ describe("autoApplyController", () => {
     });
 
     it("should return an empty array if no records exist for the page", async () => {
-      const page = 4; // Assuming there are less than 40 records.
-      const pageSize = 10;
+      const body = {
+        page: 4, // Assuming there are less than 40 records.
+        pageSize: 10,
+      };
 
-      const res: AxiosResponse = await client.get(`/autoapply/`, {
-        params: { page, pageSize },
-      });
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
 
       expect(res.status).toBe(200);
       expect(res.data).toHaveProperty("data");
       expect(res.data.data).toEqual([]);
-      expect(res.data.pagination.page).toBe(page);
+      expect(res.data.pagination.page).toBe(body.page);
       expect(res.data.pagination.totalPages).toBeGreaterThanOrEqual(1);
+    });
+
+    it("should order the results correctly based on the orderBy column and orderDirection", async () => {
+      const body = {
+        page: 1,
+        pageSize: 5,
+        orderBy: "dateApplied",
+        orderDirection: "ASC",
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body);
+
+      expect(res.status).toBe(200);
+      expect(res.data).toHaveProperty("data");
+      expect(res.data.data.length).toBeGreaterThan(0);
+
+      const dates = res.data.data.map((autoApply: AutoApply) =>
+        new Date(autoApply.dateApplied).getTime()
+      );
+
+      // Check if the dates are sorted in ascending order
+      for (let i = 1; i < dates.length; i++) {
+        expect(dates[i]).toBeGreaterThanOrEqual(dates[i - 1]);
+      }
+    });
+
+    it("should return an error if an invalid orderBy column is provided", async () => {
+      const body = {
+        page: 1,
+        pageSize: 5,
+        orderBy: "nonExistentColumn",
+      };
+
+      const res: AxiosResponse = await client.post(`/autoapply/`, body, {
+        validateStatus: () => true, // Allows validation of non-200 responses
+      });
+
+      expect(res.status).toBe(400);
+      expect(res.data).toHaveProperty("error");
     });
   });
 });

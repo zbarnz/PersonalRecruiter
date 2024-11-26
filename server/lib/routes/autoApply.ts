@@ -8,6 +8,6 @@ router.post(
   "/removeAppliedListings",
   autoApplyController.removeAppliedListings
 );
+router.post("/", autoApplyController.getApplysForUser);
 
 router.get("/complete/:_id", autoApplyController.completeApply);
-router.get("/", autoApplyController.getApplysForUser);
