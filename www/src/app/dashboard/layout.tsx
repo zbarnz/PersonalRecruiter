@@ -4,7 +4,7 @@ import { Inter } from "next/font/google";
 import styles from "../../styles/app.module.css";
 
 import "@mantine/core/styles.css";
-import { DoubleNavbar } from "./_componenets/DoubleNavbar";
+import { Navbar } from "./_componenets/Navbar";
 
 export default function RootLayout({
   children,
@@ -13,7 +13,7 @@ export default function RootLayout({
 }>) {
   return (
     <div className={styles.pageWrapper}>
-      <DoubleNavbar />
+      <Navbar />
       <div className={styles.main}>{children}</div>
     </div>
   );
