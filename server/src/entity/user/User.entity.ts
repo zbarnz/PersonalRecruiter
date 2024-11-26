@@ -6,6 +6,7 @@ export class User {
   points: number;
   hash: string;
   salt: string;
+  verified: boolean;
 
   constructor() {}
 }

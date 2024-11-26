@@ -18,6 +18,7 @@ import {
   ScrollArea,
   rem,
   useMantineTheme,
+  Skeleton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -69,7 +70,7 @@ const mockdata = [
   },
 ];
 
-export function Header() {
+export function Header({ loading }: { loading: boolean }) {
   const [drawerOpened, { toggle: toggleDrawer, close: closeDrawer }] =
     useDisclosure(false);
   const [linksOpened, { toggle: toggleLinks }] = useDisclosure(false);
@@ -79,7 +80,7 @@ export function Header() {
   const excludeNavPages = ["/dashboard"];
 
   const user = useSelector((state: RootState) => state.user);
-  console.log('user: ', user);
+  console.log("user: ", user);
 
   if (excludeNavPages.includes(pathname)) return null;
 
@@ -104,7 +105,7 @@ export function Header() {
     </UnstyledButton>
   ));
 
-   return (
+  return (
     <Box>
       <header className={styles.header}>
         <Group justify="space-between" h="100%">
@@ -175,7 +176,9 @@ export function Header() {
             visibleFrom="sm"
             style={{ minWidth: "220px", justifyContent: "flex-end" }}
           >
-            {user.loggedIn ? (
+            {loading ? (
+              <Skeleton height={40} width={200} />
+            ) : user.loggedIn ? (
               <Button variant="default" component={Link} href="/dashboard">
                 Profile {user.user?.email}
               </Button>
