@@ -31,11 +31,11 @@ const pagesNeedingAuth: Set<string> = new Set([]);
 function AppContent({ children }: { children: React.ReactNode }) {
   const store = useStore<RootState>();
   const router = useRouter();
-  const userInfo = store.getState().user;
-  console.log('layout top user: ', userInfo);
   const page = usePathname();
+  
+  const userInfo = store.getState().user;
   const blockPage = pagesNeedingAuth.has(page as string);
-  console.log('blockpage: ', blockPage)
+
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function refresh() {
@@ -44,8 +44,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
       }
 
       const user = store.getState().user;
-      console.log('user in layout useeffect: ', user)
-      console.log('userInfo in layout useeffect: ', userInfo)
 
       if (!user.user && blockPage) {
         router.push("/login");
@@ -60,14 +58,12 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-    { loading ? <div /> :
       <MantineProvider>
         <Notifications />
-        <Header />
+        <Header loading={loading}/>
         <main className={styles.main}>{children}</main>
         <Footer />
       </MantineProvider>
-    }
     </>
   );
 }
