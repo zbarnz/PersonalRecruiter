@@ -123,7 +123,7 @@ export const getApplysForUser = async (req: Request, res: Response) => {
       relations: ["listing", "listing.jobBoard"],
       skip: (page - 1) * pageSize,
       take: pageSize,
-      order: { createdAt: "DESC" }, // Example: Sort by creation date
+      order: { dateApplied: "DESC" }, // Example: Sort by creation date
     });
 
     res.json({
