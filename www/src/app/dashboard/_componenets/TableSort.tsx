@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IconChevronDown, IconChevronUp, IconSearch, IconSelector } from '@tabler/icons-react';
 import {
   Anchor,
@@ -13,7 +13,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import classes from './TableSort.module.css';
-
+import autoApplyAPI from '../../../../lib/api/classes/autoApplyAPI';
 interface RowData {
   title: string;
   company: string;
@@ -170,6 +170,39 @@ export function TableSort() {
   const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
   const [reverseSortDirection, setReverseSortDirection] = useState(false);
 
+  const [autoApplyData, setAutoApplyData] = useState<AutoApply[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchApplications = async () => {
+      setLoading(true);
+      setError(null);
+
+      const api = new autoApplyAPI(); // Create an instance of autoApplyAPI
+      const payload = {
+        page: 1,
+        pageSize: 10,
+        orderBy: "title", // Example order by field
+        orderDirection: "ASC", // Example order direction
+        filters: { status: "active" }, // Example filter
+      };
+
+      const response = await api.getApplications(payload);
+
+      if (response) {
+        setSortedData(response.autoApply);
+      } else {
+        setError("Failed to fetch auto-apply records.");
+      }
+
+      setLoading(false);
+    };
+
+    fetchApplications();
+  }, []);
+
+
   const setSorting = (field: keyof RowData) => {
     const reversed = field === sortBy ? !reverseSortDirection : false;
     setReverseSortDirection(reversed);
@@ -207,10 +240,10 @@ export function TableSort() {
         <Table.Td>
           <Group justify="space-between">
             <Text fz="xs" c="teal" fw={700}>
-              {row.skillMatch*100}%
+              {Math.floor(row.skillMatch*100)}%
             </Text>
             <Text fz="xs" c="red" fw={700}>
-              {100 - row.skillMatch*100}%
+              {Math.floor(100 - row.skillMatch*100)}%
             </Text>
           </Group>
           <Progress.Root>
