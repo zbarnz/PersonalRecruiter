@@ -31,9 +31,14 @@ const pagesNeedingAuth: Set<string> = new Set([]);
 function AppContent({ children }: { children: React.ReactNode }) {
   const store = useStore<RootState>();
   const router = useRouter();
+
   const userInfo = store.getState().user;
+
   const page = usePathname();
+  
+  const userInfo = store.getState().user;
   const blockPage = pagesNeedingAuth.has(page as string);
+
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     async function refresh() {
@@ -56,14 +61,12 @@ function AppContent({ children }: { children: React.ReactNode }) {
 
   return (
     <>
-    { loading ? <div /> :
       <MantineProvider>
         <Notifications />
-        <Header />
+        <Header loading={loading}/>
         <main className={styles.main}>{children}</main>
         <Footer />
       </MantineProvider>
-    }
     </>
   );
 }
