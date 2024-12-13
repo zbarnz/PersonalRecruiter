@@ -35,7 +35,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const userInfo = store.getState().user;
 
   const page = usePathname();
-  
+
   const userInfo = store.getState().user;
   const blockPage = pagesNeedingAuth.has(page as string);
 
@@ -51,19 +51,21 @@ function AppContent({ children }: { children: React.ReactNode }) {
       if (!user.user && blockPage) {
         router.push("/login");
       }
+      setLoading(false);
     }
 
     if (!userInfo.loggedIn) {
       refresh();
+    } else {
+      setLoading(false);
     }
-    setLoading(false);
   }, [userInfo, store, router]);
 
   return (
     <>
       <MantineProvider>
         <Notifications />
-        <Header loading={loading}/>
+        <Header loading={loading} />
         <main className={styles.main}>{children}</main>
         <Footer />
       </MantineProvider>

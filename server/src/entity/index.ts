@@ -21,3 +21,6 @@ export { JobBoardSchema } from "./job_board/JobBoard.schema";
 
 export { UserApplicantConfig } from "./user_applicant_config/UserApplicantConfig.entity";
 export { UserApplicantConfigSchema } from "./user_applicant_config/UserApplicantConfig.schema";
+
+export { Phone } from "./phone/Phone.entity";
+export { PhoneSchema } from "./phone/Phone.schema";
