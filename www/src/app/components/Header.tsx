@@ -80,7 +80,6 @@ export function Header({ loading }: { loading: boolean }) {
   const excludeNavPages = ["/dashboard"];
 
   const user = useSelector((state: RootState) => state.user);
-  console.log("user: ", user);
 
   if (excludeNavPages.includes(pathname)) return null;
 

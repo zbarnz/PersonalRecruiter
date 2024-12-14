@@ -1,0 +1,26 @@
+.statsDisplayCard {   
+    display: flex; 
+    aspect-ratio: auto; 
+    text-decoration: none;
+    height: 200px;
+    font-size: 1rem;
+    color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
+    font-weight: 500;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.top {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: space-between;
+
+}
+
+.bottom {
+    color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-dark-1));
+    align-self: flex-end;
+    font-size: 18px;
+}

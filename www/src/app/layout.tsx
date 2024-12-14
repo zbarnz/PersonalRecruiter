@@ -31,6 +31,9 @@ const pagesNeedingAuth: Set<string> = new Set([]);
 function AppContent({ children }: { children: React.ReactNode }) {
   const store = useStore<RootState>();
   const router = useRouter();
+
+  const userInfo = store.getState().user;
+
   const page = usePathname();
   
   const userInfo = store.getState().user;
