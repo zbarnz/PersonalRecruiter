@@ -38,7 +38,7 @@ export const UserSchema = new EntitySchema<User>({
     },
     verified: {
       type: Boolean,
-      default: 0,
+      default: false,
     },
   },
 });

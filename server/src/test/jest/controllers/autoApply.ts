@@ -173,7 +173,7 @@ describe("autoApplyController", () => {
     });
   });
 
-  describe.only("getApplysForUser", () => {
+  describe("getApplysForUser", () => {
     beforeAll(async () => {
       // Create AutoApply records
       for (let i = 0; i < 15; i++) {

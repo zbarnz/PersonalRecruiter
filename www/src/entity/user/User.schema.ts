@@ -33,7 +33,11 @@ export const UserSchema = new EntitySchema<User>({
     },
     salt: {
       type: "varchar",
-      select: false
+      select: false,
+    },
+    verified: {
+      type: Boolean,
+      default: 0,
     },
   },
 });

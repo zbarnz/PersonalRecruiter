@@ -19,6 +19,7 @@ import {
   rem,
   useMantineTheme,
   Skeleton,
+  Menu,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import {
@@ -29,6 +30,12 @@ import {
   IconFingerprint,
   IconCoin,
   IconChevronDown,
+  IconSettings,
+  IconMessageCircleUser,
+  IconPhoto,
+  IconSearch,
+  IconLayoutBoard,
+  IconUserCircle,
 } from "@tabler/icons-react";
 import styles from "../../styles/components/Header.module.css";
 import { usePathname } from "next/navigation";
@@ -164,10 +171,10 @@ export function Header({ loading }: { loading: boolean }) {
               </HoverCard.Dropdown>
             </HoverCard>
             <a href="#" className={styles.link}>
-              Learn
+              About Us
             </a>
             <a href="#" className={styles.link}>
-              Academy
+              Contact
             </a>
           </Group>
 
@@ -178,9 +185,54 @@ export function Header({ loading }: { loading: boolean }) {
             {loading ? (
               <Skeleton height={40} width={200} />
             ) : user.loggedIn ? (
-              <Button variant="default" component={Link} href="/dashboard">
-                Profile {user.user?.email}
-              </Button>
+              <Menu
+                shadow="md"
+                width={200}
+                position="bottom-end"
+                withArrow={true}
+              >
+                <Menu.Target>
+                  <Button variant="default">Profile {user.user?.email}</Button>
+                </Menu.Target>
+                <Menu.Dropdown>
+                  <Menu.Label>Application</Menu.Label>
+                  <Menu.Item
+                    leftSection={
+                      <IconLayoutBoard
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                    component={Link}
+                    href="/dashboard"
+                  >
+                    Dashboard
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Label>Configuration</Menu.Label>
+                  <Menu.Item
+                    leftSection={
+                      <IconUserCircle
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                    component={Link}
+                    href="/dashboard"
+                  >
+                    Profile
+                  </Menu.Item>
+                  <Menu.Item
+                    leftSection={
+                      <IconSettings
+                        style={{ width: rem(14), height: rem(14) }}
+                      />
+                    }
+                    component={Link}
+                    href="/dashboard"
+                  >
+                    Settings
+                  </Menu.Item>
+                </Menu.Dropdown>
+              </Menu>
             ) : (
               <>
                 <Button variant="default" component={Link} href="/login">

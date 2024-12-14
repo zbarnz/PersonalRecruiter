@@ -3,7 +3,7 @@ import { getConnection } from "../../data-source";
 import { logger } from "../../lib/logger/pino.config";
 import { jwtUtils } from "../../lib/utils/jwt";
 import { passwordUtils } from "../../lib/utils/password";
-import { User } from "../entity";
+import { Phone, User } from "../entity";
 
 //helpers
 export const getUserHelper = async (id: User["id"]): Promise<User> => {
@@ -38,8 +38,8 @@ export const registerUser = async (req: Request, res: Response) => {
     }
 
     if (phone) {
-      const existingUserPhone = await connection.manager.findOne(User, {
-        where: { phone: phone },
+      const existingUserPhone = await connection.manager.findOne(Phone, {
+        where: { number: phone, verified: true },
       });
 
       if (existingUserPhone) {
@@ -59,6 +59,25 @@ export const registerUser = async (req: Request, res: Response) => {
     const user = connection.manager.create(User, userData);
     const { salt, hash, ...savedUser } = await connection.manager.save(user);
     const { token, expiresIn } = jwtUtils.issueJWT(savedUser);
+
+    if (phone) {
+      function generateVerificationCode() {
+        return Math.floor(100000 + Math.random() * 900000);
+      }
+
+      const expiration = new Date();
+      const verificationCode = generateVerificationCode();
+      expiration.setMinutes(expiration.getMinutes() + 15);
+
+      const registeredPhone = connection.manager.create(Phone, {
+        number: phone,
+        user: savedUser,
+        expiration: expiration,
+        verification_code: verificationCode,
+      });
+      await connection.manager.save(registeredPhone);
+    }
+
     res.json({ user: savedUser, jwt: { token, expiresIn } });
   } catch (error) {
     res
