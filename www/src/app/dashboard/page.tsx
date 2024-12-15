@@ -9,37 +9,87 @@ import {
   Anchor,
 } from "@mantine/core";
 
-import {TableSort} from "./_componenets/TableSort"
-import styles from "../../styles/page.module.css";
-import StatsDisplayCard from "./_componenets/StatsDisplayCard";
+import { TableSort } from "./_componenets/TableSort";
+import styles from "./page.module.css";
 
 export default function Dashboard() {
   return (
-    <main className={styles.main}>
-      <Box component="header" style={{marginTop: '10px'}}>
+    <div className={styles.main}>
+      <Box component="header" style={{ marginTop: "10px" }}>
         <Title order={3}>Dashboard</Title>
       </Box>
-  
-      <Box style={{marginTop: '50px', marginBottom: '50px',}}>
-        <Grid >
-          <Grid.Col span={3}>
-            <StatsDisplayCard statText="Applications Sent" statNumber={100} bottomText="Send More Applications"/>
-          </Grid.Col>
-          <Grid.Col span={3}>
-          <StatsDisplayCard statText="Application Points Available" statNumber={100} bottomText="Buy More Points" />
 
-          </Grid.Col>
+      <Box style={{ marginTop: "50px", marginBottom: "50px" }}>
+        <Grid>
           <Grid.Col span={3}>
-          <StatsDisplayCard statText="Recruiter Messages Sent" statNumber={22} bottomText="Send more messages" />
+            <Paper
+              className={styles.statsDisplayCard}
+              shadow="xl"
+              radius="lg"
+              withBorder
+              p="xl"
+            >
+              <div className={styles.top}>
+                <span>Applications Sent:</span>
+                <span>109</span>
+              </div>
 
+              <div className={styles.bottom}>
+                <span>Send More applications</span>
+              </div>
+            </Paper>
           </Grid.Col>
           <Grid.Col span={3}>
-            <Paper className={styles.statsDisplayCard} shadow="xl" radius="lg" withBorder p="xl">
-              <Anchor variant="gradient"
-              gradient={{ from: 'blue', to: 'skyblue' }}
-              fw={500}
-              fz="lg"
-              href="#text-props">
+            <Paper
+              className={styles.statsDisplayCard}
+              shadow="xl"
+              radius="lg"
+              withBorder
+              p="xl"
+            >
+              <div className={styles.top}>
+                <span>Application Points Available:</span>
+                <span>109</span>
+              </div>
+
+              <div className={styles.bottom}>
+                <span>Buy More Points</span>
+              </div>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper
+              className={styles.statsDisplayCard}
+              shadow="xl"
+              radius="lg"
+              withBorder
+              p="xl"
+            >
+              <div className={styles.top}>
+                <span>Recruiter Messages Sent:</span>
+                <span>109</span>
+              </div>
+
+              <div className={styles.bottom}>
+                <span>Send Messages</span>
+              </div>
+            </Paper>
+          </Grid.Col>
+          <Grid.Col span={3}>
+            <Paper
+              className={styles.statsDisplayCard}
+              shadow="xl"
+              radius="lg"
+              withBorder
+              p="xl"
+            >
+              <Anchor
+                variant="gradient"
+                gradient={{ from: "blue", to: "skyblue" }}
+                fw={500}
+                fz="lg"
+                href="#text-props"
+              >
                 Spin Wheel!
               </Anchor>
             </Paper>
@@ -48,12 +98,6 @@ export default function Dashboard() {
       </Box>
 
       <TableSort />
-
-      <Box component="footer" className={styles.footer}>
-        <Text>
-          © {new Date().getFullYear()} Personal Recruiter. All rights reserved.
-        </Text>
-      </Box>
-    </main>
+    </div>
   );
 }
