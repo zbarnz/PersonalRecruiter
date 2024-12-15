@@ -35,8 +35,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
   const userInfo = store.getState().user;
 
   const page = usePathname();
-
-  const userInfo = store.getState().user;
   const blockPage = pagesNeedingAuth.has(page as string);
 
   const [loading, setLoading] = useState(true);
