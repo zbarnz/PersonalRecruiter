@@ -178,7 +178,7 @@ const fakeData = [
   },
 ];
 
-export function TableSort() {
+export function ApplicationTable() {
   const [search, setSearch] = useState("");
   const [sortedData, setSortedData] = useState<RowData[]>(fakeData);
   const [sortBy, setSortBy] = useState<keyof RowData | null>(null);
@@ -320,7 +320,7 @@ export function TableSort() {
           visible={userInfo.loading || loading}
           zIndex={1000}
           overlayProps={{ radius: "sm", blur: 2 }}
-          loaderProps={{ color: "pink", type: "bars" }}
+          loaderProps={{ color: "blue", type: "bars" }}
         />
         <Table
           horizontalSpacing="md"

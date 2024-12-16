@@ -10,9 +10,10 @@ import {
   Center,
 } from "@mantine/core";
 
-import { TableSort } from "./_componenets/Table";
+import { ApplicationTable } from "./_componenets/Table";
 import styles from "./page.module.css";
 import { Navbar } from "./_componenets/Navbar";
+import { StatsRingCard } from "./_componenets/StatsRingCard";
 
 export default function Dashboard() {
   return (
@@ -26,83 +27,25 @@ export default function Dashboard() {
 
         <Box style={{ marginTop: "50px", marginBottom: "50px" }}>
           <Grid>
-            <Grid.Col span={3}>
-              <Paper
-                className={styles.statsDisplayCard}
-                shadow="xl"
-                radius="lg"
-                withBorder
-                p="xl"
-              >
-                <div className={styles.top}>
-                  <span>Applications Sent:</span>
-                  <span>109</span>
-                </div>
-
-                <div className={styles.bottom}>
-                  <span>Send More applications</span>
-                </div>
-              </Paper>
+            <Grid.Col span={6}>
+              <StatsRingCard 
+              title='Credit Information' 
+              pointsUsed={100} 
+              pointsUsedSubtitle={'Total Credits Used'} 
+              remainingPoints={200} 
+              remainingPointsSubtitle={'Remaining Credits'}/>
             </Grid.Col>
-            <Grid.Col span={3}>
-              <Paper
-                className={styles.statsDisplayCard}
-                shadow="xl"
-                radius="lg"
-                withBorder
-                p="xl"
-              >
-                <div className={styles.top}>
-                  <span>Application Points Available:</span>
-                  <span>109</span>
-                </div>
-
-                <div className={styles.bottom}>
-                  <span>Buy More Points</span>
-                </div>
-              </Paper>
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <Paper
-                className={styles.statsDisplayCard}
-                shadow="xl"
-                radius="lg"
-                withBorder
-                p="xl"
-              >
-                <div className={styles.top}>
-                  <span>Recruiter Messages Sent:</span>
-                  <span>109</span>
-                </div>
-
-                <div className={styles.bottom}>
-                  <span>Send Messages</span>
-                </div>
-              </Paper>
-            </Grid.Col>
-            <Grid.Col span={3}>
-              <Paper
-                className={styles.statsDisplayCard}
-                shadow="xl"
-                radius="lg"
-                withBorder
-                p="xl"
-              >
-                <Anchor
-                  variant="gradient"
-                  gradient={{ from: "blue", to: "skyblue" }}
-                  fw={500}
-                  fz="lg"
-                  href="#text-props"
-                >
-                  Spin Wheel!
-                </Anchor>
-              </Paper>
+            <Grid.Col span={6}>
+              <StatsRingCard title='About Applications' 
+              pointsUsed={10} 
+              pointsUsedSubtitle={'Total Job Applications Sent'} 
+              remainingPoints={20} 
+              remainingPointsSubtitle={'Remaining With Credit Balance'}/>
             </Grid.Col>
           </Grid>
         </Box>
 
-        <TableSort />
+        <ApplicationTable />
       </div>
     </Box>
   );
