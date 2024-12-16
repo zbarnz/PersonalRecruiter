@@ -1,4 +1,4 @@
-import { AutoApply, Exception, JobBoard, User } from "../entity";
+import { AutoApply, Exception, JobBoard, Listing, User } from "../entity";
 
 import { getConnection } from "../../data-source";
 
@@ -7,7 +7,7 @@ import { logger } from "../../lib/logger/pino.config";
 import { getApplyResourcesHelper } from "./applyResources";
 
 import { Request, Response } from "express";
-import { DataSource } from "typeorm";
+import { DataSource, EntityMetadata } from "typeorm";
 
 //helpers
 
@@ -124,7 +124,31 @@ export const getApplysForUser = async (req: Request, res: Response) => {
     const connection = await getConnection();
     const metadata = connection.getMetadata(AutoApply);
 
-    if (!metadata.columns.some((column) => column.propertyName === orderBy)) {
+    const isOrderableColumn = (metadata: EntityMetadata, orderBy: string) => {
+      // Check if the column is directly on the main entity
+      if (metadata.columns.some((column) => column.propertyName === orderBy)) {
+        return true;
+      }
+
+      // Check if the column exists in related entities
+      for (const relation of metadata.relations) {
+        const relatedMetadata = connection.getMetadata(relation.type);
+        if (orderBy.startsWith(`${relation.propertyName}.`)) {
+          const [, relatedColumn] = orderBy.split(`${relation.propertyName}.`);
+          if (
+            relatedMetadata.columns.some(
+              (column) => column.propertyName === relatedColumn
+            )
+          ) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    };
+
+    if (!isOrderableColumn(metadata, orderBy)) {
       return res.status(400).json({
         error: `Ordering error. Please try again`,
       });
@@ -154,16 +178,69 @@ export const getApplysForUser = async (req: Request, res: Response) => {
       { user: { id: userId } } as Record<string, any>
     ); // Include user filter
 
-    const [results, total] = await connection.manager.findAndCount(AutoApply, {
-      relations: ["listing", "listing.jobBoard", "user"],
-      where,
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      order: { [orderBy]: orderDirection.toUpperCase() as "ASC" | "DESC" },
-    });
+    //BUILD QUERY
+    /******************************************************************************** */
+
+    const queryBuilder = connection
+      .getRepository(AutoApply)
+      .createQueryBuilder("autoApply")
+      .leftJoinAndSelect("autoApply.listing", "listing")
+      .leftJoinAndSelect("listing.jobBoard", "jobBoard")
+      .leftJoinAndSelect("autoApply.user", "user");
+
+    // Add where conditions if needed
+    if (where) {
+      queryBuilder.where(where);
+    }
+
+    // Validate and set the order clause
+    if (orderBy.includes(".")) {
+      const [relation, column] = orderBy.split(".");
+      if (!["listing", "jobBoard", "user"].includes(relation)) {
+        return res.status(400).json({
+          error: `Invalid relation '${relation}' in orderBy.`,
+        });
+      }
+
+      // Ensure the column exists in the relation's metadata
+      const relatedMetadata = connection.getMetadata(
+        relation === "listing" ? Listing : JobBoard
+      ); // Adjust accordingly
+      if (!relatedMetadata.columns.some((col) => col.propertyName === column)) {
+        return res.status(400).json({
+          error: `Column '${column}' does not exist on relation '${relation}'.`,
+        });
+      }
+
+      queryBuilder.orderBy(
+        `${relation}.${column}`,
+        orderDirection.toUpperCase() as "ASC" | "DESC"
+      );
+    } else {
+      const metadata = connection.getMetadata(AutoApply);
+      if (!metadata.columns.some((col) => col.propertyName === orderBy)) {
+        return res.status(400).json({
+          error: `Column '${orderBy}' does not exist on 'AutoApply'.`,
+        });
+      }
+
+      queryBuilder.orderBy(
+        `autoApply.${orderBy}`,
+        orderDirection.toUpperCase() as "ASC" | "DESC"
+      );
+    }
+
+    // Apply pagination
+    queryBuilder.skip((page - 1) * pageSize).take(pageSize);
+
+    // Execute query
+    const [results, total] = await queryBuilder.getManyAndCount();
+
+    /********************************************************************************/
+    //END QUERY
 
     res.json({
-      data: results,
+      autoApply: results,
       pagination: {
         total,
         page,
