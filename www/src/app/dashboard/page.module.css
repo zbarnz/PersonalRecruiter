@@ -1,34 +1,40 @@
-.statsDisplayCard {   
-    display: flex; 
-    aspect-ratio: auto; 
-    text-decoration: none;
-    min-height: 200px;
-    font-size: 1rem;
-    color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
-    font-weight: 500;
-    flex-direction: column;
-    justify-content: space-between;
+.pageWrapper {
+  display: flex;
+  flex-direction: row; /* Align children horizontally */
+  width: 100%; /* Ensure it spans the full width of the viewport */
+}
+
+.statsDisplayCard {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-decoration: none;
+  min-height: 200px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: light-dark(var(--mantine-color-gray-7), var(--mantine-color-dark-1));
+  flex: 1 1 auto; /* Allow it to grow and shrink */
+  overflow: hidden; /* Ensure no content overflows */
 }
 
 .top {
-    display: flex;
-    width: 100%;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: space-between;
-
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  width: 100%;
 }
 
 .bottom {
-    color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-dark-1));
-    align-self: flex-end;
-    font-size: 18px;
+  color: light-dark(var(--mantine-color-blue-7), var(--mantine-color-dark-1));
+  align-self: flex-end;
+  font-size: 18px;
 }
 
 .main {
   margin-left: auto;
   margin-right: auto;
-  max-width: 85%;
+  width: 75%;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
 }

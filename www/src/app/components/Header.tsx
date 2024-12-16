@@ -84,7 +84,7 @@ export function Header({ loading }: { loading: boolean }) {
   const theme = useMantineTheme();
   const pathname = usePathname();
 
-  const excludeNavPages = ["/dashboard"];
+ const excludeNavPages = ["/dashboard"];
 
   const user = useSelector((state: RootState) => state.user);
 

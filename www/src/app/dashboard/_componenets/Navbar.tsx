@@ -1,22 +1,29 @@
-import { useState } from 'react';
+import { useState } from "react";
 import {
   IconGauge,
   IconHome2,
   IconLogout,
   IconSwitchHorizontal,
   IconUser,
-} from '@tabler/icons-react';
-import { Code, Group, Text } from '@mantine/core';
-import styles from './Navbar.module.css';
+} from "@tabler/icons-react";
+import { Code, Group, Text } from "@mantine/core";
+import styles from "./Navbar.module.css";
+import { useStore, useSelector } from "react-redux";
+import { store, RootState } from "../../../store";
 
 const data = [
-  { link: '', label: 'Home', icon: IconHome2 },
-  { link: '', label: 'Dashboard', icon: IconGauge },
-  { link: '', label: 'Account', icon: IconUser },
+  { link: "", label: "Home", icon: IconHome2 },
+  { link: "", label: "Dashboard", icon: IconGauge },
+  { link: "", label: "Account", icon: IconUser },
 ];
 
 export function Navbar() {
-  const [active, setActive] = useState('Billing');
+  const [active, setActive] = useState("Billing");
+
+  // Use `useSelector` to subscribe to `user` updates
+  const userInfo = useSelector((state: RootState) => state.user);
+
+  console.log(userInfo);
 
   const links = data.map((item) => (
     <a
@@ -38,14 +45,27 @@ export function Navbar() {
     <nav className={styles.navbar}>
       <div className={styles.navbarMain}>
         <Text className={styles.header}>
-          <IconUser className={styles.linkIcon} stroke={1.5} />
-          <span>Personal Recruiter</span>
+          {!userInfo?.user ? (
+            <>
+              <IconUser className={styles.linkIcon} stroke={2} size={4} />
+              <span>Snap Candidate</span>
+            </>
+          ) : (
+            <>
+              <IconUser className={styles.linkIcon} stroke={2} size={4} />
+              <span>{userInfo.user.email}</span>
+            </>
+          )}
         </Text>
         {links}
       </div>
 
       <div className={styles.footer}>
-        <a href="#" className={styles.link} onClick={(event) => event.preventDefault()}>
+        <a
+          href="#"
+          className={styles.link}
+          onClick={(event) => event.preventDefault()}
+        >
           <IconLogout className={styles.linkIcon} stroke={1.5} />
           <span>Logout</span>
         </a>
