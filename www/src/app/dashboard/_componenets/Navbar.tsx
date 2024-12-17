@@ -5,20 +5,44 @@ import {
   IconLogout,
   IconSwitchHorizontal,
   IconUser,
+  IconFileCv,
+  IconSettings,
 } from "@tabler/icons-react";
 import { Code, Group, Text } from "@mantine/core";
 import styles from "./Navbar.module.css";
 import { useStore, useSelector } from "react-redux";
 import { store, RootState } from "../../../store";
+import { usePathname } from "next/navigation";
 
-const data = [
-  { link: "", label: "Home", icon: IconHome2 },
-  { link: "", label: "Dashboard", icon: IconGauge },
-  { link: "", label: "Account", icon: IconUser },
-];
-
-export function Navbar() {
+export function Navbar({
+  setActivePage,
+}: {
+  setActivePage: React.Dispatch<React.SetStateAction<string>>;
+}) {
   const [active, setActive] = useState("Billing");
+
+  const data = [
+    {
+      label: "Dashboard",
+      icon: IconGauge,
+      onClick: () => setActivePage("dashboard"),
+    },
+    {
+      label: "Resume",
+      icon: IconFileCv,
+      onClick: () => setActivePage("resume"),
+    },
+    {
+      label: "Preferences",
+      icon: IconSettings,
+      onClick: () => setActivePage("preferences"),
+    },
+    {
+      label: "Account",
+      icon: IconUser,
+      onClick: () => setActivePage("account"),
+    },
+  ];
 
   // Use `useSelector` to subscribe to `user` updates
   const userInfo = useSelector((state: RootState) => state.user);
@@ -29,11 +53,11 @@ export function Navbar() {
     <a
       className={styles.link}
       data-active={item.label === active || undefined}
-      href={item.link}
       key={item.label}
       onClick={(event) => {
         event.preventDefault();
         setActive(item.label);
+        item.onClick();
       }}
     >
       <item.icon className={styles.linkIcon} stroke={1.5} />
