@@ -28,7 +28,9 @@ export default function Dashboard() {
       case "resume":
         return <Resume />;
       case "prefereneces":
-      //return <Preferences />;
+        //return <Preferences />;
+      case "billing":
+        //return <Billing />
       default:
         return <MainDash />;
     }

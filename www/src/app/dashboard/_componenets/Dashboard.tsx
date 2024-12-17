@@ -6,7 +6,7 @@ import {
   Grid,
   Paper,
   Anchor,
-  Center
+  Center,
 } from "@mantine/core";
 import styles from "../page.module.css";
 import { ApplicationTable } from "./Table";
@@ -39,6 +39,9 @@ export function MainDash() {
             />
           </Grid.Col>
         </Grid>
+      </Box>
+      <Box style={{ marginTop: "50px", marginBottom: "20px" }}>
+        <Title order={4}>Sent Applications</Title>
       </Box>
       <ApplicationTable />
     </>

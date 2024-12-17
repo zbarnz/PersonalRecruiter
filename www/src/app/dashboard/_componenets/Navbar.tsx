@@ -7,6 +7,7 @@ import {
   IconUser,
   IconFileCv,
   IconSettings,
+  IconChartBar,
 } from "@tabler/icons-react";
 import { Code, Group, Text } from "@mantine/core";
 import styles from "./Navbar.module.css";
@@ -36,6 +37,11 @@ export function Navbar({
       label: "Preferences",
       icon: IconSettings,
       onClick: () => setActivePage("preferences"),
+    },
+    {
+      label: "Billing",
+      icon: IconChartBar,
+      onClick: () => setActivePage("billing"),
     },
     {
       label: "Account",
