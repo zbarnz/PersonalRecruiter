@@ -20,7 +20,7 @@ import {
   Pagination,
   LoadingOverlay,
 } from "@mantine/core";
-import classes from "./Table.module.css";
+import styles from "./Table.module.css";
 import autoApplyAPI from "../../../../lib/api/classes/autoApplyAPI";
 import { AutoApply } from "../../../entity";
 import { RootState } from "../../../store";
@@ -46,13 +46,13 @@ function Th({ children, reversed, sorted, onSort }: ThProps) {
       : IconChevronDown
     : IconSelector;
   return (
-    <Table.Th className={classes.th}>
-      <UnstyledButton onClick={onSort} className={classes.control}>
+    <Table.Th className={styles.th}>
+      <UnstyledButton onClick={onSort} className={styles.control}>
         <Group justify="space-between">
           <Text fw={500} fz="sm">
             {children}
           </Text>
-          <Center className={classes.icon}>
+          <Center className={styles.icon}>
             <Icon size={16} stroke={1.5} />
           </Center>
         </Group>
@@ -280,13 +280,13 @@ export function ApplicationTable() {
           </Group>
           <Progress.Root>
             <Progress.Section
-              className={classes.progressSection}
+              className={styles.progressSection}
               value={row.skillMatch * 100}
               color="teal"
             />
 
             <Progress.Section
-              className={classes.progressSection}
+              className={styles.progressSection}
               value={100 - row.skillMatch * 100}
               color="red"
             />
@@ -314,6 +314,7 @@ export function ApplicationTable() {
         style={{
           marginBottom: "50px",
         }}
+        className={styles.test}
         minWidth={1400}
       >
         <LoadingOverlay

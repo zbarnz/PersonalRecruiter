@@ -10,43 +10,41 @@ import {
   Center,
 } from "@mantine/core";
 
+import { useState } from "react";
+
 import { ApplicationTable } from "./_componenets/Table";
 import styles from "./page.module.css";
 import { Navbar } from "./_componenets/Navbar";
-import { StatsRingCard } from "./_componenets/StatsRingCard";
+import { MainDash } from "./_componenets/Dashboard";
+import { Resume } from "./_componenets/Resume";
+import { Preferences } from "./_componenets/Preferences";
+import { Account } from "./_componenets/Account";
+import { Billing } from "./_componenets/Billing";
 
 export default function Dashboard() {
+  const [activePage, setActivePage] = useState("dashboard"); // State for active page
+
+  const renderPage = () => {
+    switch (activePage) {
+      case "dashboard":
+        return <MainDash />;
+      case "resume":
+        return <Resume />;
+      case "preferences":
+        return <Preferences />;
+      case "billing":
+        return <Billing />;
+      case "account":
+        return <Account />;
+      default:
+        return <MainDash />;
+    }
+  };
+
   return (
     <Box className={styles.pageWrapper}>
-      <Navbar />
-
-      <div className={styles.main}>
-        <Box component="header" style={{ marginTop: "50px" }}>
-          <Title order={3}>Dashboard</Title>
-        </Box>
-
-        <Box style={{ marginTop: "50px", marginBottom: "50px" }}>
-          <Grid>
-            <Grid.Col span={6}>
-              <StatsRingCard 
-              title='Credit Information' 
-              pointsUsed={100} 
-              pointsUsedSubtitle={'Total Credits Used'} 
-              remainingPoints={200} 
-              remainingPointsSubtitle={'Remaining Credits'}/>
-            </Grid.Col>
-            <Grid.Col span={6}>
-              <StatsRingCard title='About Applications' 
-              pointsUsed={10} 
-              pointsUsedSubtitle={'Total Job Applications Sent'} 
-              remainingPoints={20} 
-              remainingPointsSubtitle={'Remaining With Credit Balance'}/>
-            </Grid.Col>
-          </Grid>
-        </Box>
-
-        <ApplicationTable />
-      </div>
+      <Navbar setActivePage={setActivePage} />
+      <div className={styles.main}>{renderPage()}</div>
     </Box>
   );
 }

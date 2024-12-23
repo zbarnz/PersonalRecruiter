@@ -1,0 +1,12 @@
+.uploadContainer {
+  padding-inline: var(--mantine-spacing-md);
+  margin-top: 50px;
+  margin-bottom: 50px;
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+}
+
+.upload:hover {
+  cursor: pointer;
+}

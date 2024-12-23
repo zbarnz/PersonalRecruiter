@@ -18,6 +18,7 @@ import { store, RootState } from "../store";
 import { useRouter, usePathname } from "next/navigation";
 import userService from "../services/userService";
 import { useEffect, useState } from "react";
+import { Navbar } from "./dashboard/_componenets/Navbar";
 
 const inter = Inter({ subsets: ["latin"] });
 

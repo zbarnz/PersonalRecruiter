@@ -148,6 +148,7 @@ export const refreshUser = async (req: Request, res: Response) => {
       email: user.email,
       phone: user.phone,
       points: user.points,
+      createdAt: user.createdAt,
     },
   });
 };
