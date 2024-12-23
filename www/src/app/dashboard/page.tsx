@@ -17,6 +17,9 @@ import styles from "./page.module.css";
 import { Navbar } from "./_componenets/Navbar";
 import { MainDash } from "./_componenets/Dashboard";
 import { Resume } from "./_componenets/Resume";
+import { Preferences } from "./_componenets/Preferences";
+import { Account } from "./_componenets/Account";
+import { Billing } from "./_componenets/Billing";
 
 export default function Dashboard() {
   const [activePage, setActivePage] = useState("dashboard"); // State for active page
@@ -27,10 +30,12 @@ export default function Dashboard() {
         return <MainDash />;
       case "resume":
         return <Resume />;
-      case "prefereneces":
-        //return <Preferences />;
+      case "preferences":
+        return <Preferences />;
       case "billing":
-        //return <Billing />
+        return <Billing />;
+      case "account":
+        return <Account />;
       default:
         return <MainDash />;
     }

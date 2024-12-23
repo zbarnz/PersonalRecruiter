@@ -20,7 +20,7 @@ export function Navbar({
 }: {
   setActivePage: React.Dispatch<React.SetStateAction<string>>;
 }) {
-  const [active, setActive] = useState("Billing");
+  const [active, setActive] = useState("dashboard");
 
   const data = [
     {

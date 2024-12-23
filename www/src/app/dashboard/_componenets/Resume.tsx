@@ -102,92 +102,97 @@ export function Resume() {
           </Dropzone>
         </Container>
 
-        <Container>
-          <Title order={4} mb="md">
-            Resume Information
-          </Title>
-          <form>
-            <Grid gutter="md">
-              {/* Personal Info */}
-              <Grid.Col span={6}>
-                <TextInput label="Name" placeholder="Your name" required />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Email" placeholder="Your email" required />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Phone" placeholder="Your phone number" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Location" placeholder="Your location" />
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <TextInput label="Link" placeholder="Portfolio/LinkedIn URL" />
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <Textarea
-                  label="Summary"
-                  placeholder="Brief professional summary"
-                  autosize
-                  minRows={3}
-                />
-              </Grid.Col>
+        <Container style={{ marginBottom: "50px" }}>
+          <Card shadow="sm" padding="lg" radius="md" withBorder>
+            <Title order={4} mb="md">
+              Resume Information
+            </Title>
+            <form>
+              <Grid gutter="md">
+                {/* Personal Info */}
+                <Grid.Col span={6}>
+                  <TextInput label="Name" placeholder="Your name" required />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Email" placeholder="Your email" required />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Phone" placeholder="Your phone number" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Location" placeholder="Your location" />
+                </Grid.Col>
+                <Grid.Col span={12}>
+                  <TextInput
+                    label="Link"
+                    placeholder="Portfolio/LinkedIn URL"
+                  />
+                </Grid.Col>
+                <Grid.Col span={12}>
+                  <Textarea
+                    label="Summary"
+                    placeholder="Brief professional summary"
+                    autosize
+                    minRows={3}
+                  />
+                </Grid.Col>
 
-              {/* Education */}
-              <Grid.Col span={6}>
-                <TextInput label="School" placeholder="Your school name" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Degree" placeholder="Degree earned" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="GPA" placeholder="Your GPA" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Date" placeholder="Graduation date" />
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <Textarea
-                  label="Education Description"
-                  placeholder="Details about education"
-                  autosize
-                  minRows={3}
-                />
-              </Grid.Col>
+                {/* Education */}
+                <Grid.Col span={6}>
+                  <TextInput label="School" placeholder="Your school name" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Degree" placeholder="Degree earned" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="GPA" placeholder="Your GPA" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Date" placeholder="Graduation date" />
+                </Grid.Col>
+                <Grid.Col span={12}>
+                  <Textarea
+                    label="Education Description"
+                    placeholder="Details about education"
+                    autosize
+                    minRows={3}
+                  />
+                </Grid.Col>
 
-              {/* Work Experience */}
-              <Grid.Col span={6}>
-                <TextInput label="Company" placeholder="Company name" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Job Title" placeholder="Your job title" />
-              </Grid.Col>
-              <Grid.Col span={6}>
-                <TextInput label="Date" placeholder="Employment period" />
-              </Grid.Col>
-              <Grid.Col span={12}>
-                <Textarea
-                  label="Work Descriptions"
-                  placeholder="Job responsibilities and achievements"
-                  autosize
-                  minRows={3}
-                />
-              </Grid.Col>
+                {/* Work Experience */}
+                <Grid.Col span={6}>
+                  <TextInput label="Company" placeholder="Company name" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Job Title" placeholder="Your job title" />
+                </Grid.Col>
+                <Grid.Col span={6}>
+                  <TextInput label="Date" placeholder="Employment period" />
+                </Grid.Col>
+                <Grid.Col span={12}>
+                  <Textarea
+                    label="Work Descriptions"
+                    placeholder="Job responsibilities and achievements"
+                    autosize
+                    minRows={3}
+                  />
+                </Grid.Col>
 
-              {/* Skills */}
-              <Grid.Col span={12}>
-                <Textarea
-                  label="Skills"
-                  placeholder="List of skills"
-                  autosize
-                  minRows={3}
-                />
-              </Grid.Col>
-            </Grid>
-            <Group mt="md">
-              <Button type="submit">Save</Button>
-            </Group>
-          </form>
+                {/* Skills */}
+                <Grid.Col span={12}>
+                  <Textarea
+                    label="Skills"
+                    placeholder="List of skills"
+                    autosize
+                    minRows={3}
+                  />
+                </Grid.Col>
+              </Grid>
+              <Group mt="md">
+                <Button type="submit">Save</Button>
+              </Group>
+            </form>
+          </Card>
         </Container>
       </Group>
     </>
