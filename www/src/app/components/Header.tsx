@@ -170,6 +170,9 @@ export function Header({ loading }: { loading: boolean }) {
                 </div>
               </HoverCard.Dropdown>
             </HoverCard>
+            <a href="/pricing" className={styles.link}>
+              Pricing
+            </a>
             <a href="#" className={styles.link}>
               About Us
             </a>
