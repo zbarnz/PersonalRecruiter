@@ -1,0 +1,42 @@
+.container {
+    align-items: center;
+    margin: 10px;
+} 
+.planTitle {
+  font-family: Greycliff CF, var(--mantine-font-family);
+  font-size: rem(30px);
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 20px;
+}
+.price {
+    font-family: Greycliff CF, var(--mantine-font-family);
+    font-size: rem(40px);
+}
+.priceMonth {
+    font-family: Greycliff CF, var(--mantine-font-family);
+    margin-top: 20px;
+    margin-left: 5px;
+
+}
+.priceRow{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: absolute;
+    top: 50%;
+    bottom: 50%;
+}
+.upperBorder {
+    position: absolute;
+    top: 0;
+    height: 7px;
+    width: 100%;
+    border-color: blue;
+}
+
+.purchaseButton {
+    position: absolute;
+    bottom: 30px;
+}
+
